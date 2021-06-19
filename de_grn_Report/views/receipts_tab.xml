@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <record id="grn_report_form_inherit" model="ir.ui.view">
+        <field name="name">grn.transfer.report</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[5]" position="after">
+                <page name="receipts" string="Receipts">
+                    <group>
+                        <group>
+                            <!-- table 1 left side-->
+                            <field name="gate_entry_no"/>
+                            <field name="erp_grn_no"/>
+                            <field name="purchase_order_no"/>
+                            <field name="vendor_picking_list"/>
+                            <field name="tower_heigh"/>
+                            <field name="type"/>
+                            <field name="container_no"/>
+                            <field name="mode_of_transport"/>
+                            <field name="sr_no"/>
+                            <field name="grn_description"/>
+                            <field name="received_quantity"/>
+                            <!-- table 2 left-->
+                            <field name="name_1"/>
+                            <field name="position"/>
+                            <field name="date_inspected"/>
+                            <field name="inspected_signature"/>
+
+                        </group>
+
+                        <group>
+                            <!-- table 1 right side-->
+                            <field name="gate_entry_date"/>
+                            <field name="vendor_supplier_name"/>
+                            <field name="vendor_invoice_no"/>
+                            <field name="material_related_to"/>
+                            <field name="tower_wind_speed"/>
+                            <field name="cha_name"/>
+                            <field name="truck_no"/>
+                            <field name="no_of_trucks"/>
+                            <field name="item_code"/>
+                            <field name="quantity_ordered"/>
+                            <field name="receiver_Comments"/>
+                            <!-- table 2 -->
+                            <field name="name_2"/>
+                            <field name="position_2"/>
+                            <field name="date"/>
+                            <field name="signature_second"/>
+
+
+                        </group>
+
+                    </group>
+
+
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
+

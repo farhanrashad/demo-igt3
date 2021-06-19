@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <report
+                id="po_line_report"
+                model="purchase.order"
+                string="PO Line Report"
+                report_type="xlsx"
+                name="de_po_line_report.po_line_report_xlsx"
+                file="PO Line Report"
+        />
+    </data>
+</odoo>

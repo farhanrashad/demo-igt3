@@ -1,0 +1,16 @@
+<odoo>
+	<data noupdate="0">
+		
+		<menuitem id="msa_root_menu" name="MSA"
+            active="True"
+            sequence="105"/>
+
+
+		<menuitem id="msa_menu" name="Master Service Agreement" parent="msa_root_menu"
+			action="de_msa.action_master_service_agreement_view"
+			sequence="1" />
+			
+			
+	</data>
+</odoo>
+

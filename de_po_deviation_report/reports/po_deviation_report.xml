@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <report
+                id="po_deviation_report"
+                model="purchase.order"
+                string="PO Deviation Report"
+                report_type="xlsx"
+                name="de_po_deviation_report.po_deviation_report_xlsx"
+                file="PO Deviation Report"
+        />
+    </data>
+</odoo>

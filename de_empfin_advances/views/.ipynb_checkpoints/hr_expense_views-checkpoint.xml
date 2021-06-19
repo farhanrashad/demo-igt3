@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        
+        <!-- HR Expense Sheet -->
+        <!--
+        <record model="ir.ui.view" id="view_hr_expense_sheet_form_inherit_advance">
+            <field name="name">view.hr.expense.sheet.form.inherit.advance</field>
+            <field name="model">hr.expense.sheet</field>
+            <field name="inherit_id" ref="hr_expense.view_hr_expense_sheet_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='employee_details']" position="after">
+                    <group name="advance_detail" string="Adance Details">
+                        <field name="hr_salary_advance_id" options="{'no_create':True}"/>
+                    </group>
+                    
+                </xpath>
+            </field>
+        </record>
+-->
+        
+        <!-- HR Expense -->
+        <record model="ir.ui.view" id="hr_expense_from_view_line">
+            <field name="name">hr.expense.form.advance</field>
+            <field name="model">hr.expense</field>
+            <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_id']" position="before">
+                    <field name="hr_salary_advance_id" domain="[('employee_id','=',employee_id),('state','=','paid')]" options="{'no_create':True}" attrs="{'readonly':[('state','!=','draft')]}"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

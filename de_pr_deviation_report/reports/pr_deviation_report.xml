@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <report
+                id="pr_deviation_report"
+                model="purchase.requisition"
+                string="PR Deviation Report"
+                report_type="xlsx"
+                name="de_pr_deviation_report.pr_deviation_report_xlsx"
+                file="PR Deviation Report"
+        />
+    </data>
+</odoo>

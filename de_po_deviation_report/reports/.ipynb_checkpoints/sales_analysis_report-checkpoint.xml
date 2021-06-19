@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="sale_analysis_report"
+                model="pos.details.wizard"
+                string="Sales Analysis Report"
+                report_type="xlsx"
+                name="de_pos_sales_report.sale_analysis_report_xlsx"
+                file="Sales Analysis Report"
+        />
+    </data>
+</odoo>

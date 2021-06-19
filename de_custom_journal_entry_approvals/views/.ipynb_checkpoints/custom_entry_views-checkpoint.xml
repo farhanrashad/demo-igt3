@@ -1,0 +1,40 @@
+<odoo>
+  <data>
+       <record id="view_custom_entry_form_inherit_approvals" model="ir.ui.view">
+		<field name="name">view.custom.entry.form.inherit.approvals</field>
+		<field name="model">account.custom.entry</field>
+		<field name="inherit_id" ref="de_custom_journal_entry.account_custom_entry_form_view" />
+		<field name="arch" type="xml">
+           
+            <xpath expr="//button[@name='button_confirm']" position="replace">
+                <button name="button_confirm" string="Confirm" type="object" class="btn-primary" attrs="{'invisible': ['|',('state', '!=', 'draft'),('category_id', '!=', False)]}"/>
+
+            </xpath>
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="state" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" attrs="{'invisible': [('approval_state','=','pending')]}"/>
+            </xpath>
+           
+             <xpath expr="//field[@name='state']" position="after">
+                <field name="approval_state" widget="statusbar" statusbar_visible="pending,approved" attrs="{'invisible': [('approval_state','!=','pending')]}"/>
+            </xpath>
+
+            <xpath expr="//button[@name='button_confirm']" position="after">
+                <button name="action_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': ['|','|',('category_id', '=', False),('approval_state', '=', 'pending'),'&amp;',('state', 'not in', ['draft']),('category_id', '!=', False)]}"/>
+            </xpath>
+            
+			<xpath expr="//group[1]/group[2]" position="inside">
+                <field name="category_id" invisible="0"/> 
+                <field name="request_status" string="Approval Status" invisible="0"/> 
+                <field name="approval_request_id" invisible="0"/> 
+			</xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="%(action_approval_approver_view_custom_entry)d" type="action" class="oe_stat_button" icon="fa-users" context="{'custom_entry_id':id,'category_id':category_id}" attrs="{'invisible': [('approval_request_id', '=', False)]}">
+                    <field name="approvers_count" widget="statinfo" string="Approvers"/>
+                </button>     
+            </xpath>
+            
+		</field>
+	</record>
+      
+  </data>
+</odoo>
