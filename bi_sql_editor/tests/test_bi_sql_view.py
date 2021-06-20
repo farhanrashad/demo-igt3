@@ -2,11 +2,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo.exceptions import AccessError, UserError
-from odoo.tests import tagged
-from odoo.tests.common import SingleTransactionCase
+from odoo.tests.common import SingleTransactionCase, at_install, post_install
 
 
-@tagged("-at_install", "post_install")
+@at_install(False)
+@post_install(True)
 class TestBiSqlViewEditor(SingleTransactionCase):
     @classmethod
     def setUpClass(cls):
@@ -84,11 +84,6 @@ class TestBiSqlViewEditor(SingleTransactionCase):
         with self.assertRaises(UserError):
             self.view.unlink()
         self.view.button_set_draft()
-        self.assertNotEqual(
-            self.view.cron_id,
-            False,
-            "Set to draft materialized view should" " not unlink cron",
-        )
         self.view.unlink()
         res = self.bi_sql_view.search([("name", "=", "Partners View 2")])
         self.assertEqual(len(res), 0, "View not deleted")
