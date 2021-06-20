@@ -49,6 +49,13 @@ class BiSQLViewField(models.Model):
         "timestamp without time zone": "datetime",
     }
 
+    _GROUP_OPERATOR_SELECTION = [
+        ("sum", "Sum"),
+        ("avg", "Average"),
+        ("min", "Minimum"),
+        ("max", "Maximum"),
+    ]
+
     name = fields.Char(string="Name", required=True, readonly=True)
 
     sql_type = fields.Char(
@@ -114,6 +121,13 @@ class BiSQLViewField(models.Model):
         help="For 'Many2one' Odoo field.\n" " Comodel of the field.",
     )
 
+    group_operator = fields.Selection(
+        string="Group Operator",
+        selection=_GROUP_OPERATOR_SELECTION,
+        help="By default, Odoo will sum the values when grouping. If you wish "
+        "to alter the behaviour, choose an alternate Group Operator",
+    )
+
     # Constrains Section
     @api.constrains("is_index")
     def _check_index_materialized(self):
@@ -127,10 +141,12 @@ class BiSQLViewField(models.Model):
     def _compute_index_name(self):
         for sql_field in self:
             sql_field.index_name = "{}_{}".format(
-                sql_field.bi_sql_view_id.view_name, sql_field.name,
+                sql_field.bi_sql_view_id.view_name,
+                sql_field.name,
             )
 
     # Overload Section
+    @api.model
     def create(self, vals):
         field_without_prefix = vals["name"][2:]
         # guess field description
@@ -216,30 +232,33 @@ class BiSQLViewField(models.Model):
         self.ensure_one()
         res = ""
         if self.graph_type and self.field_description:
-            res = """<field name="{}" type="{}" />""".format(self.name, self.graph_type)
+            res = """<field name="{}" type="{}" />\n""".format(
+                self.name, self.graph_type
+            )
         return res
 
     def _prepare_pivot_field(self):
         self.ensure_one()
         res = ""
-        if self.graph_type and self.field_description:
-            res = """<field name="{}" type="{}" />""".format(self.name, self.graph_type)
+        if self.field_description:
+            graph_type_text = self.graph_type and 'type="%s"' % (self.graph_type) or ""
+            res = """<field name="{}" {} />\n""".format(self.name, graph_type_text)
         return res
 
     def _prepare_search_field(self):
         self.ensure_one()
         res = ""
         if self.field_description:
-            res = """<field name="{}"/>""".format(self.name)
+            res = """<field name="{}"/>\n""".format(self.name)
         return res
 
     def _prepare_search_filter_field(self):
         self.ensure_one()
         res = ""
         if self.field_description and self.is_group_by:
-            res = """<filter name="%s" string="%s"
-                        context="{'group_by':'%s'}"/>""" % (
-                self.field_description.lower().replace(" ", "_"),
+            res = """<filter name="group_by_%s" string="%s"
+                        context="{'group_by':'%s'}"/>\n""" % (
+                self.name,
                 self.field_description,
                 self.name,
             )
