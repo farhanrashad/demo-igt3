@@ -200,8 +200,13 @@
                     				<field name="number_days_in_month"/>
                     			</group>
                     			<group>
-                    				<button name='create_capax_invoice' string="Create Capex Invoice" type="object" class='oe_highlight' />
-                    				<button name='create_opex_invoice' string="Create Opex Invoice" type="object" class='oe_highlight' />
+                    				<group>
+                    					<button name='refresh_simulation' string="Refresh Simulation" type="object" class='btn-success' />
+                    				</group>
+                    				<group>
+                    					<button name='create_capax_invoice' string="Create Capex Invoice" type="object" class='oe_highlight' />
+                    					<button name='create_opex_invoice' string="Create Opex Invoice" type="object" class='oe_highlight' />
+                    				</group>
                     			</group>
                     		</group> 
                     		<separator string=" Totals"/>
@@ -217,7 +222,7 @@
                     		<field name="msa_simulation_ids">
                     			<tree string="Price Details" >
                     				<field name="site_id"/>
-                    				<field name="year"/>
+                    				<field name="year" invisible="True"/>
                     				<field name="month_year"/>
                     				<field name="ip_start_date"/>
                     				<field name="head_lease"/>
@@ -246,11 +251,93 @@
                     				<field name="ip_fee"/>
                     				<field name="invl_fuel_total"/>
                     				<field name="invl_enegry_total"/>
+                    				<field name="month_days"/>
+                    				<field name="power_price_capex"/>
+                    				<field name="monthly_lease_amount"/>
+                    				<field name="no_of_tenants_capex"/>
                     			</tree>
+                    			<form string="Price Details" >
+                    				<group>
+                    					<group>
+                    						<field name="month_year"/>
+                    						<field name="month_days"/>
+                    						<field name="invoicing_days"/>
+                    					</group>
+                    					<group>
+                    						<field name="inv_tower_type" />
+                    						<field name="inv_power_model" />
+                    					</group>
+                    				</group>
+                    				
+                    				<group>
+                    					<group>
+                    						<field name="ip_fee_capex"/>
+                    						<field name="ip_fee_opex"/>
+                    					</group>
+                    					<group>
+                    						<field name="region_factor"/>
+                    						<field name="wind_factor"/>
+                    						<field name="sla_factor"/>
+                    					</group>
+                    				</group>
+                    				
+                    				<group>
+                    					<group>
+                    						<field name="collocation_capex"/>
+                    						<field name="collocation_opex"/>
+                    						<field name="power_price_capex"/>
+                    						<field name="gross_ip_fee"/>
+                    					</group>
+                    					<group>
+                    						<field name="power_fee_capex"/>
+		                    				<field name="capex_escalation"/>
+		                    				<field name="opex_cpi"/>
+		                    				<field name="gross_ip_fee_capex"/>
+		                    				<field name="gross_ip_fee_opex"/>
+                    					</group>
+                    				</group>
+                    				
+                    				
+                    				<group>
+                    					<group>
+                    						<field name="site_id" invisible="1"/>
+		                    				<field name="year" invisible="True"/>
+		                    				<field name="ip_start_date"/>
+		                    				<field name="head_lease"/>
+		                    				<field name="head_lease_extra"/>
+		                    				<field name="invoiced_rent_adjustment"/>
+		                                    <field name="ip_fee_capex_billed"/>
+                    					</group>
+                    					<group>
+                    						<field name="diff_capex"/>
+		                    				<field name="ip_fee_opex_billed"/>
+		                    				<field name="diff_opex"/>
+		                    				<field name="ip_fee"/>
+		                    				<field name="invl_fuel_total"/>
+		                    				<field name="invl_enegry_total"/>
+		                    				<field name="monthly_lease_amount"/>
+		                    				<field name="no_of_tenants_capex"/>
+                    					</group>
+                    				</group>
+                    			</form>
                     		</field>
                     	</page>
                         
-<!--                         Invoices -->
+                        <!-- invoicess new -->
+                        <page string="Invoices">
+                    		<field name="invoice_ids"/>
+                    	</page>
+                        
+                        <!-- <page string="*Invoices*">
+                    		<field name="invoice_ids">
+	                    		<tree>
+	                    			<field name="partner_id"/>
+	                    		</tree>
+                    		</field>
+                    	</page>
+                        
+                        
+                        
                         <page string="Invoices">
                     		<field name="account_invoice_ids">
                     			<tree string="Invoice">
@@ -270,7 +357,7 @@
                                     <field name="msa_id" invisible="1"/>
                     			</tree>
                     		</field>
-                    	</page>
+                    	</page> -->
                         
 <!--                         Target Pass-Through -->
                         <page string="Target Pass-Through">

@@ -17,9 +17,13 @@
     "data": [
         'security/ir.model.access.csv',
         'views/master_service_agreement_view.xml',
+        'views/billing_info_view.xml',
+        'views/monthly_models_view.xml',
         'views/sla_factor_views.xml',
         'views/wind_factor_views.xml',
         'views/product_view.xml',
+        'views/project_project_view.xml',
+        'views/account_move_view.xml',
         'views/msa_menu.xml',
 #         'report/employee_report_pdf.xml',
     ],

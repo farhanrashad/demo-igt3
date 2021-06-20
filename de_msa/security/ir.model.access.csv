@@ -22,3 +22,13 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 
 19,sla.factor.value,model_sla_factor_value,base.group_user,1,1,1,1
 20,wind.factor.value,model_wind_factor_value,base.group_user,1,1,1,1
+
+
+21,monthly.power.model,model_monthly_power_model,base.group_user,1,1,1,1
+22,monthly.tower.model,model_monthly_tower_model,base.group_user,1,1,1,1
+23,monthly.tower.load,model_monthly_tower_load,base.group_user,1,1,1,1
+24,monthly.sla.factor,model_monthly_sla_factor,base.group_user,1,1,1,1
+
+
+
+
