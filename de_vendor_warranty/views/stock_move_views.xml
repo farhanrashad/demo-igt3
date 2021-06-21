@@ -10,6 +10,7 @@
                 <field name="warranty_date_start" attrs="{'invisible':[('allow_warranty','=',False)], 'required':[('allow_warranty','!=',False)]}"/>
                 <field name="warranty_date_end" attrs="{'invisible':[('allow_warranty','=',False)], 'required':[('allow_warranty','!=',False)]}"/>
                 <field name="warranty_days" attrs="{'invisible':[('allow_warranty','=',False)], 'required':[('allow_warranty','!=',False)]}"/>
+                <field name="w_date" invisible="1"/>
             </field>
         </field>
       </record>
