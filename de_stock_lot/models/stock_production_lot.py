@@ -7,8 +7,17 @@ from odoo.exceptions import UserError, ValidationError
 class StockJProductionLot(models.Model):
     _inherit = 'stock.production.lot'
     
-    oem_serial_no = fields.Char(string="OEM Serial")
+    oem_serial_no = fields.Char(string="OEM Serial", compute='_compute_oem_serial')
     
+    @api.depends('product_id')
+    def _compute_oem_serial(self):
+        ml_id = self.env['stock.move.line']
+        for lot in self:
+            ml_id = self.env['stock.move.line'].search([('lot_id','=',lot.id)],limit=1)
+            lot.update({
+                'oem_serial_no': ml_id.oem_serial_no
+            })
+    @api.depends('lot_')
     @api.constrains('name', 'company_id')
     def _check_unique_lot(self):
         domain = [('company_id', 'in', self.company_id.ids),

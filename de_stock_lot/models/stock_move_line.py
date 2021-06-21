@@ -6,4 +6,4 @@ from odoo import _, api, fields, models
 class StockMoveLine(models.Model):
     _inherit = 'stock.move.line'
     
-    oem_serial_no = fields.Char(related='lot_id.oem_serial_no',readonly=False)
+    oem_serial_no = fields.Char(string='OME Serial')
