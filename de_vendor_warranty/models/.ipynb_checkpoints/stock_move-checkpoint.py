@@ -23,14 +23,14 @@ class StockMoveLine(models.Model):
     
     allow_warranty = fields.Boolean(string='Allow Warranty', compute="_compute_allow_warranty")
     
-    warranty_date_start = fields.Char(string='WTY Start')
-    warranty_date_end = fields.Char(string='WTY End')
-    warranty_days = fields.Char(string='WTY Days')
+#     warranty_date_start = fields.Char(string='WTY Start')
+#     warranty_date_end = fields.Char(string='WTY End')
+#     warranty_days = fields.Char(string='WTY Days')
     
-    w_date = fields.Date(compute="_compute_date")
-    #warranty_date_start = fields.Date(string='WTY Start')
-    #warranty_date_end = fields.Date(string='WTY End')
-    #warranty_days = fields.Integer(string='WTY Days', compute='_compute_warranty_days')
+    w_date = fields.Date()
+    warranty_date_start = fields.Date(string='WTY Start')
+    warranty_date_end = fields.Date(string='WTY End')
+    warranty_days = fields.Integer(string='WTY Days', compute='_compute_warranty_days')
     
     @api.depends('product_id','warranty_date_start','warranty_date_end')
     def _compute_date(self):
@@ -42,14 +42,16 @@ class StockMoveLine(models.Model):
 
             #date_string = line.warranty_date_start
             #line.w_date = (datetime.fromisoformat(date_string))
-            line.w_date = datetime.datetime.strptime(line.warranty_date_start, "%d-%m-%Y").date()
-            
+            if line.warranty_date_start:
+                line.w_date = datetime.datetime.strptime(line.warranty_date_start, "%d-%m-%Y").date()
+            else:
+                line.w_date = False
     @api.depends('product_id')
     def _compute_allow_warranty(self):
         for stock in self:
             stock.allow_warranty = stock.product_id.product_tmpl_id.allow_warranty
             
-    #@api.depends('warranty_date_start','warranty_date_end')
+    @api.depends('warranty_date_start','warranty_date_end')
     def _compute_warranty_days(self):
         days = 0
         for stock in self:
