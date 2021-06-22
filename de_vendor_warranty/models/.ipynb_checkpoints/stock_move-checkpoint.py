@@ -23,10 +23,7 @@ class StockMoveLine(models.Model):
     
     allow_warranty = fields.Boolean(string='Allow Warranty', compute="_compute_allow_warranty")
     
-#     warranty_date_start = fields.Char(string='WTY Start')
-#     warranty_date_end = fields.Char(string='WTY End')
-#     warranty_days = fields.Char(string='WTY Days')
-    
+
     w_date = fields.Date()
     warranty_date_start = fields.Date(string='WTY Start')
     warranty_date_end = fields.Date(string='WTY End')
@@ -36,12 +33,6 @@ class StockMoveLine(models.Model):
     def _compute_date(self):
         date_string = ''
         for line in self:
-            #d = dt.datetime.strptime(line.warranty_date_start, "%d-%m-%Y")
-            #d = d.date()
-            #line.w_date = d.isoformat()
-
-            #date_string = line.warranty_date_start
-            #line.w_date = (datetime.fromisoformat(date_string))
             if line.warranty_date_start:
                 line.w_date = datetime.datetime.strptime(line.warranty_date_start, "%d-%m-%Y").date()
             else:
