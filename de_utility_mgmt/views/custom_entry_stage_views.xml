@@ -8,10 +8,6 @@
             <tree string="Custom Entry Stages">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="custom_entry_type_ids" widget="many2many_tags" groups="base.group_no_one"/>
-                 <field name="stage_category" />
-                <field name="next_stage_id"/>
-                <field name="prv_stage_id"/>
             </tree>
         </field>
     </record>
@@ -27,8 +23,6 @@
                             <field name="name"/>
                             <field name="sequence" groups="base.group_no_one"/>
                             <field name="custom_entry_type_ids" widget="many2many_tags" groups="base.group_no_one"/>
-                            <field name="next_stage_id"/>
-                            <field name="prv_stage_id"/>
                         </group>
                         <group>
                             <field name="fold"/>
