@@ -1,0 +1,370 @@
+<odoo>
+    <data>
+        <!-- Create Vendor Bill -->
+        <record model="ir.actions.act_window" id="action_custom_entry_to_bill">
+            <field name="name">Vendor Bill</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">form,tree</field>
+            <field name="domain">[('custom_entry_id','=',active_id)]</field>
+            <field name="context">{
+                "default_custom_entry_id":active_id,
+                "default_user_id": False,
+                }
+            </field>
+        </record>
+        <!-- Custom Entries Views -->
+
+        <record id="account_custom_entry_tree_view" model="ir.ui.view">
+            <field name="name">account.custom.entry.tree.view</field>
+            <field name="model">account.custom.entry</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="Custom Entry" multi_edit="1" sample="1">
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="name" string="Number" readonly="1" decoration-bf="1"/>
+                    <field name="date_entry" string="Date" widget="date" optional="show"/>
+
+                    <field name="user_id" optional="show" widget="many2one_avatar_user" invisible="1"/>
+                    <field name="activity_ids" widget="list_activity" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1"/>
+                    <field name="stage_id"/>
+                    <field name="partner_id"/>
+                    <field name="ref_fleet"/>
+                    <field name="supplier_inv_no_fleet"/>
+                    <field name="invoice_no_fleet" groups="de_custom_journal_entry.group_show_taxes_custom_journal_entry"/>
+                    <field name="amount_total_all" string="Bill Total"/>
+                    
+                    
+                    
+                </tree>
+            </field>
+        </record>
+
+        <record id="account_custom_entry_form_view" model="ir.ui.view">
+            <field name="name">account.custom.entry.form.view</field>
+            <field name="model">account.custom.entry</field>
+            <field name="arch" type="xml">
+                <form string="Custom Journal Entry" class="">
+                    <header>
+                        <field name="expense_advance" invisible="1"/>
+                        
+                        <button name="action_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
+                    
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"
+                        attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                    
+                    <button name="action_refuse" string="Refuse" type="object" 
+                        attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                        
+                        <button name="%(action_custom_entry_to_bill)d" string="Create Bill" type="action" invisible="1"/>
+                        <button string="Create Bill" name="create_custom_invoice" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('stage_category','!=','confirm')]}"/>
+                        <button string="Create Bill" name="create_advance_expense" type="object" class="btn-primary" invisible="1"/>
+
+
+                        <field name="state" widget="statusbar" invisible="1" statusbar_visible="draft,confirm,done"/>
+                        <field name="stage_id" widget="statusbar" domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]"/>
+
+
+                    </header>
+                    <sheet>
+                        <field name="stage_category" invisible="1" />
+                        
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object" name="action_view_invoice"
+                                    class="oe_stat_button"
+                                    icon="fa-pencil-square-o">
+                                <field name="invoice_count" widget="statinfo" string="Vendor Bills"/>
+                                <field name='invoice_ids' invisible="1"/>
+                            </button>
+                        </div>
+
+
+                        <!--                         <field name="has_project" invisible="1"/>
+                                                <field name="has_analytic" invisible="1"/>
+                                                <field name="has_product" invisible="1"/> -->
+                        <!--                    <field name="has_rent_vechile" invisible="1"/>
+                                                <field name="has_travel" invisible="1"/>
+                                                <field name="has_hotel" invisible="1"/> -->
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_entry" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="partner_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="custom_entry_type_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="currency_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="company_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                            </group>
+<!-- attrs="{'invisible':[('has_partner','==','no')], 'required': [('has_partner','==','required')]}" -->
+
+                            <!--                         #fleet fields form -->
+                            <group>
+                                <field name="ref_fleet" required='1' attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="supplier_inv_no_fleet" required='1' attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="invoice_no_fleet" groups="de_custom_journal_entry.group_show_taxes_custom_journal_entry"/>
+                                <field name="amount_total_all"/>
+<!--                                 <field name="amount_total_fleet"
+                                       attrs="{'invisible':[('has_fleet_fields','==','no')], 'required': [('has_fleet_fields','==','required')]}"/> -->
+                                
+                                
+                                <label for="duration_from" attrs="{'invisible':[('has_fleet_fields','==','no')]}"/>
+                                <div name="duration_from_div" class="d-flex" attrs="{'invisible':[('has_fleet_fields','==','no')]}">
+                                <field name="duration_from" attrs="{'invisible':[('has_fleet_fields','==','no')], 'required': [('has_fleet_fields','==','required')]}"/>
+                                <span class="oe_inline o_form_label mx-3 oe_read_only"> to </span>
+                <!-- Bigger margin on the left because in edit mode the external link button covers the text -->
+                                <span class="oe_inline o_form_label mr-3 ml-5 oe_edit_only"> to </span>
+                                <field name="duration_to" attrs="{'invisible':[('has_fleet_fields','==','no')], 'required': [('has_fleet_fields','==','required')]}"/>
+                                </div>
+                                <field name="taxes_fleet" attrs="{'invisible':[('has_fleet_fields','==','no')]}" groups='de_custom_journal_entry.group_show_taxes_custom_journal_entry'/>
+                                <field name="period_fleet" attrs="{'invisible':[('has_fleet_fields','==','no')]}" groups='de_custom_journal_entry.group_show_taxes_custom_journal_entry'/>
+                            </group>
+                        </group>
+                        <group>
+                            <!--                         #Accommodation fields form -->
+                            <group>
+<!--                                 <field name="ref_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')], 'required': [('has_accommodation_fields','==','required')]}"/>
+                                <field name="supplier_inv_no_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')], 'required': [('has_accommodation_fields','==','required')]}"/> -->
+                                <field name="customer_type_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')], 'required': [('has_accommodation_fields','==','required')]}"/>
+<!--                                 <field name="invoice_no_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')]}"/> -->
+                            </group>
+                            <group>
+<!--                                 <field name="amount_total_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')], 'required': [('has_accommodation_fields','==','required')]}"/> -->
+                                <field name="effective_date_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')], 'required': [('has_accommodation_fields','==','required')]}"/>
+                                <field name="date_of_sub_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')], 'required': [('has_accommodation_fields','==','required')]}"/>
+                                <field name="taxes_accom"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')]}" groups='de_custom_journal_entry.group_show_taxes_custom_journal_entry'/>
+                                <field name="period"
+                                       attrs="{'invisible':[('has_accommodation_fields','==','no')]}" groups='de_custom_journal_entry.group_show_taxes_custom_journal_entry'/>
+                            </group>
+                        </group>
+                        <group>
+                            <!--                         #travel fields form -->
+                            <group>
+<!--                                 <field name="ref_travel"
+                                       attrs="{'invisible':['|',('has_travel_fields','==','no'),('custom_entry_type_id','!=','Fleet Bills')], 'required': [('has_travel_fields','==','required')]}"/>
+                                <field name="supplier_inv_no_travel"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')], 'required': [('has_travel_fields','==','required')]}"/> -->
+                                <field name="travel_by"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')], 'required': [('has_travel_fields','==','required')]}"/>
+                                <field name="customer_type"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')], 'required': [('has_travel_fields','==','required')]}"/>
+                            </group>
+                            <group>
+<!--                                 <field name="invoice_no_travel"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')]}"/> -->
+<!--                                 <field name="amount_total_travel"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')], 'required': [('has_travel_fields','==','required')]}"/> -->
+                                <field name="effective_date"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')], 'required': [('has_travel_fields','==','required')]}"/>
+                                <field name="date_of_sub"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')], 'required': [('has_travel_fields','==','required')]}"/>
+                                <field name="taxes_travel"
+                                       attrs="{'invisible':[('has_travel_fields','==','no')]}" groups='de_custom_journal_entry.group_show_taxes_custom_journal_entry'/>
+                            </group>
+                        </group>
+
+                        <field name="has_partner" invisible="1"/>
+                        <field name="has_fleet_fields" invisible="1"/>
+                        <field name="has_travel_fields" invisible="1"/>
+                        <field name="has_accommodation_fields" invisible="1"/>
+                        <notebook>
+                            <page string="Line" name="custom_entry_line">
+                                <field name="custom_entry_line" widget="one2many_list" attrs="{'readonly': [('stage_category', '!=', 'draft')]}">
+                                    <tree string="Custom Entry Line" editable="bottom">
+                                        <field name="company_id" invisible="1"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <!--                                     <field name="product_uom_category_id" invisible="1" /> -->
+
+                                        <!--                                     #fleet fields line-model -->
+
+                                        <field name="car_details"
+                                               attrs="{'column_invisible':[('parent.has_fleet_fields','==','no')], 'required': [('parent.has_fleet_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="driver"
+                                               attrs="{'column_invisible':[('parent.has_fleet_fields','==','no')], 'required': [('parent.has_fleet_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="user"
+                                               attrs="{'column_invisible':[('parent.has_fleet_fields','==','no')], 'required': [('parent.has_fleet_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="job_scope"
+                                               attrs="{'column_invisible':[('parent.has_fleet_fields','==','no')], 'required': [('parent.has_fleet_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="job_scope_account" invisible="1"
+                                               options="{'no_create':True}"/>
+                                        <field name="days"
+                                               attrs="{'column_invisible':[('parent.has_fleet_fields','==','no')], 'required': [('parent.has_fleet_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="amount"
+                                               attrs="{'column_invisible':[('parent.has_fleet_fields','==','no')], 'required': [('parent.has_fleet_fields','==','required')]}"
+                                               options="{'no_create':True}" sum="Amount"/>
+                                        <field name="remark"
+                                               attrs="{'column_invisible':[('parent.has_fleet_fields','==','no')]}"
+                                               options="{'no_create':True}"/>
+
+
+                                        <!--                                     #Travel fields line-model -->
+
+                                        <field name="category"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': ['|',('parent.has_travel_fields','==','required'),('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="user_travel"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="fromm"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="to"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="departure_date"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="arrival_date"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="number_of_days"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="travel_reference"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="description"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="travel_for"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="unit_price"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="extra_charges"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="remark_travel"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')],'required':[('extra_charges','!=',0.0)]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="amount_travel"
+                                               attrs="{'column_invisible':[('parent.has_travel_fields','==','no')], 'required': [('parent.has_travel_fields','==','required')]}"
+                                               options="{'no_create':True}"  sum="Amount"/>
+
+
+                                        <!--                                     #Accommodation fields line-model -->
+
+                                        <field name="category_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="user_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="hotel_detail"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="check_in"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="check_out"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="number_of_nights"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="travel_reference_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="description_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="travel_for_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="unit_price_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="extra_charges_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="remark_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')],'required':[('extra_charges','!=',0.0)]}"
+                                               options="{'no_create':True}"/>
+                                        <field name="amount_accom"
+                                               attrs="{'column_invisible':[('parent.has_accommodation_fields','==','no')], 'required': [('parent.has_accommodation_fields','==','required')]}"
+                                               options="{'no_create':True}"  sum="Amount"/>
+
+
+                                        <!--                                     <field name="analytic_account_id" attrs="{'column_invisible':[('parent.has_analytic','==','no')], 'required': [('parent.has_analytic','==','required')]}" options="{'no_create':True}" optional="hide"/>
+                                                                            <field name="analytic_tag_ids" attrs="{'column_invisible':[('parent.has_analytic','==','no')], 'required': [('parent.has_analytic','==','required')]}" widget="many2many_tags" options="{'no_create':True,}" optional="hide"/>
+                                                                            <field name="product_id" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
+                                                                            <field name="product_uom_id" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
+                                                                            <field name="product_qty" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
+                                                                            <field name="price_unit" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
+                                                                            <field name="price_subtotal" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
+
+                                                                            <field name="date_departure" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+                                                                            <field name="date_arrival" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+                                                                            <field name="travel_from" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+                                                                            <field name="travel_to" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+                                                                            <field name="travel_purpose" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+                                                                            <field name="trave_ref" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+
+                                                                            <field name="vehicle_no" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
+                                                                            <field name="driver_name" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
+
+                                                                             <field name="date_in" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
+                                                                            <field name="date_out" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
+                                                                            <field name="hote_travel_purpose" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
+                                                                            <field name="hotel_name" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/> -->
+
+<!--                                         <field name='note' optional="show"/> -->
+
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Comments" name="custom_entry_line">
+                                <group>
+                                    <field name="text"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <!-- Attachment preview -->
+                    <div class="o_attachment_preview"/>
+                    <!-- Chatter -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="action_custom_entry" model="ir.actions.act_window">
+            <field name="name">Custom Journal Entry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.custom.entry</field>
+            <field name="view_mode">tree,kanban,form,activity</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new custom journal entry!
+                </p>
+            </field>
+        </record>
+
+        <menuitem action="action_custom_entry" name="Custom Entry" id="menu_custom_entry_type_config_custom_entry"
+                  parent="custom_entry_menu" sequence="2"/>
+
+    </data>
+</odoo>
