@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_op_penalty_config_user,access.op.penalty.config.user,model_op_penalty_config,group_operations_penalty_user,1,1,1,1
+access_op_penalty_config_line_user,access.op.penalty.config.line.user,model_op_penalty_config_line,group_operations_penalty_user,1,1,1,1
+
+access_op_penalty_type_user,access.op.penalty.type.user,model_op_penalty_type,group_operations_penalty_user,1,1,1,1
+
+access_op_penalty_stage_user,access.op.penalty.stage.user,model_op_penalty_stage,group_operations_penalty_user,1,1,1,1
+
+
