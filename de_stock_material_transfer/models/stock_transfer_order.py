@@ -110,9 +110,22 @@ class StockTransferOrder(models.Model):
     picking_type_id = fields.Many2one('stock.picking.type', compute='_compute_all_picking', store=True )
     picking_type_code = fields.Selection(related='picking_type_id.code')
     return_location_id = fields.Many2one('stock.location', string='Return Location', compute='_compute_all_picking', store=True, readonly=True, )
-
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
+    
+    #document fields
+    health_check_form = fields.Boolean(related='transfer_order_category_id.health_check_form')
+    fir_report = fields.Boolean(related='transfer_order_category_id.fir_report')
+    accident_report = fields.Boolean(related='transfer_order_category_id.accident_report')
+    hoto_checklist = fields.Boolean(related='transfer_order_category_id.hoto_checklist')
+    proof_attachment = fields.Boolean(related='transfer_order_category_id.proof_attachment')
+    
+    file_health_check = fields.Binary(string='Health Check Form')
+    file_fir = fields.Binary(string='FIR Report')
+    file_accident_report = fields.Binary(string='Accident Report')
+    file_hoto_checklist = fields.Binary(string='HOTO Checklist')
+    file_proof_attachment = fields.Binary(string='Proof Attachment')
+    
     
     #optional fields
     #has_penalty = fields.Boolean(related="transfer_order_category_id.has_penalty", ondelete='set default')

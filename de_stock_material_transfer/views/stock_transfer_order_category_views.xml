@@ -90,6 +90,18 @@
                                     </group>
                                  </group>
                             </page>
+                            <page string="Documents" name="documents">
+                                <group>
+                                    <group string="Required Documents" name="required_documents">
+                                        <field name="health_check_form" />
+                                        <field name="fir_report" />
+                                        <field name="accident_report" />
+                                        <field name="hoto_checklist" />
+                                        <field name="proof_attachment"  />
+                                        
+                                    </group>
+                                </group>
+                            </page>
                         </notebook>
                     </sheet>
                 </form>

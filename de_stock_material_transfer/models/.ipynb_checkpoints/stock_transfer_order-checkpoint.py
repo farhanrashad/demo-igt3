@@ -110,9 +110,22 @@ class StockTransferOrder(models.Model):
     picking_type_id = fields.Many2one('stock.picking.type', compute='_compute_all_picking', store=True )
     picking_type_code = fields.Selection(related='picking_type_id.code')
     return_location_id = fields.Many2one('stock.location', string='Return Location', compute='_compute_all_picking', store=True, readonly=True, )
-
     sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
         copy=False, check_company=True)
+    
+    #document fields
+    health_check_form = fields.Boolean(related='transfer_order_category_id.health_check_form')
+    fir_report = fields.Boolean(related='transfer_order_category_id.fir_report')
+    accident_report = fields.Boolean(related='transfer_order_category_id.accident_report')
+    hoto_checklist = fields.Boolean(related='transfer_order_category_id.hoto_checklist')
+    proof_attachment = fields.Boolean(related='transfer_order_category_id.proof_attachment')
+    
+    file_health_check = fields.Binary(string='Health Check Form')
+    file_fir = fields.Binary(string='FIR Report')
+    file_accident_report = fields.Binary(string='Accident Report')
+    file_hoto_checklist = fields.Binary(string='HOTO Checklist')
+    file_proof_attachment = fields.Binary(string='Proof Attachment')
+    
     
     #optional fields
     #has_penalty = fields.Boolean(related="transfer_order_category_id.has_penalty", ondelete='set default')
@@ -556,10 +569,11 @@ class StockTransferOrder(models.Model):
         transfer_order_type_id = self.curr_txn_type_id
         stage_id = self.stage_id
         stage = []
-        if self.stock_transfer_txn_line:
-            for txn in self.stock_transfer_txn_line.filtered(lambda t: t.txn_action == 'open').sorted(key=lambda r: r.sequence):
-                transfer_order_type_id = txn.transfer_exception_type_id
-                break
+        #if self.stock_transfer_txn_line:
+            #.sorted(key=lambda r: r.sequence)   
+            #for txn in self.stock_transfer_txn_line.filtered(lambda t: t.txn_action == 'open'):
+             #   transfer_order_type_id = txn.transfer_exception_type_id
+               # break
         self.curr_txn_type_id = transfer_order_type_id
         self.txn_stage_ids = [(6, 0, self.stock_transfer_txn_line.txn_stage_id.ids)]
             #for txn in self.stock_transfer_txn_line.filtered(lambda t: t.txn_action == 'open').sorted(key=lambda r: r.sequence):
@@ -924,6 +938,20 @@ class StockTransferOrder(models.Model):
 
     def action_view_credit_note(self):
         self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'binding_type': 'action',
+            'name': 'Bills',
+            'domain': [('stock_transfer_order_id', 'in', self.ids)],
+            'target': 'current',
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+        }
+
+
+    """ 
+    def action_view_credit_note(self):
+        self.ensure_one()
         invoices = self.env['account.move'].search([('stock_transfer_order_id', 'in', self.ids)])
         action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
         action["context"] = {
@@ -942,7 +970,7 @@ class StockTransferOrder(models.Model):
         else:
             action = {'type': 'ir.actions.act_window_close'}
         return action
-    
+    """
     
 class StockTransferOrderLine(models.Model):
     _name = 'stock.transfer.order.line'

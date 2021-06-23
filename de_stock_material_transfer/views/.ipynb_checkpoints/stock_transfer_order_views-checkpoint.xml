@@ -85,6 +85,12 @@
                     <field name="next_stage_id" invisible="1" />
                      <field name="txn_stage_id" invisible="1" />
                     <field name="curr_txn_stage_id" invisible="1" />
+                    
+                    <field name="health_check_form" invisible="1" />
+                    <field name="fir_report" invisible="1" />
+                    <field name="accident_report" invisible="1" />
+                    <field name="hoto_checklist" invisible="1" />
+                    <field name="proof_attachment" invisible="1" />
                     <!--
                     <field name="has_penalty" invisible="1"/>
                     <field name="has_closed" invisible="1"/>
@@ -265,6 +271,22 @@
                                     <field name="stage_id" invisible="1"/>
                                 </tree>
                             </field>
+                        </page>
+                        <page string="Documents" name="documents">
+                            <group string="Required Documents" name="required_documents">
+                                <field filename="file_health_check_filename" name="file_health_check" attrs="{'invisible':[('health_check_form','!=',True)], 'required':[('health_check_form','=',True)]}"/>
+                                
+                                <field filename="file_fir_filename" name="file_fir" attrs="{'invisible':[('fir_report','!=',True)], 'required':[('fir_report','=',True)]}"/>
+                                
+                                <field filename="file_accident_report_filename" name="file_accident_report" attrs="{'invisible':[('accident_report','!=',True)], 'required':[('accident_report','=',True)]}"/>
+                                <field filename="file_hoto_checklist_filename" name="file_hoto_checklist" attrs="{'invisible':[('hoto_checklist','!=',True)], 'required':[('hoto_checklist','=',True)]}"/>
+                                
+                                <field filename="file_proof_attachment_filename" name="file_proof_attachment" attrs="{'invisible':[('proof_attachment','!=',True)], 'required':[('proof_attachment','=',True)]}"/>
+
+
+
+
+                            </group>
                         </page>
                     </notebook>
                 </sheet>

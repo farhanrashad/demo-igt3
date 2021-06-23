@@ -59,6 +59,14 @@ class StockTransferOrderCategory(models.Model):
     
     group_id = fields.Many2one('res.groups', string='Security Group')
     
+    #required documents booleans
+    health_check_form = fields.Boolean(string='Health Check Form')
+    fir_report = fields.Boolean(string='FIR Report')
+    accident_report = fields.Boolean(string='Accident Report')
+    hoto_checklist = fields.Boolean(string='HOTO Checklist')
+    proof_attachment = fields.Boolean(string='Proof Documents')
+    
+    
     #has_penalty = fields.Boolean(string="Allow Penalty", default=False)
     #has_closed = fields.Boolean(string="Forcefully Close", default=False)
     has_partner = fields.Selection(CATEGORY_SELECTION, string="Has Partner", default="no", required=True,)
