@@ -62,7 +62,14 @@
 
                     </header>
                     <sheet>
+                        <field name="has_partner" invisible="1"/>
+                        <field name="has_invoice" invisible="1"/>
+                        
                         <field name="stage_category" invisible="1" />
+                        <field name="has_hse_fields" invisible="1"/>
+                        <field name="has_pm_fields" invisible="1"/>
+                        <field name="has_sla_fields" invisible="1"/>
+                        <field name="has_spmrf_fields" invisible="1"/>
                         
                         <div class="oe_button_box" name="button_box">
                             <button type="object" name="action_view_invoice"
@@ -72,10 +79,6 @@
                                 <field name='invoice_ids' invisible="1"/>
                             </button>
                         </div>
-
-
-
-
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -105,27 +108,33 @@
 
                         </group>
 
-                        <field name="has_partner" invisible="1"/>
-                        <field name="has_penalty_fields" invisible="1"/>
+                        
                         <notebook>
                             <page string="Line" name="penalty_entry_line">
                                 <field name="penalty_entry_line" widget="one2many_list" attrs="{'readonly': [('stage_category', '!=', 'draft')]}">
                                     <tree string="penalty Line" editable="bottom">
-                                       <field name="site_id" />
+                                       <field name="project_id" />
                                        <field name="name" />
-                                       <field name="service_charge" />
-                                       <field name="penalty_percent" />
-                                       <field name="amount" />
-                                       <field name="confirmed_amount" />
-                                       <field name="remark" />
+                                        
+                                        <field name="penalty_sow_type_id" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                                        <field name="penalty_sow_id" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                                        <field name="frequency" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                                        <field name="sow_deduct_type" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                                        
+                                        <field name="service_class" attrs="{'invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
+                                        <field name="service_level" attrs="{'invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
+                                        <field name="uptime" attrs="{'invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
+                                        
+                                        <field name="penalty_percent" />
+                                        
+                                       <field name="service_charge" sum="Service Charges"/>
+                                       <field name="amount" sum="Penalty Amount"/>
+                                       <field name="confirmed_amount" sum="Confirmed Amount"/>
+                                       <field name="description" />
                                     </tree>
                                 </field>
                             </page>
-                            <page string="Comments" name="penalt_comments">
-                                <group>
-                                    <field name="text"/>
-                                </group>
-                            </page>
+                            
                         </notebook>
                     </sheet>
                     <!-- Attachment preview -->

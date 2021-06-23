@@ -39,12 +39,11 @@ class OPPenaltyType(models.Model):
 
     
     #Main Type fields
-    has_penalty_fields = fields.Selection(CATEGORY_SELECTION, string="Penalty Alarm & Invoices", default="no", required=True,)
-    has_asset_fields = fields.Selection(CATEGORY_SELECTION, string="Asset Lifetime Invoices", default="no", required=True,)
-    has_hse_fields = fields.Selection(CATEGORY_SELECTION, string="HSE Invoice", default="no", required=True,)
-    has_pm_fields = fields.Selection(CATEGORY_SELECTION, string="PM Invoice", default="no", required=True,)
-    has_power_fuel_fields = fields.Selection(CATEGORY_SELECTION, string="Power & Fuel Invoice", default="no", required=True,)
-    has_sla_fields = fields.Selection(CATEGORY_SELECTION, string="SLA Invoice", default="no", required=True,)
+    has_hse_fields = fields.Selection(CATEGORY_SELECTION, string="HSE Penalties", default="no", required=True,)
+    has_pm_fields = fields.Selection(CATEGORY_SELECTION, string="PM Penalties", default="no", required=True,)
+    has_sla_fields = fields.Selection(CATEGORY_SELECTION, string="SLA Penalties", default="no", required=True,)
+    has_spmrf_fields = fields.Selection(CATEGORY_SELECTION, string="Spare Parts Penalties", default="no", required=True,)
+
 
     #header fields    
     has_partner = fields.Selection(CATEGORY_SELECTION, string="Partner", default="no", required=True,)

@@ -35,49 +35,24 @@ class OPPenaltyEntry(models.Model):
     #account related fields
     journal_id = fields.Many2one('account.journal',related='penalty_type_id.journal_id')
     
+    #Header Fields
     has_partner = fields.Selection(related="penalty_type_id.has_partner")
     has_invoice = fields.Selection(related="penalty_type_id.has_invoice")
+    partner_id = fields.Many2one('res.partner',  String="Supplier")
+    invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True)
 
-    has_penalty_fields = fields.Selection(related="penalty_type_id.has_penalty_fields")
-    taxe_ids = fields.Many2one('account.tax', string='Taxes')
     amount_total = fields.Float(string='Amount Total')
     confirmed_amount_total = fields.Float(string='Confirmed Amount Total')
     month  = fields.Char(string='Month')
-
-      
-    #travel form
-    #travel form field datatype define
-    ref_travel = fields.Char('Reference', copy=False)
-    supplier_inv_no_travel = fields.Char(string='Supplier Invoice Number')
-    travel_by = fields.Selection(
-        [('flight ticket', 'Flight Ticket'),
-         ('Vehicle', 'Vehicle Rental')],
-        string='Travel By', track_visibility="always")
-    customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
-    effective_date = fields.Date(string='Effected Date')
-    date_of_sub = fields.Date(string='Date of Subscription')
-    taxes_travel = fields.Many2one('account.tax', string='Taxes')
-       
-    #accommodation form
-    #accommodation form field datatype define
-    ref_accom = fields.Char('Reference', copy=False)
-    supplier_inv_no_accom = fields.Char(string='Supplier Invoice Number')
-    customer_type_accom = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
-#     amount_total_accom = fields.Float(string='Amount Total' , compute="_compute_total_accom")
-    effective_date_accom = fields.Date(string='Effected Date')
-    date_of_sub_accom = fields.Date(string='Date of Subscription')
-    period = fields.Date('Period')
-    taxes_accom = fields.Many2one('account.tax', string='Taxes')
-    
-    partner_id = fields.Many2one('res.partner',  String="Supplier")
     amount_total_all = fields.Float(string="Total Amount")
     ref = fields.Char('Reference', copy=False)
-    invoice_no_fleet = fields.Many2one('account.move', string='Invoice Number', compute="_compute_invoice_no_fleet", readonly=True)
-    purchase_requisition_id = fields.Many2one('purchase.requisition', string="Requisition", check_company=True)
-    purchase_id = fields.Many2one('purchase.order', string="Purchase", check_company=True)
-    invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True)
-    picking_id = fields.Many2one('stock.picking', string="Picking", check_company=True)
-    purchase_subscription_id = fields.Many2one('purchase.subscription', string="Purchase Subscription", check_company=True)
+    
+    #Line Item fields
+    has_hse_fields = fields.Selection(related="penalty_type_id.has_hse_fields")
+    has_pm_fields = fields.Selection(related="penalty_type_id.has_pm_fields")
+    has_sla_fields = fields.Selection(related="penalty_type_id.has_sla_fields")
+    has_spmrf_fields = fields.Selection(related="penalty_type_id.has_spmrf_fields")
+    
 
     invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
     invoice_count = fields.Integer(compute="_compute_invoice", string='Bill Count', copy=False, default=0, store=True)
@@ -136,22 +111,9 @@ class OPPenaltyEntry(models.Model):
         return {}
 
     def action_refuse(self):
-        
-
-        
-        for rec in self:
-            selected_ids = rec.env.context.get('active_ids', [])
-            selected_records = rec.env['op.penalty.entry'].browse(selected_ids)
-            return {
-            'name': ('Reason'),
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'penalty.entry.refuse.wizard',
-            'view_id': False,
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-            'context': {'default_penalty_entry_id': self.id,
-                       },}
+        self.update({
+            'stage_id' : self.stage_id.next_stage_id.id,
+        })
         
         
     def action_submit(self):
@@ -298,107 +260,38 @@ class OPPenaltyEntryLine(models.Model):
 
     invoice_lines = fields.One2many('account.move.line', 'penalty_entry_line_id', string="Bill Lines", readonly=True, copy=False)
 
-    site_id = fields.Many2one('project.project', string='Site')
+    project_id = fields.Many2one('project.project', string='Site')
     name = fields.Char(stirng='Description')
-    service_charge = fields.Float(string='Service Charge')
     penalty_percent = fields.Float(string='% Penalty')
-    amount = fields.Float(string='Penalty Amount')
+    service_charge = fields.Float(string='Service Charge')
     confirmed_amount = fields.Float(string='Confirmed Amount')
-    remark = fields.Char(string="Remark")
+    amount = fields.Float(string='Penalty Amount')
     
-
-
+    #sla
+    service_class = fields.Selection([
+        ('a', 'Critical Site'), 
+        ('b', 'Class B'), 
+        ('c', 'Class C')], default='a', string='Classification')
+    service_level = fields.Selection([
+        ('critical', 'Critical'), 
+        ('major', 'Major'), 
+        ('minor', 'Minor'), 
+        ('normal', 'Normal')], default='normal', string='Service Level')
+    uptime = fields.Float(string='Uptime', default=0.0)
+    #occurence
+    #sow
+    penalty_sow_type_id = fields.Many2one('op.penalty.config.sow.type', string='SOW Type')
+    penalty_sow_id = fields.Many2one('op.penalty.config.sow', string='SOW')
+    frequency = fields.Char(related='penalty_sow_id.frequency')
+    sow_deduct_type = fields.Selection([
+        ('a', 'A'), 
+        ('b', 'B'), 
+        ], default='a', string='Deduction Type')
     
-    @api.onchange('departure_date','arrival_date')
-    def _number_of_days(self):
-        for line in self:
-            if line.departure_date and line.arrival_date:
-                if line.departure_date > line.arrival_date:
-                    raise UserError(("Arrival Date cant be before Departure Date."))
-                else:
-                    delta = line.arrival_date - line.departure_date
-                    if abs(delta.days) > 0:
-                        line.number_of_days = abs(delta.days)
-                    else:
-                        line.number_of_days = 1
-            else:
-                line.number_of_days = 0
+    description = fields.Text(string="Remarks")
     
     
     
-    @api.onchange('car_details')
-    def _get_driver_user(self):
-        if self.car_details and self.penalty_entry_id.duration_from:
-            current_user = self.env['fleet.vehicle.user.log'].search([('vehicle_id','=',self.car_details.id),('date_start','<=',self.custom_entry_id.duration_from),('date_end','>',self.custom_entry_id.duration_from)],limit=1)
-            current_driver = self.env['fleet.vehicle.assignation.log'].search([('vehicle_id','=',self.car_details.id),('date_start','<=',self.custom_entry_id.duration_from),('date_end','>',self.custom_entry_id.duration_from)],limit=1)
-            if current_user:
-                self.update({
-                    'user': current_user.user_id.id
-                })
-            if current_driver:
-                self.update({
-                    'driver': current_driver.driver_id.id
-                })
-    
-    @api.depends('number_of_days', 'unit_price', 'extra_charges')
-    def _compute_amount_travel(self):
-        total_amount_travel = 0
-        for line in self:
-            if line.number_of_days or line.unit_price or line.extra_charges:
-                total_amount_travel = (line.number_of_days * line.unit_price) + line.extra_charges
-            line.update({
-                'amount_travel': total_amount_travel
-            })
-        
-
-                    
-                    
-                    
-
-
-    @api.depends('number_of_nights', 'unit_price_accom', 'extra_charges_accom')
-    def _compute_amount_accom(self):
-        total_amount = 0
-        for line in self:
-            if line.number_of_nights or line.unit_price_accom or line.extra_charges_accom:
-                total_amount = (line.number_of_nights * line.unit_price_accom) + line.extra_charges_accom
-            line.update({
-                'amount_accom': total_amount
-            })
-
-    @api.onchange('check_in','check_out')
-    def _number_of_nights(self):
-        for line in self:
-            if line.check_in and line.check_out:
-                if line.check_in > line.check_out:
-                    raise UserError(("Check Out cant be before Check in."))
-                else:
-                    delta = line.check_out - line.check_in
-                    if abs(delta.days) > 0:
-                        line.number_of_nights = abs(delta.days)
-                    else:
-                        line.number_of_nights = 1
-            else:
-                line.number_of_nights = 0
-        
-        
-
-
-
-    @api.depends('product_qty', 'price_unit')
-    def _compute_amount(self):
-        tot = 0
-        for line in self:
-            if line.penalty_entry_id.has_product:
-                tot = line.product_qty * line.price_unit
-        self.update({
-            'price_subtotal': line.product_qty * line.price_unit
-        })
-        
-    @api.onchange('product_id')
-    def onchange_product_id(self):
-        if self.product_id:
-            self.product_uom_id = self.product_id.uom_id.id
     
     def _prepare_account_move_line(self, move=False):
         self.ensure_one()

@@ -59,12 +59,11 @@
                                         <field name="has_invoice" widget="radio" options="{'horizontal': true}"/>
                                     </group>
                                     <group string="Select Type" name="add_new_fields">
-                                        <field name="has_penalty_fields" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_asset_fields" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_hse_fields" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_pm_fields" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_power_fuel_fields" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_sla_fields" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_spmrf_fields" widget="radio" options="{'horizontal': true}"/>
+
 
                                     </group>
                                 </group>

@@ -77,6 +77,7 @@ class PenaltyConfigSOW(models.Model):
     _description = 'Penalty Config SOW'
     
     name = fields.Char(string='Name', required=True)
+    frequency = fields.Char(string='Frequency')
     
 class PenaltyConfigSOWType(models.Model):
     _name = 'op.penalty.config.sow.type'
