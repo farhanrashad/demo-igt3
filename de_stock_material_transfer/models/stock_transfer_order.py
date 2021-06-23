@@ -924,6 +924,20 @@ class StockTransferOrder(models.Model):
 
     def action_view_credit_note(self):
         self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'binding_type': 'action',
+            'name': 'Bills',
+            'domain': [('stock_transfer_order_id', 'in', self.ids)],
+            'target': 'current',
+            'res_model': 'account.move',
+            'view_mode': 'tree,form',
+        }
+
+
+    """ 
+    def action_view_credit_note(self):
+        self.ensure_one()
         invoices = self.env['account.move'].search([('stock_transfer_order_id', 'in', self.ids)])
         action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
         action["context"] = {
@@ -942,7 +956,7 @@ class StockTransferOrder(models.Model):
         else:
             action = {'type': 'ir.actions.act_window_close'}
         return action
-    
+    """
     
 class StockTransferOrderLine(models.Model):
     _name = 'stock.transfer.order.line'
