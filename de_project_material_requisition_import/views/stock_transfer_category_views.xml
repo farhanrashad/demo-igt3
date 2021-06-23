@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+        
+        <record id="view_stock_transfer_order_category_import" model="ir.ui.view">
+            <field name="name">stock.transfer.order.category.import</field>
+            <field name="model">stock.transfer.order.category</field>
+            <field name="inherit_id" ref="de_stock_material_transfer.stock_transfer_order_category_form_view" />
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='auto_expiry']" position="after">
+                    <field name="health_check_form" />
+                    <field name="fir_report" />
+                    <field name="accident_report" />
+                    <field name="hoto_checklist" />
+                    <field name="is_publish" />
+                    <field name="is_requisition" />
+                </xpath>
+
+           </field>
+        </record>
+
+       
+    </data>
+</odoo>
