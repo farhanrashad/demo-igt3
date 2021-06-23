@@ -103,7 +103,7 @@ class OPPenaltyType(models.Model):
             "context": {
                 'form_view_initial_mode': 'edit',
                 'default_name': name,
-                'default_penalty_entry_type_id': self.id,
+                'default_penalty_type_id': self.id,
                 'default_user_id': self.env.user.id,
             },
         }
