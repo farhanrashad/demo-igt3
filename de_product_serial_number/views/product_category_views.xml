@@ -1,0 +1,22 @@
+<odoo>
+  <data>
+      
+       <record id="view_product_category_sequence" model="ir.ui.view">
+            <field name="name">product.category.sequence</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="product.product_category_form_view" />
+            <field name="arch" type="xml">
+                
+                <xpath expr="//group[@name='first']" position="after">
+                    <group name='sequence'  >
+                    <field name="sequence_code"  />  
+                    <field name="company_id"  /> 
+                    <field name="sequence_id" invisible='1' /> 
+                        
+                    </group>    
+                </xpath>
+              
+           </field>
+        </record>
+  </data>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_penalty_entry_type_manager,access.penalty.entry.type.manager,model_account_penalty_entry_type,,1,1,1,1
+access_penalty_entry_stage_manager,access.penalty.entry.stage.manager,model_account_penalty_entry_stage,,1,1,1,1
+access_penalty_entry_manager,access.penalty.entry.manager,model_account_penalty_entry,,1,1,1,1
+access_penalty_entry_line_manager,access.penalty.entry.line.manager,model_account_penalty_entry_line,,1,1,1,1
+access_penalty_entry_refuse_wizard,access.penalty.entry.refuse.wizard,model_penalty_entry_refuse_wizard,,1,1,1,1

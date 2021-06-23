@@ -1,0 +1,162 @@
+<odoo>
+    <data>
+        <!-- Create Vendor Bill -->
+        <record model="ir.actions.act_window" id="action_penalty_entry_to_bill">
+            <field name="name">Vendor Bill</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">form,tree</field>
+            <field name="domain">[('penalty_entry_id','=',active_id)]</field>
+            <field name="context">{
+                "default_penalty_entry_id":active_id,
+                "default_user_id": False,
+                }
+            </field>
+        </record>
+        <!-- penalty Entries Views -->
+
+        <record id="account_penalty_entry_tree_view" model="ir.ui.view">
+            <field name="name">account.penalty.entry.tree.view</field>
+            <field name="model">account.penalty.entry</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <tree string="penalty Entry" multi_edit="1" sample="1">
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="name" string="Number" readonly="1" decoration-bf="1"/>
+                    <field name="date_entry" string="Date" widget="date" optional="show"/>
+
+                    <field name="activity_ids" widget="list_activity" optional="show"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1"/>
+                    <field name="stage_id"/>
+                    <field name="partner_id"/>
+                    <field name="amount_total_all" string="Bill Total"/>
+                    
+                    
+                    
+                </tree>
+            </field>
+        </record>
+
+        <record id="account_penalty_entry_form_view" model="ir.ui.view">
+            <field name="name">account.penalty.entry.form.view</field>
+            <field name="model">account.penalty.entry</field>
+            <field name="arch" type="xml">
+                <form string="penalty Journal Entry" class="">
+                    <header>
+
+                        <button name="action_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
+                    
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"
+                        attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                    
+                    <button name="action_refuse" string="Refuse" type="object" 
+                        attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                        
+                        <button name="%(action_penalty_entry_to_bill)d" string="Create Bill" type="action" invisible="1"/>
+                        <button string="Create Bill" name="create_penalty_invoice" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('stage_category','!=','confirm')]}"/>
+                        <button string="Create Bill" name="create_advance_expense" type="object" class="btn-primary" invisible="1"/>
+
+
+                        <field name="state" widget="statusbar" invisible="1" statusbar_visible="draft,confirm,done"/>
+                        <field name="stage_id" widget="statusbar" domain="[('penalty_entry_type_ids', '=', penalty_entry_type_id)]"/>
+
+
+                    </header>
+                    <sheet>
+                        <field name="stage_category" invisible="1" />
+                        
+                        <div class="oe_button_box" name="button_box">
+                            <button type="object" name="action_view_invoice"
+                                    class="oe_stat_button"
+                                    icon="fa-pencil-square-o">
+                                <field name="invoice_count" widget="statinfo" string="Vendor Bills"/>
+                                <field name='invoice_ids' invisible="1"/>
+                            </button>
+                        </div>
+
+
+
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_entry" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="partner_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="amount_total" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="confirmed_amount_total" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                            </group>
+
+                            <group>
+                                <field name="penalty_entry_type_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="penalty_entry_type_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="currency_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+                                <field name="company_id" attrs="{'readonly': [('stage_category', '!=', 'draft')]}"/>
+
+                            </group>
+                        </group>
+                        <group>
+
+
+                        </group>
+                        <group>
+
+
+                        </group>
+
+                        <field name="has_partner" invisible="1"/>
+                        <field name="has_penalty_fields" invisible="1"/>
+                        <notebook>
+                            <page string="Line" name="penalty_entry_line">
+                                <field name="penalty_entry_line" widget="one2many_list" attrs="{'readonly': [('stage_category', '!=', 'draft')]}">
+                                    <tree string="penalty Line" editable="bottom">
+                                       <field name="site_id" />
+                                       <field name="name" />
+                                       <field name="service_charge" />
+                                       <field name="penalty_percent" />
+                                       <field name="amount" />
+                                       <field name="confirmed_amount" />
+                                       <field name="remark" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Comments" name="penalt_comments">
+                                <group>
+                                    <field name="text"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <!-- Attachment preview -->
+                    <div class="o_attachment_preview"/>
+                    <!-- Chatter -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="action_penalty_entry" model="ir.actions.act_window">
+            <field name="name">Penalty Journal Entry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.penalty.entry</field>
+            <field name="view_mode">tree,kanban,form,activity</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new penalty journal entry!
+                </p>
+            </field>
+        </record>
+
+        <menuitem action="action_penalty_entry" name="penalty Entry" id="menu_penalty_entry_type_config_penalty_entry"
+                  parent="penalty_entry_menu" sequence="2"/>
+
+    </data>
+</odoo>
