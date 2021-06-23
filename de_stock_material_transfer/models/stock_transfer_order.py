@@ -556,10 +556,11 @@ class StockTransferOrder(models.Model):
         transfer_order_type_id = self.curr_txn_type_id
         stage_id = self.stage_id
         stage = []
-        if self.stock_transfer_txn_line:
-            for txn in self.stock_transfer_txn_line.filtered(lambda t: t.txn_action == 'open').sorted(key=lambda r: r.sequence):
-                transfer_order_type_id = txn.transfer_exception_type_id
-                break
+        #if self.stock_transfer_txn_line:
+            #.sorted(key=lambda r: r.sequence)   
+            #for txn in self.stock_transfer_txn_line.filtered(lambda t: t.txn_action == 'open'):
+             #   transfer_order_type_id = txn.transfer_exception_type_id
+               # break
         self.curr_txn_type_id = transfer_order_type_id
         self.txn_stage_ids = [(6, 0, self.stock_transfer_txn_line.txn_stage_id.ids)]
             #for txn in self.stock_transfer_txn_line.filtered(lambda t: t.txn_action == 'open').sorted(key=lambda r: r.sequence):
