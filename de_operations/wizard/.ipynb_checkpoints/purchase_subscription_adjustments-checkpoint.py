@@ -35,7 +35,7 @@ class PurchaseSubscriptionAdjustments(models.TransientModel):
         ('fixed', 'fixed amount')
         ], string='Payment Method', default='fixed', required=True,)
 
-    ref = fields.Char(string='Reference', copy=False, tracking=True)
+    ref = fields.Char(string='Reference', copy=False)
     #amount = fields.Float('Amount', digits='Product Price', )
     amount = fields.Float('Adjustment Amount', digits='Account', help="The percentage of amount to be Billed in advance, taxes excluded.")
     #price_unit = fields.Float(string='Unit Price', digits='Product Price')

@@ -26,11 +26,11 @@ class PurchaseSubscriptionAdjustments(models.Model):
     amount = fields.Float('Escalation %', digits='Account', help="The percentage of amount to be Billed in advance, taxes excluded.")
     currency_id = fields.Many2one('res.currency', string='Currency')
     purchase_subscription_id = fields.Many2one('purchase.subscription','Subscription',)
-    recurring_interval = fields.Integer(string="Invoicing Period", help="Repeat every (Days/Week/Month/Year)", required=True, default=1, tracking=True)
+    recurring_interval = fields.Integer(string="Invoicing Period", help="Repeat every (Days/Week/Month/Year)", required=True, default=1)
     recurring_interval_type = fields.Selection([('daily', 'Days'), ('weekly', 'Weeks'),
                                                 ('monthly', 'Months'), ('yearly', 'Years'), ],
                                                string='Recurrence', required=True,
-                                               help="Invoice automatically repeat at specified interval", default='monthly', tracking=True)
+                                               help="Invoice automatically repeat at specified interval", default='monthly')
     
     
     

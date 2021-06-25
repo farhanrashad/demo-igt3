@@ -20,7 +20,7 @@
     # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Accounting',
-    'version': '14.0.0.6',
+    'version': '14.0.0.7',
 
     # any module necessary for this one to work correctly
     'depends': ['de_purchase_subscription','de_project_planning','de_account_stock_transfer','de_fuel_management'],
