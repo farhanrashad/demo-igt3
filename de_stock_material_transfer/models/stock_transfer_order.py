@@ -983,8 +983,8 @@ class StockTransferOrderLine(models.Model):
     state = fields.Selection(related='stock_transfer_order_id.state', readonly=True)
     stage_category = fields.Selection(related='stock_transfer_order_id.stage_category', store=True)
     action_type = fields.Selection(related='stock_transfer_order_id.action_type', store=True)
-    date_request = fields.Datetime(realted='stock_transfer_order_id.date_request', readonly=True)
-    date_order = fields.Datetime(realted='stock_transfer_order_id.date_order', readonly=True)
+    date_request = fields.Datetime(related='stock_transfer_order_id.date_request', readonly=True)
+    date_order = fields.Datetime(related='stock_transfer_order_id.date_order', readonly=True)
     
     partner_id = fields.Many2one('res.partner', related='stock_transfer_order_id.partner_id', readonly=True,store=True)
     user_id = fields.Many2one('res.users', related='stock_transfer_order_id.user_id', readonly=True,store=True)
