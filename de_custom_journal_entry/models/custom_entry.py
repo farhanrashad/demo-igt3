@@ -533,7 +533,7 @@ class CustomEntryLine(models.Model):
          ('petrol charges', 'Petrol Charges.'),
          ('toll fee', 'Toll Fee.'),
          ('replacement', 'Replacement.')],
-        string='Job Scope', track_visibility="always")
+        string='Job Scope', )
     f_rent_days = fields.Float(string='Days')
     f_amount = fields.Float(string="Amount")
     
