@@ -15,8 +15,6 @@ class AccountCustomEntryStage(models.Model):
         return [default_custom_entry_type_id] if default_custom_entry_type_id else None
     
     name = fields.Char(string='Stage Name', required=True, translate=True)
-    active = fields.Boolean('Active', default=True, help="If unchecked, it will allow you to hide the stage without removing it.")
-
     description = fields.Text(
         "Requirements", help="Enter here the internal requirements for this stage. It will appear "
                              "as a tooltip over the stage's name.", translate=True)
@@ -29,10 +27,5 @@ class AccountCustomEntryStage(models.Model):
     stage_category = fields.Selection([
         ('draft', 'Draft'),
         ('progress', 'In Progress'),
-        ('confirm', 'Confirmed'),
         ('closed', 'Closed'),
     ], string='Category', default='draft')
-    
-    next_stage_id = fields.Many2one('account.custom.entry.stage', string='Next Stage', copy=False)
-    prv_stage_id = fields.Many2one('account.custom.entry.stage', string='Previous Stage', copy=False)
-

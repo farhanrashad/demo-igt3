@@ -62,13 +62,17 @@
                                         <field name="has_purchase" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_picking" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_invoice" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_purchase_subscription" widget="radio" options="{'horizontal': true}"/>                                        
+                                        <field name="has_purchase_subscription" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_project" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_analytic" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_product" widget="radio" options="{'horizontal': true}"/>
+                                        
+                                        <field name="has_rent_vechile" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_travel" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_hotel" widget="radio" options="{'horizontal': true}"/>
+                                        
                                     </group>
-                                    <group string="Select Type" name="add_new_fields">
-                                        <field name="has_fleet_fields" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_accommodation_fields" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_travel_fields" widget="radio" options="{'horizontal': true}"/>
-                                    </group>
+                                    
                                 </group>
                             </page>
                         </notebook>
@@ -183,7 +187,7 @@
         <field name="view_mode">kanban</field>
     </record>
         
-        <menuitem action="action_custom_entry_type_dashboard" name="Dashboard" id="menu_custom_entry_type_dashboard" parent="custom_entry_root_menu" sequence="1"/>
+        <menuitem action="action_custom_entry_type_dashboard" name="Dashboard" id="menu_custom_entry_type_dashboard" groups="account.group_account_user" parent="custom_entry_root_menu" sequence="1"/>
         
     </data>
 </odoo>
