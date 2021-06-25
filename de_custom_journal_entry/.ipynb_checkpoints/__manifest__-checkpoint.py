@@ -14,10 +14,10 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Accounting',
-    'version': '14.0.0.4',
+    'version': '14.0.0.6',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_purchase_subscription','account','project','stock','purchase_requisition'],
+    'depends': ['de_purchase_subscription','account','de_project_planning','stock','purchase_requisition'],
 
     # always loaded
     'data': [
@@ -27,6 +27,7 @@
         'views/custom_entry_stage_views.xml',
         'views/account_move_views.xml',
         'views/custom_entry_views.xml',
+        'views/account_payment_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

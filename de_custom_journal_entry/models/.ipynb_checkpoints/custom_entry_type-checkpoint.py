@@ -34,27 +34,39 @@ class CustomEntryType(models.Model):
     sequence_id = fields.Many2one('ir.sequence', 'Reference Purchase Subscription Sequence',
         copy=False, check_company=True)
     
+    generate_accounting = fields.Boolean(string='Generate Accounting')
     expense_advance = fields.Boolean(string='Pay Advance Expense')
-    journal_id = fields.Many2one('account.journal', string="Accounting Journal", required=True, company_dependent=True, check_company=True,)
+    journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
+    payment_journal_id = fields.Many2one('account.journal', string="Payment Journal", required=True, company_dependent=True, check_company=True,  domain="[('type', 'in', ['bank', 'cash'])]")
+
+    group_id = fields.Many2one('res.groups', string='Security Group')
 
         
     #header fields    
     has_partner = fields.Selection(CATEGORY_SELECTION, string="Partner", default="no", required=True,)
     has_ref = fields.Selection(CATEGORY_SELECTION, string="Reference", default="no", required=True,)
-    has_purchase_requisition = fields.Selection(CATEGORY_SELECTION, string="Requisition", default="no", required=True,)
+    has_supplier_bill = fields.Selection(CATEGORY_SELECTION, string="Supplier Bill", default="no", required=True,)
+    has_period = fields.Selection(CATEGORY_SELECTION, string="Period", default="no", required=True,)
+    has_attachment = fields.Selection(CATEGORY_SELECTION, string="Attachment", default="no", required=True,)
+    has_description = fields.Selection(CATEGORY_SELECTION, string="Description", default="no", required=True,)
+    has_purchase_requisition = fields.Selection(CATEGORY_SELECTION, string="Purchase Requisition", default="no", required=True,)
     has_purchase = fields.Selection(CATEGORY_SELECTION, string="Purchase", default="no", required=True,)
     has_picking = fields.Selection(CATEGORY_SELECTION, string="Picking", default="no", required=True,)
     has_invoice = fields.Selection(CATEGORY_SELECTION, string="Invoice", default="no", required=True,)
-    has_purchase_subscription = fields.Selection(CATEGORY_SELECTION, string="Purchase Subscription", default="no", required=True,)
 
     #Line Item fields
     has_project = fields.Selection(CATEGORY_SELECTION, string="Project", default="no", required=True,)
     has_product = fields.Selection(CATEGORY_SELECTION, string="Product", default="no", required=True,)
+    has_advanced = fields.Selection(CATEGORY_SELECTION, string="Advanced", default="no", required=True,)
     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Analytic", default="no", required=True,)
 
+    #feature options fields
     has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Rent Vehicle", default="no", required=True,)
     has_travel = fields.Selection(CATEGORY_SELECTION, string="Travel", default="no", required=True,)
     has_hotel = fields.Selection(CATEGORY_SELECTION, string="Hotel", default="no", required=True,)
+    has_electricity = fields.Selection(CATEGORY_SELECTION, string="Electricity", default="no", required=True,)
+    has_fuel_drawn = fields.Selection(CATEGORY_SELECTION, string="Fuel Drawn", default="no", required=True,)
+    has_fuel_filling = fields.Selection(CATEGORY_SELECTION, string="Fuel Filling", default="no", required=True,)
 
 
     @api.model
