@@ -1230,7 +1230,9 @@ class StockTransferTXNLine(models.Model):
         for txn in self:
             if txn.transfer_exception_type_id:
                 txn.sequence = txn.transfer_exception_type_id.sequence
-                
+            else:
+                txn.sequence = 0    
+  
     def unlink(self):
         if self.txn_action == 'apply':
             raise UserError(_('You cannot delete an applied transaction.'))
