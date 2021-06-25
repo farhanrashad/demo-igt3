@@ -17,7 +17,7 @@
     'version': '14.0.0.6',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_purchase_subscription','account','de_project_planning','stock','purchase_requisition'],
+    'depends': ['de_purchase_subscription','account','de_project_planning','stock','purchase_requisition','de_travel_request'],
 
     # always loaded
     'data': [
