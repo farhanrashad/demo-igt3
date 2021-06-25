@@ -45,7 +45,7 @@ class CustomEntryType(models.Model):
     #header fields    
     has_partner = fields.Selection(CATEGORY_SELECTION, string="Partner", default="no", required=True,)
     has_ref = fields.Selection(CATEGORY_SELECTION, string="Reference", default="no", required=True,)
-    has_supplier_bill = fields.Selection(CATEGORY_SELECTION, string="Supplier Bill", default="no", required=True,)
+    has_supplier_bill = fields.Selection(CATEGORY_SELECTION, string="Supplier Bill Ref.", default="no", required=True,)
     has_period = fields.Selection(CATEGORY_SELECTION, string="Period", default="no", required=True,)
     has_attachment = fields.Selection(CATEGORY_SELECTION, string="Attachment", default="no", required=True,)
     has_description = fields.Selection(CATEGORY_SELECTION, string="Description", default="no", required=True,)
@@ -59,7 +59,7 @@ class CustomEntryType(models.Model):
     has_product = fields.Selection(CATEGORY_SELECTION, string="Product", default="no", required=True,)
     has_advanced = fields.Selection(CATEGORY_SELECTION, string="Advanced", default="no", required=True,)
     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Analytic", default="no", required=True,)
-
+    has_employee = fields.Selection(CATEGORY_SELECTION, string="Employee", default="no", required=True,)
     #feature options fields
     has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Rent Vehicle", default="no", required=True,)
     has_travel = fields.Selection(CATEGORY_SELECTION, string="Travel", default="no", required=True,)

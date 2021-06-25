@@ -9,7 +9,8 @@ from dateutil.relativedelta import relativedelta
 import json
 from lxml import etree
 
-MONTH_LIST= [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May'), ('6', 'Jun'), ('7', 'Jul'), ('8', 'Aug'), ('9', 'Sep'), ('10', 'Oct'), ('11', 'Nov'),('12', 'Dec')]
+MONTH_LIST = [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May'), ('6', 'Jun'), ('7', 'Jul'), ('8', 'Aug'), ('9', 'Sep'), ('10', 'Oct'), ('11', 'Nov'),('12', 'Dec')]
+
 class CustomEntry(models.Model):
     _name = 'account.custom.entry'
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -20,7 +21,7 @@ class CustomEntry(models.Model):
     
     name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     date_entry = fields.Datetime(string='Entry Date', required=True, index=True, copy=False, default=fields.Datetime.now,)
-    date_entry_month = fields.Selection(MONTH_LIST, string='Month', default=MONTH_LIST[int(datetime.now().strftime('%m'))-1])
+    date_entry_month = fields.Selection(MONTH_LIST, string='Month')
     date_entry_year = fields.Char(string='Year', compute='_compute_entry_year')
 
     date_submit = fields.Datetime('Submission Date', readonly=False)
@@ -45,7 +46,7 @@ class CustomEntry(models.Model):
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
     
-    partner_id = fields.Many2one('res.partner', string='Vendor', required=True, change_default=True, tracking=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
+    partner_id = fields.Many2one('res.partner', string='Vendor', change_default=True, tracking=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     
     
     #Header optional fields
@@ -74,6 +75,7 @@ class CustomEntry(models.Model):
     has_project = fields.Selection(related="custom_entry_type_id.has_project")
     has_analytic = fields.Selection(related="custom_entry_type_id.has_analytic")
     has_product = fields.Selection(related="custom_entry_type_id.has_product")
+    has_employee = fields.Selection(related="custom_entry_type_id.has_employee")
     has_advanced = fields.Selection(related="custom_entry_type_id.has_advanced")
     
     #application optional fields
@@ -84,12 +86,12 @@ class CustomEntry(models.Model):
     has_fuel_drawn = fields.Selection(related="custom_entry_type_id.has_fuel_drawn")
     has_fuel_filling = fields.Selection(related="custom_entry_type_id.has_fuel_filling")
     
-    #application extra fields
+    #application common extra fields for hotel/accomodation
     customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
     date_effective = fields.Date(string='Effective Date')
     date_subscription = fields.Date(string='Date of Subscription')
     
-    #fleet or rent vehicle extra fields
+    #fleet/rent vehicle extra fields
     f_duration_from = fields.Date(string='Duration')
     f_duration_to = fields.Date(string='')
     
@@ -98,10 +100,6 @@ class CustomEntry(models.Model):
         ('flight ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
         string='Travel By', track_visibility="always")
-    
-
-    
-    
     
     invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
     invoice_count = fields.Integer(compute="_compute_invoice", string='Bill Count', copy=False, default=0, store=True)
@@ -485,6 +483,9 @@ class CustomEntryLine(models.Model):
     analytic_account_id = fields.Many2one('account.analytic.account', store=True, string='Analytic Account', )
     analytic_tag_ids = fields.Many2many('account.analytic.tag', store=True, string='Analytic Tags', )
     
+    #employee
+    employee_id = fields.Many2one('hr.employee',string="Employee")
+    
     #Product
     product_id = fields.Many2one('product.product', string="Products", check_company=True)
     product_uom_id = fields.Many2one('uom.uom', string="Unit of Measure",
@@ -496,24 +497,69 @@ class CustomEntryLine(models.Model):
     advance_subtotal = fields.Monetary(string='Adv. Subtotal', store=True)
     
     #has travel
-    date_departure = fields.Date(string='Departure', )
-    date_arrival = fields.Date(string='Arrival', )
+    t_travel_category = fields.Selection([
+        ('domestic', 'Domestic'),
+        ('international', 'International'),
+        ], string='Category', default='domestic')
     travel_from = fields.Char(string='From')
     travel_to = fields.Char(string='To')
-    travel_purpose = fields.Char(string='purpose')
-    trave_ref = fields.Char(string='reference')
+    date_departure = fields.Date(string='Departure Date', )
+    date_arrival = fields.Date(string='Arrival Date', )    
+    number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
+    travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
+    t_unit_price = fields.Float(string="Unit Price")
+    t_extra_charges = fields.Float(string="Extra Charges")
+    t_amount_travel = fields.Float(string="Total Amount", compute='_compute_all_amount_travel')
     
-    #has vehicle
-    vehicle_no = fields.Char(string='Vehicle No.')
-    driver_name = fields.Char(string='Driver')
-    rent_days = fields.Float(string='Days')
+    @api.depends('number_of_days', 't_unit_price', 't_extra_charges')
+    def _compute_all_amount_travel(self):
+        total_amount_travel = 0
+        for line in self:
+            total_amount_travel = (line.number_of_days * line.t_unit_price) + line.t_extra_charges
+            line.update({
+                't_amount_travel': total_amount_travel
+            })
+            
+    #has fleet/rent vehicle
+    f_fleet_id = fields.Many2one('fleet.vehicle', string="Car Detail")
+    f_driver_id = fields.Many2one('res.partner', string="Driver")
+    f_job_scope = fields.Selection(
+        [('car rental', 'Car Rental.'),
+         ('driver ot', 'Driver OT.'),
+         ('driver salary', 'Driver Salary.'),
+         ('maintenance fee', 'Maintenance Fee.'),
+         ('management fee', 'Management Fee.'),
+         ('on demand', 'On Demand.'),
+         ('petrol charges', 'Petrol Charges.'),
+         ('toll fee', 'Toll Fee.'),
+         ('replacement', 'Replacement.')],
+        string='Job Scope', track_visibility="always")
+    f_rent_days = fields.Float(string='Days')
+    f_amount = fields.Float(string="Amount")
     
-    #has hotel
-    date_in = fields.Datetime(string='Check In', )
-    date_out = fields.Datetime(string='Check Out', )
-    #no_of_nights = fields.Integer(string='No. of Nights')
-    hote_travel_purpose = fields.Char(string='purpose')
-    hotel_name = fields.Char(string='Hotel')
+    
+    #has hotel/accomodation
+    h_category = fields.Selection([
+        ('travel', 'Travel'),
+        ('housing allowance', 'Housing Allowance'),
+        ], string='Category', default='travel')
+    hotel_detail = fields.Char(string="Hotel Detail")
+    h_check_in = fields.Date(string="Check-In")
+    h_check_out = fields.Date(string="Check-Out")
+    h_number_of_nights = fields.Float(string="Number of Nights", compute='_number_of_nights')
+    h_travel_id = fields.Many2one('travel.request' , string="Travel Reference")
+    h_unit_price = fields.Float(string="Unit Price")
+    h_extra_charges = fields.Float(string="Extra Charges")
+    h_amount = fields.Float(string="Total Amount", compute='_compute_all_amount_hotel')
+    
+    @api.depends('h_number_of_nights', 'h_unit_price', 'h_extra_charges')
+    def _compute_all_amount_hotel(self):
+        total_amount = 0
+        for line in self:
+            total_amount = (line.h_number_of_nights * line.h_unit_price) + line.h_extra_charges
+            line.update({
+                'h_amount': total_amount
+            })
 
     #has electricity
     date_bill_from = fields.Date(string='Date From', )

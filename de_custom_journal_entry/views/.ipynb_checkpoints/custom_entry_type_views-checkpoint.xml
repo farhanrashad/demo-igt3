@@ -79,6 +79,7 @@
                                         <field name="has_project" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_analytic" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_product" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_employee" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_advanced" widget="radio" options="{'horizontal': true}"/>
                                     </group>
                                     
