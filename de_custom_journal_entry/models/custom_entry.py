@@ -46,7 +46,7 @@ class CustomEntry(models.Model):
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
     
-    partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', select=True, change_default=True, tracking=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
+    partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', select=True, change_default=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     
     
     #Header optional fields
@@ -99,7 +99,7 @@ class CustomEntry(models.Model):
     t_travel_by = fields.Selection([
         ('flight ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
-        string='Travel By', track_visibility="always")
+        string='Travel By',)
     
     invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
     invoice_count = fields.Integer(compute="_compute_invoice", string='Bill Count', copy=False, default=0, store=True)
