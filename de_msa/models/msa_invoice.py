@@ -17,7 +17,7 @@ class MSAInvoice(models.Model):
     origin = fields.Char(string='Source Document')
     currency_id = fields.Many2one('res.currency', string='Invoice Currency')
     residual = fields.Char(string='Regional Name')
-    amount_untaxed = fields.Char(string='Balance')
+    amount_untaxed = fields.Char(string='Amount Untaxed')
     sub_total = fields.Float(string='Balance')
     amount_total = fields.Float(string='Amount Total')
     amount_total_usd = fields.Float(string='Amount Total USD')

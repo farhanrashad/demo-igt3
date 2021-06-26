@@ -1,20 +1,29 @@
 # -*- coding: utf-8 -*-
-# Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
-
 {
-    "name": "Master Service Agreement",
-    "category": 'Agreement',
-    "summary": "Master Service Agreement",
-    "description": """
-	 
-   
+    'name': "Master Service Agreement",
+
+    'summary': """
+        Master Service Agreement
+        """,
+
+    'description': """
+        Master Service Agreement
     """,
-    "sequence": 1,
-    "author": "Dynexcel",
-    "website": "http://www.dynexcel.co",
-    "version": '14.1.0.1',
-    "depends": ['product','project'],
-    "data": [
+
+    'author': "Dynexccel",
+    'website': "https://www.dynexcel.com",
+
+    # Categories can be used to filter modules in modules listing
+    # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
+    # for the full list
+    'category': 'Agreement',
+    'version': '14.0.0.1',
+
+    # any module necessary for this one to work correctly
+    'depends': ['base','product','project','account','contacts'],
+
+    # always loaded
+    'data': [
         'security/ir.model.access.csv',
         'views/master_service_agreement_view.xml',
         'views/billing_info_view.xml',
@@ -27,7 +36,6 @@
         'views/msa_menu.xml',
 #         'report/employee_report_pdf.xml',
     ],
-    
     "price": 25,
     "currency": 'EUR',
     "installable": True,
