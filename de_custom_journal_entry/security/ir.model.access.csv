@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_entry_type_manager,access.custom.entry.type.manager,model_account_custom_entry_type,account.group_account_manager,1,1,1,1
+access_custom_entry_stage_manager,access.custom.entry.stage.manager,model_account_custom_entry_stage,account.group_account_manager,1,1,1,1
+access_custom_entry_manager,access.custom.entry.manager,model_account_custom_entry,account.group_account_manager,1,1,1,1
+access_custom_entry_line_manager,access.custom.entry.line.manager,model_account_custom_entry_line,account.group_account_manager,1,1,1,1
