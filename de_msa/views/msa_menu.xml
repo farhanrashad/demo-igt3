@@ -2,9 +2,8 @@
 	<data noupdate="0">
 		
 		<menuitem id="msa_root_menu" name="MSA"
-            active="True"
-            sequence="105"/>
-
+            active="True" web_icon="de_msa,static/description/icon.png"
+            sequence="5"/>
 
 		<menuitem id="msa_menu" name="Master Service Agreement" parent="msa_root_menu"
 			action="de_msa.action_master_service_agreement_view"
