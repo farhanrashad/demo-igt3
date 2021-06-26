@@ -4,6 +4,7 @@ from odoo import api, fields, models, _
 
 class collocation_discount_tower_capex(models.Model):
     _name = "collocation.discount.tower.capex"
+    _description = 'Collocation Discount Tower CAPEX'
     
     year = fields.Char('Year', size=4, required=True)
     factor_for_1 = fields.Float('Factor for 1 Tenant')

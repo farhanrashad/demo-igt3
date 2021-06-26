@@ -4,8 +4,9 @@ from odoo import api, fields, models, _
 
 class tower_without_power(models.Model):
     _name = 'tower.without.power'
+    _description = 'Tower Without Power'
     
-    tower_type = fields.Many2one('product.product', 'Tower Type', domain="[('sale_ok', '=', True)]", required=True)
+    tower_type = fields.Many2one('product.product', 'Tower Type', domain="[('sale_ok', '=', True),('is_product_category_tower', '=', True)]", required=True)
     ip_fee_capex = fields.Float('IP Fee For CAPEX')
     ip_fee_opex = fields.Float('IP Fee For OPEX')
     msa_id = fields.Many2one('master.service.agreement', 'Master Service Agreement')

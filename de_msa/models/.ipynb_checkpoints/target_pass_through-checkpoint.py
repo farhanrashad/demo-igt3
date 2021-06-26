@@ -5,9 +5,10 @@ from odoo import api, fields, models, _
 
 class target_pass_through(models.Model):
     _name = 'target.pass.through'
+    _description = 'Target Pass Through'
     
     msa_id = fields.Many2one('master.service.agreement', 'Master Service Agreement')
-    power_model_id = fields.Many2one('product.product', 'Power Model')
+    power_model_id = fields.Many2one('product.product', 'Power Model', domain="[('sale_ok', '=', True), ('is_product_category_power', '=', True)]")
     site_load = fields.Selection([('access_low', 'Access Low'),
                                   ('access_hight', 'Access High'),
                                   ('dwdm', 'DWDM'),

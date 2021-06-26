@@ -4,6 +4,7 @@ from odoo import api, fields, models, _
 
 class site_load(models.Model):
     _name = 'site.load'
+    _description = 'Site Load'
 
     power_type = fields.Many2one('product.product', 'Power Model', domain="[('sale_ok', '=', True),('is_product_category_power', '=', True)]", required=True)
     msa_id = fields.Many2one('master.service.agreement', 'MSA')

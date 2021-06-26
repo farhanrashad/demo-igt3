@@ -5,6 +5,7 @@ from odoo import api, fields, models, _
 
 class collocation_discount_power_capex(models.Model):
     _name = "collocation.discount.power.capex"
+    _description = 'Collocation Discount Power CAPEX'
     
 
     year = fields.Char('Year', size=4, required=True)

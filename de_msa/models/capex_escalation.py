@@ -4,6 +4,7 @@ from odoo import api, fields, models, _
 
 class capex_escalation(models.Model):
     _name = "capex.escalation"
+    _description = 'CAPEX Escalation'
   
     year = fields.Char('Year', required=True, size=4)
     cpi = fields.Float('CPI')

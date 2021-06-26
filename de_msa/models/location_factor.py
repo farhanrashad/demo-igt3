@@ -3,6 +3,7 @@ from odoo import api, fields, models, _
 
 class location_factor(models.Model):
     _name = "location.factor"
+    _description = 'Location Factor'
     
     state_id = fields.Many2one('res.country.state', 'Region', domain="[('country_id.name', '=', 'Myanmar')]", required=True)
     factor = fields.Float('Factor', digits=(16, 3))

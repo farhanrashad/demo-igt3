@@ -7,6 +7,7 @@ from odoo.exceptions import UserError
 
 class msa_simulation(models.Model):
     _name = 'msa.simulation'
+    _description = 'MSA Simulation'
     
     def compute_values(self):
         for rec in self:

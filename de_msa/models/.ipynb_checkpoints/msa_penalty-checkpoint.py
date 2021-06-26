@@ -3,6 +3,7 @@ from odoo import api, fields, models, _
 
 class msa_penalty(models.Model):
     _name = "msa.penalty"
+    _description = 'MSA Penalty'
     
     
     name = fields.Char('Name', required=True)

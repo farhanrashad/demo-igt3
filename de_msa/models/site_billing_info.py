@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 
 class site_billing_info(models.Model):
     _name = 'site.billing.info'
+    _description = 'Site Building Info'
 
     
 #     @api.model
