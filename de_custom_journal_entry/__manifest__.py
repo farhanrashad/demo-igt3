@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Custom Journal Entry",
-
+    'name': "Third-Party Billing",
     'summary': """
-        Customize Journal Entry
+        Customize Journal Entries
         """,
-
     'description': """
         Customize Journal Entry
-        Depends on Purchase Subscription
+        
     """,
-
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Accounting',
-    'version': '14.0.0.6',
-
-    # any module necessary for this one to work correctly
-    'depends': ['de_purchase_subscription','account', 'project','de_project_planning','stock','purchase_requisition','purchase','de_travel_request'],
+    'version': '14.0.0.7',
+    
+    'depends': ['de_purchase_subscription','account', 'project','stock','purchase_requisition','purchase','de_travel_request'],
 
     # always loaded
     'data': [
