@@ -4,9 +4,9 @@
     'summary': """Travel Request""",
     'description': """ """,
     'author': "Dynexcel",
-    'website': "http://www.dynexcel.co",
+    'website': "https://www.dynexcel.com",
     'category': 'Hr',
-    'version': '14.0.0.0',
+    'version': '14.0.0.2',
     'depends': ['base', 'hr','digest'],
     'data': [
         'security/ir.model.access.csv',

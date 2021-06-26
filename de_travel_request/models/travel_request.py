@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 class TravelRequest(models.Model):
     _name = 'travel.request'
+    _description = 'Travel Request'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
 
 
@@ -23,7 +24,7 @@ class TravelRequest(models.Model):
         return super(TravelRequest, self).create(values)
 
     crnt_year = fields.Integer(string="Current Year", default=datetime.now().year)
-    travel_request = fields.Char('Name', required=True, copy=False, readonly=True, index=True,
+    travel_request = fields.Char(string='Travel Reference', required=True, copy=False, readonly=True, index=True,
                                  default=lambda self: _('New'))
 
     state = fields.Selection([
@@ -48,7 +49,7 @@ class TravelRequest(models.Model):
     travel_request_lines = fields.One2many('travel.request.line', 'travel_request_id')
 
     name = fields.Char('Name', required=True, tracking=True)
-    description_main = fields.Char('Description')
+    description_main = fields.Char(string='Desc')
     travel_type = fields.Selection(
         [('business', 'Business'), ('personal', 'Personal'), ('visa run', 'Visa Run'), ('meeting', 'Meeting')],
         string="Travel Type", default=None)
@@ -91,8 +92,9 @@ class TravelRequest(models.Model):
 
 class TravelRequestLine(models.Model):
     _name = 'travel.request.line'
+    _description = 'Travel Request Line'
 
-    travel_request_id = fields.Many2one('travel.request')
+    travel_request_id = fields.Many2one('travel.request',string='Travel Request')
 
     hotel_detail = fields.Char(string="Hotel Detail")
     check_in = fields.Datetime(string="Check In")
