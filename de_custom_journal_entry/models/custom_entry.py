@@ -46,7 +46,7 @@ class CustomEntry(models.Model):
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
     
-    partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', select=True, change_default=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
+    partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', change_default=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     
     
     #Header optional fields
@@ -65,10 +65,10 @@ class CustomEntry(models.Model):
     supplier_bill_ref = fields.Char(string='Supplier Bill Ref.')
     attachment1 = fields.Boolean(string='Attachment 1')
     description = fields.Text(string='Description')
-    purchase_requisition_id = fields.Many2one('purchase.requisition', string="Requisition", check_company=True, ondelete='cascade', select=True,)
-    purchase_id = fields.Many2one('purchase.order', string="Purchase", check_company=True, ondelete='cascade', select=True,)
-    invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True, ondelete='cascade', select=True,)
-    picking_id = fields.Many2one('stock.picking', string="Picking", check_company=True, ondelete='cascade', select=True,)
+    purchase_requisition_id = fields.Many2one('purchase.requisition', string="Requisition", check_company=True, ondelete='cascade')
+    purchase_id = fields.Many2one('purchase.order', string="Purchase Order", check_company=True, ondelete='cascade')
+    invoice_id = fields.Many2one('account.move', string="Invoice Reference", check_company=True, ondelete='cascade')
+    picking_id = fields.Many2one('stock.picking', string="Picking Reference", check_company=True, ondelete='cascade')
     
     
     #optional line items fields
@@ -478,10 +478,10 @@ class CustomEntryLine(models.Model):
     invoice_lines = fields.One2many('account.move.line', 'custom_entry_line_id', string="Bill Lines", readonly=True, copy=False)
 
     #Project   
-    project_id = fields.Many2one('project.project', string="Project", check_company=True, ondelete='cascade', select=True,)
-    state_id = fields.Many2one('res.country.state', compute='_compute_state', string='Region', ondelete='cascade', select=True,)
-    analytic_account_id = fields.Many2one('account.analytic.account', store=True, string='Analytic Account',ondelete='cascade', select=True, )
-    analytic_tag_ids = fields.Many2many('account.analytic.tag', store=True, string='Analytic Tags', ondelete='cascade', select=True,)
+    project_id = fields.Many2one('project.project', string="Project", check_company=True, ondelete='cascade')
+    state_id = fields.Many2one('res.country.state', compute='_compute_state', string='Region', ondelete='cascade')
+    analytic_account_id = fields.Many2one('account.analytic.account', store=True, string='Analytic Account',ondelete='cascade')
+    analytic_tag_ids = fields.Many2many('account.analytic.tag', store=True, string='Analytic Tags', ondelete='cascade')
     
     #employee
     employee_id = fields.Many2one('hr.employee',string="Employee")
@@ -490,7 +490,7 @@ class CustomEntryLine(models.Model):
     product_id = fields.Many2one('product.product', string="Products", check_company=True)
     product_uom_id = fields.Many2one('uom.uom', string="Unit of Measure",
         domain="[('category_id', '=', product_uom_category_id)]")
-    product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id')
+    product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', string="UOM Category")
     product_qty = fields.Float(string='Quantity', default=1.0, digits='Product Unit of Measure', )
     price_unit = fields.Float(string='Unit Price', default=1.0, digits='Product Price')
     price_subtotal = fields.Monetary(compute='_compute_all_amount', string='Subtotal', store=True)
@@ -500,16 +500,16 @@ class CustomEntryLine(models.Model):
     t_travel_category = fields.Selection([
         ('domestic', 'Domestic'),
         ('international', 'International'),
-        ], string='Category', default='domestic')
+        ], string='Travel Category', default='domestic')
     travel_from = fields.Char(string='From')
     travel_to = fields.Char(string='To')
     date_departure = fields.Date(string='Departure Date', )
     date_arrival = fields.Date(string='Arrival Date', )    
     number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
     travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
-    t_unit_price = fields.Float(string="Unit Price")
-    t_extra_charges = fields.Float(string="Extra Charges")
-    t_amount_travel = fields.Float(string="Total Amount", compute='_compute_all_amount_travel')
+    t_unit_price = fields.Float(string="Travel Unit Price")
+    t_extra_charges = fields.Float(string="Travel Extra Charges")
+    t_amount_travel = fields.Float(string="Travel Total Amount", compute='_compute_all_amount_travel')
     
     @api.depends('number_of_days', 't_unit_price', 't_extra_charges')
     def _compute_all_amount_travel(self):
@@ -522,7 +522,7 @@ class CustomEntryLine(models.Model):
             
     #has fleet/rent vehicle
     f_fleet_id = fields.Many2one('fleet.vehicle', string="Car Detail")
-    f_driver_id = fields.Many2one('res.partner', string="Driver", ondelete='cascade', select=True,)
+    f_driver_id = fields.Many2one('res.partner', string="Driver", ondelete='cascade')
     f_job_scope = fields.Selection(
         [('car rental', 'Car Rental.'),
          ('driver ot', 'Driver OT.'),
@@ -542,14 +542,14 @@ class CustomEntryLine(models.Model):
     h_category = fields.Selection([
         ('travel', 'Travel'),
         ('housing allowance', 'Housing Allowance'),
-        ], string='Category', default='travel')
+        ], string='Accomodation Category', default='travel')
     hotel_detail = fields.Char(string="Hotel Detail")
     h_check_in = fields.Date(string="Check-In")
     h_check_out = fields.Date(string="Check-Out")
     h_number_of_nights = fields.Float(string="Number of Nights", compute='_number_of_nights')
-    h_travel_id = fields.Many2one('travel.request' , string="Travel Reference")
-    h_unit_price = fields.Float(string="Unit Price")
-    h_extra_charges = fields.Float(string="Extra Charges")
+    h_travel_id = fields.Many2one('travel.request' , string="Travel Request")
+    h_unit_price = fields.Float(string="Hotel Unit Price")
+    h_extra_charges = fields.Float(string="Hote Extra Charges")
     h_amount = fields.Float(string="Total Amount", compute='_compute_all_amount_hotel')
     
     @api.depends('h_number_of_nights', 'h_unit_price', 'h_extra_charges')
@@ -578,11 +578,11 @@ class CustomEntryLine(models.Model):
     amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount')
     
     #has fuel Drawn
-    d_date = fields.Date(string='Date', )
-    d_partner_id = fields.Many2one('res.partner',string='Fuel Purchase From', ondelete='cascade', select=True,)
-    d_product_qty = fields.Float(string='Fuel Qty', default=1.0, digits='Product Unit of Measure', )
-    d_price_unit = fields.Float(string='Unit Price', default=1.0, digits='Product Price')
-    d_price_subtotal = fields.Monetary(compute='_compute_fuel_drawn_total', string='Subtotal', store=True)
+    d_date = fields.Date(string='Drawn Date')
+    d_partner_id = fields.Many2one('res.partner',string='Drawn Purchase From', ondelete='cascade')
+    d_product_qty = fields.Float(string='Drawn Qty', default=1.0, digits='Product Unit of Measure', )
+    d_price_unit = fields.Float(string='Drawn Unit Price', default=1.0, digits='Product Price')
+    d_price_subtotal = fields.Monetary(compute='_compute_fuel_drawn_total', string='Drawn Subtotal', store=True)
     d_booklet_no = fields.Char(string='Booklet')
     d_receipt_no = fields.Char(string='Receipt No.')
     
@@ -598,18 +598,18 @@ class CustomEntryLine(models.Model):
         })
         
     #Fuel Filling
-    f_date = fields.Date(string='Date', )
-    f_partner_id = fields.Many2one('res.partner',string='Fuel Purchase From', ondelete='cascade', select=True,)
+    f_date = fields.Date(string='Filling Date')
+    f_partner_id = fields.Many2one('res.partner',string='Filling Purchase From', ondelete='cascade')
     f_gen_name = fields.Char(string='Generator Name')
     f_gen_capacity = fields.Integer(string='Generator Capacity')
     f_curr_drgh = fields.Float(string='Current DRGH')
     f_opening_stock = fields.Float(string='Opening Stock')
     f_closing_stock = fields.Float(string='Closting Stock', compute='_compute_fuel_filled_closing_stock')
-    f_product_qty = fields.Float(string='Fuel Qty', default=1.0, digits='Product Unit of Measure', )
-    f_price_unit = fields.Float(string='Unit Price', default=1.0, digits='Product Price')
-    f_price_subtotal = fields.Monetary(compute='_compute_fuel_filled_total', string='Subtotal', store=True)
-    f_booklet_no = fields.Char(string='Booklet')
-    f_receipt_no = fields.Char(string='Receipt No.')
+    f_product_qty = fields.Float(string='Filling Qty', default=1.0, digits='Product Unit of Measure', )
+    f_price_unit = fields.Float(string='Filling Unit Price', default=1.0, digits='Product Price')
+    f_price_subtotal = fields.Monetary(compute='_compute_fuel_filled_total', string='Filling Subtotal', store=True)
+    f_booklet_no = fields.Char(string='Filling Booklet')
+    f_receipt_no = fields.Char(string='Filling Receipt No.')
     
     #fuel filling methods
     @api.depends('f_opening_stock', 'f_product_qty')

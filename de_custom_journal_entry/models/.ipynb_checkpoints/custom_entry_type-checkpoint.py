@@ -34,66 +34,39 @@ class CustomEntryType(models.Model):
     sequence_id = fields.Many2one('ir.sequence', 'Reference Purchase Subscription Sequence',
         copy=False, check_company=True)
     
+    generate_accounting = fields.Boolean(string='Generate Accounting')
     expense_advance = fields.Boolean(string='Pay Advance Expense')
-    journal_id = fields.Many2one('account.journal', string="Accounting Journal", required=True, company_dependent=True, check_company=True,)
+    journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
+    payment_journal_id = fields.Many2one('account.journal', string="Payment Journal", required=True, company_dependent=True, check_company=True,  domain="[('type', 'in', ['bank', 'cash'])]")
 
-    
-    #Main Type fields
-    has_fleet_fields = fields.Selection(CATEGORY_SELECTION, string="Fleet", default="no", required=True,)
-    has_travel_fields = fields.Selection(CATEGORY_SELECTION, string="Travel", default="no", required=True,)
-    has_accommodation_fields = fields.Selection(CATEGORY_SELECTION, string="Accommodation", default="no", required=True,)
-    
-    
+    group_id = fields.Many2one('res.groups', string='Security Group')
+
+        
     #header fields    
-    has_partner = fields.Selection(CATEGORY_SELECTION, string="Partner", default="no", required=True,)
-    has_ref = fields.Selection(CATEGORY_SELECTION, string="Reference", default="no", required=True,)
-    has_purchase_requisition = fields.Selection(CATEGORY_SELECTION, string="Requisition", default="no", required=True,)
-    has_purchase = fields.Selection(CATEGORY_SELECTION, string="Purchase", default="no", required=True,)
-    has_picking = fields.Selection(CATEGORY_SELECTION, string="Picking", default="no", required=True,)
-    has_invoice = fields.Selection(CATEGORY_SELECTION, string="Invoice", default="no", required=True,)
-    has_purchase_subscription = fields.Selection(CATEGORY_SELECTION, string="Purchase Subscription", default="no", required=True,)
-    #new fields for Fleet Bill(form)
-    has_supplier_inv_no = fields.Selection(CATEGORY_SELECTION, string="Supplier Invoice Number", default="no", required=True,)
-    has_supplier = fields.Selection(CATEGORY_SELECTION, string="Supplier", default="no", required=True,)
-    has_invoice_no = fields.Selection(CATEGORY_SELECTION, string="Invoice Number", default="no", required=True,)
-    has_amount_total = fields.Selection(CATEGORY_SELECTION, string="Amount Total", default="no", required=True,)
-    has_duration = fields.Selection(CATEGORY_SELECTION, string="Duration", default="no", required=True,)
-    #new fields for travel bill (form)
-    has_travel_by = fields.Selection(CATEGORY_SELECTION, string="Travel By", default="no", required=True,)
-    has_customer_type = fields.Selection(CATEGORY_SELECTION, string="Customer Type", default="no", required=True,)
-    has_effective_date = fields.Selection(CATEGORY_SELECTION, string="Effective Date", default="no", required=True,)
-    has_date_of_sub = fields.Selection(CATEGORY_SELECTION, string="Date of Submission", default="no", required=True,)
-    
-    
+    has_partner = fields.Selection(CATEGORY_SELECTION, string="Has Partner", default="no", required=True,)
+    has_ref = fields.Selection(CATEGORY_SELECTION, string="Has Reference", default="no", required=True,)
+    has_supplier_bill = fields.Selection(CATEGORY_SELECTION, string="Has Supplier Bill", default="no", required=True,)
+    has_period = fields.Selection(CATEGORY_SELECTION, string="Has Period", default="no", required=True,)
+    has_attachment = fields.Selection(CATEGORY_SELECTION, string="Has Attachment", default="no", required=True,)
+    has_description = fields.Selection(CATEGORY_SELECTION, string="Has Description", default="no", required=True,)
+    has_purchase_requisition = fields.Selection(CATEGORY_SELECTION, string="Has Purchase Requisition", default="no", required=True,)
+    has_purchase = fields.Selection(CATEGORY_SELECTION, string="Has Purchase", default="no", required=True,)
+    has_picking = fields.Selection(CATEGORY_SELECTION, string="Has Picking", default="no", required=True,)
+    has_invoice = fields.Selection(CATEGORY_SELECTION, string="Has Invoice", default="no", required=True,)
 
-    #Line Item fields(fleet bill)
-    has_car_details = fields.Selection(CATEGORY_SELECTION, string="Car Detail", default="no", required=True,)
-    has_driver = fields.Selection(CATEGORY_SELECTION, string="Driver", default="no", required=True,)
-    has_user = fields.Selection(CATEGORY_SELECTION, string="User", default="no", required=True,)
-    has_job_scope = fields.Selection(CATEGORY_SELECTION, string="Job Scope", default="no", required=True,)
-    has_days = fields.Selection(CATEGORY_SELECTION, string="Days", default="no", required=True,)
-    has_amount = fields.Selection(CATEGORY_SELECTION, string="Amount (MMK)", default="no", required=True,)
-    has_remark = fields.Selection(CATEGORY_SELECTION, string="Remark", default="no", required=True,)
-    #Line Item fields(Travel bill)
-    has_category = fields.Selection(CATEGORY_SELECTION, string="Category", default="no", required=True,)
-    has_from = fields.Selection(CATEGORY_SELECTION, string="From", default="no", required=True,)
-    has_to = fields.Selection(CATEGORY_SELECTION, string="To", default="no", required=True,)
-    has_departure_date = fields.Selection(CATEGORY_SELECTION, string="Departure Date", default="no", required=True,)
-    has_arrival_date = fields.Selection(CATEGORY_SELECTION, string="Arrival Date", default="no", required=True,)
-    has_number_of_days = fields.Selection(CATEGORY_SELECTION, string="Number of Days", default="no", required=True,)
-    has_travel_reference = fields.Selection(CATEGORY_SELECTION, string="Travel Reference", default="no", required=True,)
-    has_description = fields.Selection(CATEGORY_SELECTION, string="Description", default="no", required=True,)
-    has_unit_price = fields.Selection(CATEGORY_SELECTION, string="Unit Price", default="no", required=True,)
-    has_extra_charges = fields.Selection(CATEGORY_SELECTION, string="Extra Charges", default="no", required=True,)
-    
-    
-#     has_project = fields.Selection(CATEGORY_SELECTION, string="Project", default="no", required=True,)
-#     has_product = fields.Selection(CATEGORY_SELECTION, string="Product", default="no", required=True,)
-#     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Analytic", default="no", required=True,)
-
-#     has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Rent Vehicle", default="no", required=True,)
-#     has_travel = fields.Selection(CATEGORY_SELECTION, string="Travel", default="no", required=True,)
-#     has_hotel = fields.Selection(CATEGORY_SELECTION, string="Hotel", default="no", required=True,)
+    #Line Item fields
+    has_project = fields.Selection(CATEGORY_SELECTION, string="Has Project", default="no", required=True,)
+    has_product = fields.Selection(CATEGORY_SELECTION, string="Has Product", default="no", required=True,)
+    has_advanced = fields.Selection(CATEGORY_SELECTION, string="Has Advanced Amount", default="no", required=True,)
+    has_analytic = fields.Selection(CATEGORY_SELECTION, string="Has Analytic", default="no", required=True,)
+    has_employee = fields.Selection(CATEGORY_SELECTION, string="Has Employee", default="no", required=True,)
+    #feature options fields
+    has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
+    has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)
+    has_hotel = fields.Selection(CATEGORY_SELECTION, string="Has Hotel", default="no", required=True,)
+    has_electricity = fields.Selection(CATEGORY_SELECTION, string="Has Electricity", default="no", required=True,)
+    has_fuel_drawn = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Drawn", default="no", required=True,)
+    has_fuel_filling = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Filling", default="no", required=True,)
 
 
     @api.model

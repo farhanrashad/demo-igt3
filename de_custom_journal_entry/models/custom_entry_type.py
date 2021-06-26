@@ -43,30 +43,30 @@ class CustomEntryType(models.Model):
 
         
     #header fields    
-    has_partner = fields.Selection(CATEGORY_SELECTION, string="Partner", default="no", required=True,)
-    has_ref = fields.Selection(CATEGORY_SELECTION, string="Reference", default="no", required=True,)
-    has_supplier_bill = fields.Selection(CATEGORY_SELECTION, string="Supplier Bill Ref.", default="no", required=True,)
-    has_period = fields.Selection(CATEGORY_SELECTION, string="Period", default="no", required=True,)
-    has_attachment = fields.Selection(CATEGORY_SELECTION, string="Attachment", default="no", required=True,)
-    has_description = fields.Selection(CATEGORY_SELECTION, string="Description", default="no", required=True,)
-    has_purchase_requisition = fields.Selection(CATEGORY_SELECTION, string="Purchase Requisition", default="no", required=True,)
-    has_purchase = fields.Selection(CATEGORY_SELECTION, string="Purchase", default="no", required=True,)
-    has_picking = fields.Selection(CATEGORY_SELECTION, string="Picking", default="no", required=True,)
-    has_invoice = fields.Selection(CATEGORY_SELECTION, string="Invoice", default="no", required=True,)
+    has_partner = fields.Selection(CATEGORY_SELECTION, string="Has Partner", default="no", required=True,)
+    has_ref = fields.Selection(CATEGORY_SELECTION, string="Has Reference", default="no", required=True,)
+    has_supplier_bill = fields.Selection(CATEGORY_SELECTION, string="Has Supplier Bill", default="no", required=True,)
+    has_period = fields.Selection(CATEGORY_SELECTION, string="Has Period", default="no", required=True,)
+    has_attachment = fields.Selection(CATEGORY_SELECTION, string="Has Attachment", default="no", required=True,)
+    has_description = fields.Selection(CATEGORY_SELECTION, string="Has Description", default="no", required=True,)
+    has_purchase_requisition = fields.Selection(CATEGORY_SELECTION, string="Has Purchase Requisition", default="no", required=True,)
+    has_purchase = fields.Selection(CATEGORY_SELECTION, string="Has Purchase", default="no", required=True,)
+    has_picking = fields.Selection(CATEGORY_SELECTION, string="Has Picking", default="no", required=True,)
+    has_invoice = fields.Selection(CATEGORY_SELECTION, string="Has Invoice", default="no", required=True,)
 
     #Line Item fields
-    has_project = fields.Selection(CATEGORY_SELECTION, string="Project", default="no", required=True,)
-    has_product = fields.Selection(CATEGORY_SELECTION, string="Product", default="no", required=True,)
-    has_advanced = fields.Selection(CATEGORY_SELECTION, string="Advanced", default="no", required=True,)
-    has_analytic = fields.Selection(CATEGORY_SELECTION, string="Analytic", default="no", required=True,)
-    has_employee = fields.Selection(CATEGORY_SELECTION, string="Employee", default="no", required=True,)
+    has_project = fields.Selection(CATEGORY_SELECTION, string="Has Project", default="no", required=True,)
+    has_product = fields.Selection(CATEGORY_SELECTION, string="Has Product", default="no", required=True,)
+    has_advanced = fields.Selection(CATEGORY_SELECTION, string="Has Advanced Amount", default="no", required=True,)
+    has_analytic = fields.Selection(CATEGORY_SELECTION, string="Has Analytic", default="no", required=True,)
+    has_employee = fields.Selection(CATEGORY_SELECTION, string="Has Employee", default="no", required=True,)
     #feature options fields
-    has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Rent Vehicle", default="no", required=True,)
-    has_travel = fields.Selection(CATEGORY_SELECTION, string="Travel", default="no", required=True,)
-    has_hotel = fields.Selection(CATEGORY_SELECTION, string="Hotel", default="no", required=True,)
-    has_electricity = fields.Selection(CATEGORY_SELECTION, string="Electricity", default="no", required=True,)
-    has_fuel_drawn = fields.Selection(CATEGORY_SELECTION, string="Fuel Drawn", default="no", required=True,)
-    has_fuel_filling = fields.Selection(CATEGORY_SELECTION, string="Fuel Filling", default="no", required=True,)
+    has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
+    has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)
+    has_hotel = fields.Selection(CATEGORY_SELECTION, string="Has Hotel", default="no", required=True,)
+    has_electricity = fields.Selection(CATEGORY_SELECTION, string="Has Electricity", default="no", required=True,)
+    has_fuel_drawn = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Drawn", default="no", required=True,)
+    has_fuel_filling = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Filling", default="no", required=True,)
 
 
     @api.model

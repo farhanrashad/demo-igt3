@@ -13,7 +13,7 @@
     'category': 'Accounting',
     'version': '14.0.0.7',
     
-    'depends': ['de_purchase_subscription','account', 'project','stock','purchase_requisition','purchase','de_travel_request'],
+    'depends': ['de_purchase_subscription','account', 'fleet', 'project','stock','purchase_requisition','purchase','de_travel_request'],
 
     # always loaded
     'data': [
