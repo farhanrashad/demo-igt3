@@ -1,0 +1,14 @@
+<odoo>
+
+	<record id="acccount_move_tree_inherit" model="ir.ui.view">
+		<field name="name">acccount.move.tree</field>
+		<field name="model">account.move</field>
+		<field name="inherit_id" ref="account.view_invoice_tree" />
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='invoice_partner_display_name']" position="after">
+				<field name="category" optional="show" />
+			</xpath>
+		</field>
+	</record>
+
+</odoo>

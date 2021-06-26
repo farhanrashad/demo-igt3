@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <report
+                id="msa_report_xlsx_1"
+                model="master.service.agreement"
+                string="MSA Report"
+                report_type="xlsx"
+                name="de_msa_report.msa_report_xlsx_1"
+                file="MSA Report"
+        />
+    </data>
+</odoo>

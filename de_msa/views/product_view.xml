@@ -1,0 +1,52 @@
+<odoo>
+	
+	<record id="product_product_form_view_inherit_msa" model="ir.ui.view">
+	        <field name="name">product.product.form</field>
+	        <field name="model">product.product</field>
+	        <field name="inherit_id" ref="product.product_normal_form_view"/>
+	        <field name="arch" type="xml">
+	
+	            <xpath expr="//field[@name='barcode']" position="after">
+	                <field name="is_product_category_power" />
+	                <field name="is_product_category_tower" />
+	                
+	                <field name="wind_factor" readonly="False"/>
+	            </xpath>
+	
+	        </field>
+	    </record>
+	
+	
+	
+	<record id="product_normal_action_power" model="ir.actions.act_window">
+            <field name="name">Powers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.product</field>
+            <field name="view_mode">kanban,form,tree,activity</field>
+			<field name="domain">[('is_product_category_power', '=', True)]</field>
+			<field name="context">{'default_is_product_category_power': True}</field>
+            <field name="search_view_id" ref="product.product_search_form_view"/>
+            <field name="view_id" eval="False"/> <!-- Force empty -->
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new power here....
+              </p>
+            </field>
+        </record>
+
+	<record id="product_normal_action_tower" model="ir.actions.act_window">
+            <field name="name">Towers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.product</field>
+            <field name="view_mode">kanban,form,tree,activity</field>
+			<field name="domain">[('is_product_category_tower', '=', True)]</field>
+			<field name="context">{'default_is_product_category_tower': True}</field>
+            <field name="search_view_id" ref="product.product_search_form_view"/>
+            <field name="view_id" eval="False"/> <!-- Force empty -->
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new towers here....
+              </p>
+            </field>
+        </record>
+</odoo>
