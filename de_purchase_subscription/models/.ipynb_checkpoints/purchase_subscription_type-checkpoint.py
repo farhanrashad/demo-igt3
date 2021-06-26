@@ -34,7 +34,7 @@ class PurchaseSubscriptionType(models.Model):
     
     running_subscription_count = fields.Integer("Number of running subscriptions", compute="_compute_running_subscriptions_count")
     draft_bill_count = fields.Integer("Number of draft bills", compute="_compute_all_bills_count")
-    posted_bill_count = fields.Integer("Number of draft bills", compute="_compute_all_bills_count")
+    posted_bill_count = fields.Integer("Number of bills", compute="_compute_all_bills_count")
 
     request_to_validate_count = fields.Integer("Number of requests to validate", compute="_compute_request_to_validate_count")
     

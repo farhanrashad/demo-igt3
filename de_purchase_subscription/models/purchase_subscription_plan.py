@@ -17,12 +17,12 @@ class PurchaseSubscriptionPlan(models.Model):
                                                 ('monthly', 'Months'), ('yearly', 'Years'), ],
                                                string='Recurrence', required=True,
                                                help="Invoice automatically repeat at specified interval",
-                                               default='monthly', tracking=True)
+                                               default='monthly')
     recurring_interval_rule = fields.Selection([
         ('unlimited', 'Forever'),
         ('limited', 'Fixed')
     ], string='Duration', default='unlimited')
-    recurring_interval = fields.Integer(string="Invoicing Period", help="Repeat every (Days/Week/Month/Year)", required=True, default=1, tracking=True)
+    recurring_interval = fields.Integer(string="Invoicing Period", help="Repeat every (Days/Week/Month/Year)", required=True, default=1)
     recurring_interval_count = fields.Integer(string="End After", default=1)
     invoicing_mode = fields.Selection([
         ('manual', 'Manually'),
