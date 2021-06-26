@@ -4,6 +4,7 @@ from odoo.exceptions import UserError
 
 class GenerateXLSXReport(models.Model):
     _name = 'report.de_msa_report.msa_report_xlsx_1'
+    _description = 'MSA Commercial Invoice'
     _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, line):
