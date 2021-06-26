@@ -1,6 +1,5 @@
 from datetime import datetime
 import math
-import openerp.addons.decimal_precision as dp
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -64,7 +63,7 @@ class msa_simulation(models.Model):
     invoicing_days = fields.Integer('Invoicing Days')
     invoiced_rent_adjustment = fields.Float('Invoiced Rent Adjustment')
     mini_cluster = fields.Char('Mini Cluster')
-    cluster = fields.Many2one('site.cluster', 'Cluster')
+    #cluster = fields.Many2one('site.cluster', 'Cluster')
     month_year = fields.Char('Month Year')
     ip_start_date = fields.Date('IP Fee Start Date', readonly=True)
     simulation_date = fields.Date('Simulation Date')
