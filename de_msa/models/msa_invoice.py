@@ -11,7 +11,7 @@ class MSAInvoice(models.Model):
     date_invoice = fields.Date(string='Invoice Date')
     number = fields.Integer(string='Number')
     category = fields.Char(string='Category')
-    company_id = fields.Many2one('res.company', 'Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
+    company_id = fields.Many2one('res.company', string='Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
     user_id = fields.Char(string='Responsible')
     date_due = fields.Char(string='Due Date')
     origin = fields.Char(string='Source Document')
