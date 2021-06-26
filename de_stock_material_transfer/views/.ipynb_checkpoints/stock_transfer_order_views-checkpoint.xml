@@ -5,9 +5,9 @@
             <field name="name">stock.transfer.order.calendar.view</field>
             <field name="model">stock.transfer.order</field>
             <field name="arch" type="xml">
-                <calendar string="Transfer Order" date_start="date_order" color="state" hide_time="true" event_limit="5">
+                <calendar string="Transfer Order" date_start="date_order" color="stage_category" hide_time="true" event_limit="5">
                     <field name="user_id" avatar_field="image_128" invisible="1"/>
-                    <field name="state" filters="1" invisible="1"/>
+                    <field name="stage_category" filters="1" invisible="1"/>
                 </calendar>
             </field>
     </record>
@@ -34,7 +34,6 @@
                     <field name="stage_id" />
                     <field name="stage_category" optional="hide" />
                     <field name="stage_code" invisible="1" />
-                    <field name="state" invisible="1" />
                 </tree>
             </field>
     </record>
@@ -70,7 +69,6 @@
                     
                     <button name="action_draft" type="object" string="Set to Draft" attrs="{'invisible': [('stage_category', 'not in', ['cancel'])]}"/>
                     
-                    <field name="state" widget="statusbar" invisible="1" statusbar_visible="draft,confirm,done"/>
                     <field name="stage_id" widget="statusbar" domain="[('transfer_order_type_ids', '=', transfer_order_type_id)]" invisible="1"/>
                     
                     <field name="stage_id" widget="statusbar" domain="[('transfer_order_type_ids', '=', transfer_order_type_id)]" attrs="{'invisible':[('disallow_staging','=',False)]}"/>
@@ -214,7 +212,7 @@
                                 </tree>
                             </field>
                         <separator string="Terms and Conditions"/>
-                        <field name="description" attrs="{'readonly': [('state','not in',('draft','in_progress'))]}"/>
+                        <field name="description" attrs="{'readonly': [('stage_category','not in',('draft','in_progress'))]}"/>
 
                         </page>
                         <page string="Return Products" name="transfer_order_return_line" attrs="{'invisible': [('action_type', '=', 'normal')]}">
@@ -243,7 +241,7 @@
                                 </tree>
                             </field>
                         <separator string="Terms and Conditions"/>
-                        <field name="description" attrs="{'readonly': [('state','not in',('draft','in_progress'))]}"/>
+                        <field name="description" attrs="{'readonly': [('stage_category','not in',('draft','in_progress'))]}"/>
 
                         </page>
                         <page string="Picking Details" name="picking_details" >

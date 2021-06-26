@@ -10,15 +10,16 @@ access_stock_transfer_order_exception_manager,access.stock.order.transfer.except
 access_stock_transfer_order_exception_user,access.stock.order.transfer.exception.user,model_stock_transfer_exception_type,group_stock_requisition_user,1,1,1,1
 
 access_stock_transfer_order_category_manager,access.stock.transfer.order.category.manager,model_stock_transfer_order_category,group_stock_requisition_user,1,1,1,1
-access_stock_transfer_material_condition_manager,access.stock.transfer.material.condition.manager,model_stock_transfer_material_condition,group_stock_requisition_user,1,1,1,1
+
+access_stock_transfer_material_condition_user,access.stock.transfer.material.condition.manager,model_stock_transfer_material_condition,group_stock_requisition_user,1,1,1,1
+
 access_stock_transfer_close_reason_manager,access.stock.transfer.close.reason.manager,model_stock_transfer_close_reason,group_stock_requisition_user,1,1,1,1
+
 access_stock_transfer_close_reason_wizard_manager,access.stock.transfer.close.reason.wizard.manager,model_stock_transfer_close_reason_wizard,group_stock_requisition_manager,1,1,1,1
+
 access_stock_transfer_order_user,access.stock.transfer.order.user,model_stock_transfer_order,group_stock_requisition_user,1,1,1,1
 access_stock_transfer_order_line_user,access.stock.transfer.order.line.user,model_stock_transfer_order_line,group_stock_requisition_user,1,1,1,1
 access_stock_transfer_return_line_user,access.stock.transfer.return.line.user,model_stock_transfer_return_line,group_stock_requisition_user,1,1,1,1
-access_stock_transfer_order_user,access.stock.transfer.order.user,model_stock_transfer_order,group_stock_requisition_user,1,1,1,1
-access_stock_transfer_order_line_user,access.stock.transfer.order.line.user,model_stock_transfer_order_line,group_stock_requisition_user,1,1,1,1
-
 access_stock_transfer_txn_line_user,access.stock.transfer.txn.line.user,model_stock_transfer_txn_line,group_stock_requisition_user,1,1,1,1
 
 

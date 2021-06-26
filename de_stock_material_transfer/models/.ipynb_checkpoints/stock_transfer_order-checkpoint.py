@@ -26,10 +26,10 @@ class StockTransferOrder(models.Model):
         location_id = self.env['stock.location'].search([('return_location','=',True)],limit=1)
         return location_id
     
-    name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, states={'draft': [('readonly', False)]}, index=True, default=lambda self: _('New'))
+    name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     transfer_order_type_id = fields.Many2one('stock.transfer.order.type', string='Transfer Type', index=True, required=True, default=_get_type_id, readonly=True, copy=False, )
     code = fields.Char(related='transfer_order_type_id.code')
-    sequence_code = fields.Char(String="Sequence Code")
+    sequence_code = fields.Char(string="Sequence Code")
     
     @api.onchange('transfer_order_type_id')
     def _check_code(self):
@@ -41,15 +41,7 @@ class StockTransferOrder(models.Model):
     filter_products = fields.Boolean(related='transfer_order_category_id.filter_products')
     categ_control_ids = fields.Many2many(related='transfer_order_category_id.categ_control_ids')
     
-    partner_id = fields.Many2one('res.partner', 'Contractor',check_company=True, readonly=True, states={'draft': [('readonly', False)]},)
-
-    state = fields.Selection([
-        ('draft', 'New'),
-        ('confirm', 'Confirmed'),
-        ('process', 'Inprocess'),
-        ('done', 'Closed'),
-        ('cancel', 'Cancelled'),
-        ], string='Status', readonly=True, copy=False, index=True, tracking=4, default='draft')
+    partner_id = fields.Many2one('res.partner', 'Contractor',check_company=True, readonly=True, )
     
     stage_id = fields.Many2one('stock.transfer.order.stage', string='Stage', compute='_compute_stage_id',
         store=True, readonly=False, ondelete='restrict', tracking=True, index=True,
@@ -60,8 +52,8 @@ class StockTransferOrder(models.Model):
     next_stage_id = fields.Many2one('stock.transfer.order.stage',compute='_compute_next_stage')
     prv_stage_id = fields.Many2one('stock.transfer.order.stage',related='stage_id.prv_stage_id')
     stage_category = fields.Selection(related='stage_id.stage_category')
-    next_stage_category = fields.Selection(related='next_stage_id.stage_category')
-    prv_stage_category = fields.Selection(related='next_stage_id.stage_category')
+    next_stage_category = fields.Selection(related='next_stage_id.stage_category', string='Next Stage Category')
+    prv_stage_category = fields.Selection(related='next_stage_id.stage_category', string='Previous Stage Category')
     stage_code = fields.Char(related='stage_id.stage_code')
     
     #exceptions or transactions
@@ -83,26 +75,26 @@ class StockTransferOrder(models.Model):
     close_reason_message = fields.Char(string='Close Message', copy=False, readonly=True)
     date_closed = fields.Datetime(string='Closed Date', copy=False, readonly=True)
 
-    date_request = fields.Datetime(string='Request Date', required=True, readonly=True, index=True, states={'draft': [('readonly', False)],'in_progress': [('readonly', False)] }, copy=False, default=fields.Datetime.now, help="Order request date")
-    date_order = fields.Datetime(string='Order Date', required=True, readonly=True, index=True, states={'draft': [('readonly', False)],'in_progress': [('readonly', False)] }, copy=False, default=fields.Datetime.now, help="Order confirmation date")
-    date_scheduled = fields.Datetime(string='Date Scheduled', required=True, readonly=True, index=True, states={'draft': [('readonly', False)],'in_progress': [('readonly', False)] }, copy=False, default=fields.Datetime.now, help="Deadline schedule date")
-    delivery_deadline = fields.Datetime(string='Delivery Deadline', required=True, readonly=True, index=True, states={'draft': [('readonly', False)],'in_progress': [('readonly', False)] }, copy=False, default=fields.Datetime.now, help="Delivery Deadline")
+    date_request = fields.Datetime(string='Request Date', required=True, readonly=True, index=True, copy=False, default=fields.Datetime.now, help="Order request date")
+    date_order = fields.Datetime(string='Order Date', required=True, readonly=True, index=True, copy=False, default=fields.Datetime.now, help="Order confirmation date")
+    date_scheduled = fields.Datetime(string='Date Scheduled', required=True, readonly=True, index=True, copy=False, default=fields.Datetime.now, help="Deadline schedule date")
+    delivery_deadline = fields.Datetime(string='Delivery Deadline', required=True, readonly=True, index=True, copy=False, default=fields.Datetime.now, help="Delivery Deadline")
     return_deadline = fields.Datetime(string='Return Deadline', readonly=False, compute='_compute_return_deadline', store=True, copy=False, help="Retrun Material Deadline")
     date_delivered = fields.Datetime(string="Actual Delivery", compute="_compute_all_dates")
     date_returned = fields.Datetime(string="Actual Return", compute="_compute_all_dates")
     
-    stock_transfer_order_line = fields.One2many('stock.transfer.order.line', 'stock_transfer_order_id', string='Transfer Line', copy=True, auto_join=True,readonly=True, states={'draft': [('readonly', False)],'in_progress': [('readonly', False)]},)
+    stock_transfer_order_line = fields.One2many('stock.transfer.order.line', 'stock_transfer_order_id', string='Transfer Line', copy=True, auto_join=True,readonly=True, )
     
-    stock_transfer_return_line = fields.One2many('stock.transfer.return.line', 'stock_transfer_order_id', string='Return Transfer Line', copy=True, auto_join=True,readonly=True, states={'draft': [('readonly', False)],'in_progress': [('readonly', False)]},)
+    stock_transfer_return_line = fields.One2many('stock.transfer.return.line', 'stock_transfer_order_id', string='Return Transfer Line', copy=True, auto_join=True,readonly=True, )
 
         
-    company_id = fields.Many2one('res.company', 'Company', required=True, index=True, default=lambda self: self.env.company, readonly=True, states={'draft': [('readonly', False)],'in_progress': [('readonly', False)]},)
+    company_id = fields.Many2one('res.company', 'Company', required=True, index=True, default=lambda self: self.env.company, readonly=True, )
     description = fields.Text()
-    user_id = fields.Many2one('res.users', string="Request Owner",check_company=True, domain="[('company_ids', 'in', company_id)]", default=lambda self: self.env.user, required=True,readonly=True, states={'draft': [('readonly', False)]},)
+    user_id = fields.Many2one('res.users', string="Request Owner",check_company=True, domain="[('company_ids', 'in', company_id)]", default=lambda self: self.env.user, required=True,readonly=True)
     
     delivery_count = fields.Integer(compute='_compute_picking_count', string='Number of Delivery')
     return_count = fields.Integer(compute='_compute_picking_count', string='Number of Return')
-    picking_ids = fields.One2many('stock.picking', 'stock_transfer_order_id', string='Picking', states={'done': [('readonly', True)]})
+    picking_ids = fields.One2many('stock.picking', 'stock_transfer_order_id', string='Picking')
     bill_count = fields.Integer(compute='_compute_bill_count')
 
     location_src_id = fields.Many2one('stock.location', string='Source Location', compute='_compute_all_picking', store=True, readonly=True, )
@@ -123,7 +115,7 @@ class StockTransferOrder(models.Model):
     file_health_check = fields.Binary(string='Health Check Form')
     file_fir = fields.Binary(string='FIR Report')
     file_accident_report = fields.Binary(string='Accident Report')
-    file_hoto_checklist = fields.Binary(string='HOTO Checklist')
+    file_hoto_checklist = fields.Binary(string='HOTO Checklist Form')
     file_proof_attachment = fields.Binary(string='Proof Attachment')
     
     
@@ -687,7 +679,19 @@ class StockTransferOrder(models.Model):
         """ 
     
     def action_draft(self):
-        self.state = 'draft'
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to cancel '%s'.", order.stage_id.name))
+        stage_id = self.env['stock.transfer.order.stage'].search([('transfer_order_type_ids','=',self.transfer_order_type_id.id),('transfer_order_category_ids','=',self.transfer_order_category_id.id)],limit=1)
+        self.update({
+            'stage_id': stage_id.id,
+        })
+        for txn in self.stock_transfer_txn_line:
+            txn.txn_action = 'open'
+            txn.sudo().unlink()
+            
     
     def action_confirm(self):
         for order in self.sudo():
@@ -746,14 +750,6 @@ class StockTransferOrder(models.Model):
         self.update({
             'stage_id' : self.next_stage_id.id,
         })
-        
-    def action_done(self):
-        """
-        Generate all stock order based on selected lines, should only be called on one agreement at a time
-        """
-        if any(picking.state in ['draft', 'sent', 'to approve'] for picking in self.mapped('picking_ids')):
-            raise UserError(_('You have to cancel or validate every Transfer before closing the Transfer order.'))
-        self.write({'state': 'done'})
         
     def process_txn_stage(self):
         exceptions = self.env['stock.transfer.exception.type'].search([('transfer_order_type_id','=',self.transfer_order_type_id.id),('transfer_order_category_id','=',self.transfer_order_category_id.id),('apply_stage_id','=',self.stage_id.id),('stage_auto_apply','=',True)])
@@ -980,7 +976,6 @@ class StockTransferOrderLine(models.Model):
     transfer_order_type_id = fields.Many2one(related='stock_transfer_order_id.transfer_order_type_id', readonly=True, store=True)
     transfer_order_category_id = fields.Many2one(related='stock_transfer_order_id.transfer_order_category_id', readonly=True, store=True)
     stage_id = fields.Many2one(related='stock_transfer_order_id.stage_id', readonly=True,store=True)
-    state = fields.Selection(related='stock_transfer_order_id.state', readonly=True)
     stage_category = fields.Selection(related='stock_transfer_order_id.stage_category', store=True)
     action_type = fields.Selection(related='stock_transfer_order_id.action_type', store=True)
     date_request = fields.Datetime(related='stock_transfer_order_id.date_request', readonly=True)
@@ -1005,10 +1000,9 @@ class StockTransferOrderLine(models.Model):
     analytic_tag_ids = fields.Many2many('account.analytic.tag', string="Analytic Tags")
     supplier_id = fields.Many2one('res.partner', string='Supplier')
     project_id = fields.Many2one('project.project', string='Project')
-    state = fields.Selection(related='stock_transfer_order_id.state')
     location_src_id = fields.Many2one('stock.location', string='From', )
     location_dest_id = fields.Many2one('stock.location', string='To', domain="[('id', 'child_of', parent.location_dest_id)]")
-    return_product_id = fields.Many2one('product.product', string='Product', compute='_compute_product_return' )
+    return_product_id = fields.Many2one('product.product', string='Return Product', compute='_compute_product_return' )
     return_product_uom_qty = fields.Float(string='Return Qty', compute='_compute_product_return')
 
     
@@ -1139,7 +1133,6 @@ class StockTransferReturnLine(models.Model):
     _description = 'Stock transfer Return Line'
     
     stock_transfer_order_id = fields.Many2one('stock.transfer.order', string='Stock transfer.order Order', required=True, ondelete='cascade', index=True, copy=False)
-    state = fields.Selection(related='stock_transfer_order_id.state', readonly=True)
     partner_id = fields.Many2one('res.partner', related='stock_transfer_order_id.partner_id', readonly=True)
     user_id = fields.Many2one('res.users', related='stock_transfer_order_id.user_id', readonly=True)
 
@@ -1158,7 +1151,6 @@ class StockTransferReturnLine(models.Model):
     analytic_tag_ids = fields.Many2many('account.analytic.tag', string="Analytic Tags")
     supplier_id = fields.Many2one('res.partner', string='Supplier')
     project_id = fields.Many2one('project.project', string='Project')
-    state = fields.Selection(related='stock_transfer_order_id.state')
     location_src_id = fields.Many2one('stock.location', string='From', )
     location_dest_id = fields.Many2one('stock.location', string='To', )
     return_status = fields.Selection([
