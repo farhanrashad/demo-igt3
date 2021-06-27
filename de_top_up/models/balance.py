@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 
 class TopUpBalance(models.Model):
     _name = 'topup.balance'
-    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Top Up Balance model'
 
     def unlink(self):
@@ -125,9 +125,9 @@ class TopUpBalance(models.Model):
         curr_date = fields.date.today()
         pre_date = fields.date.today() - timedelta(days=30)
         for record in self:
-        	record.pre_period = pre_date.strftime('%B-%Y')
-        	record.curr_period = curr_date.strftime('%B-%Y')
-        	record.balance_month = record.date.strftime('%B-%Y')
+        	record.pre_period = str(pre_date.strftime('%B-%Y'))
+        	record.curr_period = str(curr_date.strftime('%B-%Y'))
+        	record.balance_month = str(record.date.strftime('%B-%Y'))
 
 
 class TopUpBalanceLine(models.Model):

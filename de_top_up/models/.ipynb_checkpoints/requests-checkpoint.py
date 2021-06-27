@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 
 class TopUpRequest(models.Model):
     _name = 'topup.request'
-    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Top Up Request model'
 
 
@@ -73,7 +73,7 @@ class TopUpRequest(models.Model):
         self.state = 'cancelled'
         
     def action_refuse(self):
-        self.state = 'refused'
+        self.state = 'draft'
 
     def action_distributed(self):
         self.state = 'distributed'
