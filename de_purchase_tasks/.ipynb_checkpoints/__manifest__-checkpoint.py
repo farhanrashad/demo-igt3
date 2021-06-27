@@ -22,7 +22,7 @@
     'version': '14.0.0.4',
 
     # any module necessary for this one to work correctly
-    'depends': ['account', 'project', 'purchase','de_purchase_requisition_type','stock'],
+    'depends': ['account', 'project', 'purchase','de_purchase_requisition_type','purchase_requisition','stock'],
     # always loaded
     'data': [
         'security/ir.model.access.csv',
