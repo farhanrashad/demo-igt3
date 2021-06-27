@@ -11,7 +11,10 @@ access_stock_transfer_order_exception_user,access.stock.order.transfer.exception
 
 access_stock_transfer_order_category_manager,access.stock.transfer.order.category.manager,model_stock_transfer_order_category,group_stock_requisition_user,1,1,1,1
 
-access_stock_transfer_material_condition_user,access.stock.transfer.material.condition.manager,model_stock_transfer_material_condition,group_stock_requisition_user,1,1,1,1
+access_stock_transfer_material_condition_user,access.stock.transfer.material.condition.user,model_stock_transfer_material_condition,group_stock_requisition_user,1,1,1,1
+access_stock_transfer_material_condition_base,access.stock.transfer.material.condition.base,model_stock_transfer_material_condition,base.group_user,1,0,0,0
+
+
 
 access_stock_transfer_close_reason_manager,access.stock.transfer.close.reason.manager,model_stock_transfer_close_reason,group_stock_requisition_user,1,1,1,1
 
