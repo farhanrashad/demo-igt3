@@ -4,6 +4,7 @@ from odoo.exceptions import UserError
 
 class GtnDgnMrfSpmrfWizard(models.TransientModel):
     _name = "gtn.dgn.mrf.spmrf.wizard"
+    _description = 'Requisition Line Wizard'
     
     src =  fields.Datetime(string='From',required=True)
     dest =  fields.Datetime(string='To',required=True)
