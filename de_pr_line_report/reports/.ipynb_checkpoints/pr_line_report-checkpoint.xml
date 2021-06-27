@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <report
+                id="pr_line_report"
+                model="purchase.requisition"
+                string="PR Line Report"
+                report_type="xlsx"
+                name="de_pr_line_report.pr_line_report_xlsx"
+                file="PR Line Report"
+        />
+    </data>
+</odoo>

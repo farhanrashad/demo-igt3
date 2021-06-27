@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <report
+                id="mrf_spmrf_report"
+                model="stock.transfer.order"
+                string="MRF/SPMRF Lines Report"
+                report_type="xlsx"
+                name="de_gtn_dgn_mrf_spmrf_line_report.mrf_spmrf_report_xlsx"
+                file="MRF/SPMRF Lines Report"
+        />
+    </data>
+</odoo>
