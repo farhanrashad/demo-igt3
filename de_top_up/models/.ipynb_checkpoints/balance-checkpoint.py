@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 
 class TopUpBalance(models.Model):
     _name = 'topup.balance'
-    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Top Up Balance model'
 
     def unlink(self):
@@ -99,10 +99,10 @@ class TopUpBalance(models.Model):
     is_populated = fields.Boolean('Is Populated')
     balance_month = fields.Char(string="Current Period", store=True, compute='_compute_previous_period')
     
-    _sql_constraints = [
-        ('balance_month_uniq', 'unique(balance_month)',
-            'Balance can be requested once in a Month')       
-    ]
+    #_sql_constraints = [
+     #   ('balance_month_uniq', 'unique(balance_month)',
+      #      'Balance can be requested once in a Month')       
+    #]
 
     
     
@@ -124,9 +124,10 @@ class TopUpBalance(models.Model):
     def _compute_previous_period(self):
         curr_date = fields.date.today()
         pre_date = fields.date.today() - timedelta(days=30)
-        self.pre_period = pre_date.strftime('%B-%Y')
-        self.curr_period = curr_date.strftime('%B-%Y')
-        self.balance_month = self.date.strftime('%B-%Y')
+        for record in self:
+        	record.pre_period = str(pre_date.strftime('%B-%Y'))
+        	record.curr_period = str(curr_date.strftime('%B-%Y'))
+        	record.balance_month = str(record.date.strftime('%B-%Y'))
 
 
 class TopUpBalanceLine(models.Model):
