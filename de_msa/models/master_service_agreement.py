@@ -4,10 +4,9 @@ from odoo import api, fields, models, _
 from datetime import date, datetime, timedelta
 from odoo.exceptions import UserError
 
-
-
 class master_service_agreement(models.Model):
     _name = 'master.service.agreement'
+    _description = 'Master Service Agreement'
     
     def get_tower_type(self, site, period):
         id = None
@@ -324,9 +323,9 @@ class master_service_agreement(models.Model):
     
     
     site_billing_info_ids = fields.One2many('site.billing.info', 'msa_id', string='Site Billing Information')
-    tower_currency_id = fields.Many2one('res.currency', 'Currency', required=True)
+    tower_currency_id = fields.Many2one('res.currency', string='Tower Currency', required=True)
     tower_without_power_ids = fields.One2many('tower.without.power', 'msa_id', string='Tower w/o Power')
-    power_currency_id = fields.Many2one('res.currency', 'Currency', required=True)
+    power_currency_id = fields.Many2one('res.currency', string='Power Currency', required=True)
     power_prices_ids = fields.One2many('power.prices', 'msa_id', string='Power Prices')
     location_factor_ids = fields.One2many('location.factor', 'msa_id', string='Location Factors')
     wind_factor_ids = fields.One2many('wind.factor', 'msa_id', string='Wind Factors')

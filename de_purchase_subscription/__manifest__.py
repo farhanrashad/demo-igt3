@@ -11,7 +11,7 @@
     "sequence": 1,
     "author": "Dynexcel",
     "website": "https://www.dynexcel.com",
-    "version": '14.1.0.6',
+    "version": '14.1.0.8',
     "depends": ['account'],
     "data": [
         'security/security.xml',

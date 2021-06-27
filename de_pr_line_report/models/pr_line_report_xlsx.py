@@ -3,6 +3,7 @@ from odoo import models
 
 class GenerateXLSXReport(models.Model):
     _name = 'report.de_pr_line_report.pr_line_report_xlsx'
+    _description = 'Purchase Requisition Report'
     _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, lines):

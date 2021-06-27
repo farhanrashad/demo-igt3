@@ -10,9 +10,9 @@
     'sequence':1,
     'category': 'Agreement',
     'version': '14.0.0.2',
-    'depends': ['base','stock','purchase','sale'],
+    'depends': ['base','stock','purchase','report_xlsx'],
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/view_purchase_order.xml',
         'reports/po_line_report.xml',
     ],

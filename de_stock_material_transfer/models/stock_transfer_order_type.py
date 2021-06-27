@@ -24,7 +24,7 @@ class StockTransferOrderType(models.Model):
     color = fields.Integer(string='Color Index')
     automated_sequence = fields.Boolean('Automated Sequence?',
         help="If checked, the Approval Requests will have an automated generated name based on the given code.")
-    sequence_code = fields.Char(string="Code")
+    sequence_code = fields.Char(string="Sequence Code")
     
     group_id = fields.Many2one('res.groups', string='Security Group')
 

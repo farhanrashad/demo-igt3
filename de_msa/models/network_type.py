@@ -4,8 +4,6 @@ from odoo import api, fields, models, _
 
 
 class network_type(models.Model):
-
     _name = 'network.type'
-
-    
-    name = fields.Char('Name')
+    _description = 'Network Type'
+    name = fields.Char(string='Name')

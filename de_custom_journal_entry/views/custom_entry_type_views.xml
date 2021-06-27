@@ -44,30 +44,54 @@
                             'invisible': [('automated_sequence', '=', False)],
                             'required': [('automated_sequence', '=', True)],
                         }"/>
+                            
                         </group>
                         <group>
-                            <field name="expense_advance"/>
-                            <field name="journal_id" options="{'no_create': True,'no_open':True}" />
+                            <field name="generate_accounting"/>
+                            <field name="journal_id" options="{'no_create': True,'no_open':True}" attrs="{'invisible': [('generate_accounting', '=', False)], 'required': [('generate_accounting', '=', True)]}"/>
+
+                            <field name="expense_advance" attrs="{'invisible': [('generate_accounting', '=', False)]}"/>
+                            <field name="payment_journal_id" attrs="{'invisible': [('expense_advance', '=', False)], 'required': [('expense_advance', '=', True)]}"/>
+                            <field name="group_id" options="{'no_create': True,'no_open':True}" />
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                     </group>
                         
                         <notebook>
                             <page string="Options" name="options">
-                                <group>
-                                    <group string="Fields" name="option_settings">
+                                <group string="Control Fields" name="control_fields">
+                                    <group string="Header Fields" name="header_fields">
                                         <field name="has_partner" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_ref" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_supplier_bill" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_period" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_attachment" widget="radio" options="{'horizontal': true}"/>
+
+                                        <field name="has_description" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_purchase_requisition" widget="radio" options="{'horizontal': true}"/>
+
                                         <field name="has_purchase" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_picking" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_invoice" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_purchase_subscription" widget="radio" options="{'horizontal': true}"/>                                        
                                     </group>
-                                    <group string="Select Type" name="add_new_fields">
-                                        <field name="has_fleet_fields" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_accommodation_fields" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_travel_fields" widget="radio" options="{'horizontal': true}"/>
+                                    <group string="Line Item Fields" name="line_item_fields">
+                                        
+                                        <field name="has_project" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_analytic" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_product" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_employee" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_advanced" widget="radio" options="{'horizontal': true}"/>
+                                    </group>
+                                    
+                                </group>
+                                <group string="Control App Fields" name="control_app_fields">
+                                    <group>
+                                        <field name="has_rent_vechile" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_travel" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_hotel" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_electricity" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_fuel_drawn" widget="radio" options="{'horizontal': true}"/>
+                                        <field name="has_fuel_filling" widget="radio" options="{'horizontal': true}"/>
                                     </group>
                                 </group>
                             </page>
@@ -81,8 +105,11 @@
             <field name="name">account.custom.entry.type</field>
             <field name="model">account.custom.entry.type</field>
             <field name="arch" type="xml">
-                <tree string="Transfer Order Type" >
+                <tree string="Custom Entry Type" >
                     <field name="name"/>
+                    <field name="sequence_code"/>
+                    <field name="journal_id"/>
+                    <field name="company_id"/>
                 </tree>
             </field>
         </record>
@@ -183,7 +210,7 @@
         <field name="view_mode">kanban</field>
     </record>
         
-        <menuitem action="action_custom_entry_type_dashboard" name="Dashboard" id="menu_custom_entry_type_dashboard" parent="custom_entry_root_menu" sequence="1"/>
+        <menuitem action="action_custom_entry_type_dashboard" name="Dashboard" id="menu_custom_entry_type_dashboard" groups="account.group_account_user" parent="custom_entry_root_menu" sequence="1"/>
         
     </data>
 </odoo>

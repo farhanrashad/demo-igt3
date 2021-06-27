@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 
 class GenerateXLSXReport(models.Model):
     _name = 'report.de_po_line_report.po_line_report_xlsx'
+    _description = 'Purchase Line Report'
     _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, lines):

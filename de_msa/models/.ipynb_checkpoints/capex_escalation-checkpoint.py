@@ -4,7 +4,8 @@ from odoo import api, fields, models, _
 
 class capex_escalation(models.Model):
     _name = "capex.escalation"
+    _description = 'CAPEX Escalation'
   
-    year = fields.Integer('Year', required=True)
-    cpi = fields.Float('CPI')
-    msa_id = fields.Many2one('master.service.agreement', 'Master Service Agreement')
+    year = fields.Char(string='Year', required=True, size=4)
+    cpi = fields.Float(string='CPI')
+    msa_id = fields.Many2one('master.service.agreement', string='Master Service Agreement')

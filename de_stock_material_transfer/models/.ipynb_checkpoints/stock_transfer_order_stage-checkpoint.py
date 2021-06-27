@@ -15,7 +15,7 @@ class StockTransferOrderStage(models.Model):
         return [default_transfer_order_type_id] if default_transfer_order_type_id else None
     
     name = fields.Char(string='Stage Name', translate=True)
-    stage_code = fields.Char(string='Code', size=3, copy=False)
+    stage_code = fields.Char(string='Stage Code', size=3, copy=False)
     active = fields.Boolean('Active', default=True, help="If unchecked, it will allow you to hide the stage without removing it.")
 
     description = fields.Text(
@@ -37,7 +37,7 @@ class StockTransferOrderStage(models.Model):
         ('transfer', 'Transferred'),
         ('close', 'Closed'),
         ('Cancel', 'Cancelled'),
-    ], string='Category', default='draft')
+    ], string='Stage Category', default='draft')
     
     next_stage_id = fields.Many2one('stock.transfer.order.stage', string='Next Stage' )
     prv_stage_id = fields.Many2one('stock.transfer.order.stage', string='Previous Stage')

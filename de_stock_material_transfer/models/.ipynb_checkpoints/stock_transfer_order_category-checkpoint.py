@@ -59,6 +59,14 @@ class StockTransferOrderCategory(models.Model):
     
     group_id = fields.Many2one('res.groups', string='Security Group')
     
+    #required documents booleans
+    health_check_form = fields.Boolean(string='Require Health Check Form')
+    fir_report = fields.Boolean(string='Require FIR Report')
+    accident_report = fields.Boolean(string='Require Accident Report')
+    hoto_checklist = fields.Boolean(string='Require HOTO Checklist')
+    proof_attachment = fields.Boolean(string='Require Proof Documents')
+    
+    
     #has_penalty = fields.Boolean(string="Allow Penalty", default=False)
     #has_closed = fields.Boolean(string="Forcefully Close", default=False)
     has_partner = fields.Selection(CATEGORY_SELECTION, string="Has Partner", default="no", required=True,)
@@ -71,8 +79,8 @@ class StockTransferOrderCategory(models.Model):
     has_tower_info = fields.Selection(CATEGORY_SELECTION, string="Has Tower info", default="no", required=True,)
     has_supplier = fields.Selection(CATEGORY_SELECTION, string="Has Supplier", default="no", required=True,)
     
-    partner_category_ids = fields.Many2many('res.partner.category', 'res_partner_category_rel', column1='partner_id', column2='category_id', string='Tags')
-    transporter_category_ids = fields.Many2many('res.partner.category', 'res_transporter_category_rel', column1='transporter_id', column2='category_id', string='Tags')
+    partner_category_ids = fields.Many2many('res.partner.category', 'res_partner_category_rel', column1='partner_id', column2='category_id', string='Partner Tags')
+    transporter_category_ids = fields.Many2many('res.partner.category', 'res_transporter_category_rel', column1='transporter_id', column2='category_id', string='Transporter Tags')
 
 
 

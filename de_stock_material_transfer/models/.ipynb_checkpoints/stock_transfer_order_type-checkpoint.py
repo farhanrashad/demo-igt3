@@ -24,7 +24,7 @@ class StockTransferOrderType(models.Model):
     color = fields.Integer(string='Color Index')
     automated_sequence = fields.Boolean('Automated Sequence?',
         help="If checked, the Approval Requests will have an automated generated name based on the given code.")
-    sequence_code = fields.Char(string="Code")
+    sequence_code = fields.Char(string="Sequence Code")
     
     group_id = fields.Many2one('res.groups', string='Security Group')
 
@@ -47,11 +47,11 @@ class StockTransferOrderType(models.Model):
     
     @api.model
     def create(self, vals):
-        if vals.get('code'):
+        if vals.get('sequence_code'):
             sequence = self.env['ir.sequence'].create({
-                'name': _('Sequence') + ' ' + vals['code'],
+                'name': _('Sequence') + ' ' + vals['sequence_code'],
                 'padding': 5,
-                'prefix': vals['code'],
+                'prefix': vals['sequence_code'],
                 'company_id': vals.get('company_id'),
             })
             vals['sequence_id'] = sequence.id
@@ -60,12 +60,12 @@ class StockTransferOrderType(models.Model):
         return transfer_type
 
     def write(self, vals):
-        if 'code' in vals:
+        if 'sequence_code' in vals:
             for transfer_type in self:
                 sequence_vals = {
-                    'name': _('Sequence') + ' ' + vals['code'],
+                    'name': _('Sequence') + ' ' + vals['sequence_code'],
                     'padding': 5,
-                    'prefix': vals['code'],
+                    'prefix': vals['sequence_code'],
                 }
                 if transfer_type.sequence_id:
                     transfer_type.sequence_id.write(sequence_vals)
