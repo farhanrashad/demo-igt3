@@ -4,8 +4,6 @@ from odoo import api, fields, models, _
 from datetime import date, datetime, timedelta
 from odoo.exceptions import UserError
 
-
-
 class master_service_agreement(models.Model):
     _name = 'master.service.agreement'
     _description = 'Master Service Agreement'

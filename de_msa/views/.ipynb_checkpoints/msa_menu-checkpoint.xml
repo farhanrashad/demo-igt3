@@ -2,7 +2,7 @@
 	<data noupdate="0">
 		
 		<menuitem id="msa_root_menu" name="MSA"
-            active="True" web_icon="de_msa,static/description/icon.png"
+            active="True" web_icon="de_msa,static/description/icon.png" groups="group_msa_user,group_msa_manager"
             sequence="5"/>
 
 		<menuitem id="msa_menu" name="Master Service Agreement" parent="msa_root_menu"
@@ -11,7 +11,6 @@
 			
 		
 		<menuitem id="msa_menu_sites" name="Sites" parent="msa_root_menu"
-			action=""
 			sequence="3" />
 			
 		<menuitem id="msa_menu_billing_info" name="Billing Info" parent="msa_menu_sites"
@@ -34,8 +33,7 @@
 			action="de_msa.action_monthly_sla_factor_view"
 			sequence="5" />
 			
-		<menuitem id="msa_menu_config" name="Configuration" parent="msa_root_menu"
-			action=""
+		<menuitem id="msa_menu_config" name="Configuration" parent="msa_root_menu" groups="group_msa_manager"
 			sequence="5" />
 			
 		<menuitem id="msa_menu_towers" name="Towers" parent="msa_menu_config"
