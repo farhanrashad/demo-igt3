@@ -16,8 +16,7 @@ class PurchaseTaskTemplate(models.Model):
     allow_picking = fields.Boolean(string='Allow on Picking', help='User will provide the milestone on picking with purchase order reference')
     allow_invoice = fields.Boolean(string='Allow on invoice', help='User will provide the milestone on invoice with purchase order reference')
 
-    user_id = fields.Many2one('res.users', string='Responsible', index=True, tracking=True,
-        default=lambda self: self.env.user, check_company=True)
+    user_id = fields.Many2one('res.users', string='Responsible', index=True, default=lambda self: self.env.user, check_company=True)
 
     company_id = fields.Many2one('res.company', 'Company', required=True, index=True, default=lambda self: self.env.company.id)
     template_doc_ids = fields.One2many('purchase.task.template.docs', 'purchase_task_template_id', string='Docs', copy=True)
