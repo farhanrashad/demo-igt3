@@ -6,6 +6,7 @@ from datetime import datetime
 
 class GenerateXLSXReport(models.Model):
     _name = 'report.de_gtn_dgn_mrf_spmrf_line_report.mrf_spmrf_report_xlsx'
+    _description = 'Requisition Lines Report'
     _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, lines):
