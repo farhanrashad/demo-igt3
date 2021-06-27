@@ -10,7 +10,7 @@
     'sequence':1,
     'category': 'Agreement',
     'version': '14.0.0.2',
-    'depends': ['base','stock','purchase'],
+    'depends': ['base','stock','purchase','report_xlsx'],
     'data': [
         'security/ir.model.access.csv',
         'views/view_purchase_requisition.xml',
