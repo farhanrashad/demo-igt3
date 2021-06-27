@@ -7,7 +7,7 @@
     'website': "http://www.dynexcel.co",
     'category': 'Uncategorized',
     'version': '14.0.0.2',
-    'depends': ['hr', 'hr_payroll'],
+    'depends': ['base','hr', 'hr_payroll'],
     'data': [
         'security/ir.model.access.csv',
         'data/form_name.xml',
