@@ -1,0 +1,14 @@
+<odoo>
+  <data>
+    <record id="view_sales_analysis" model="ir.ui.view">
+      <field name="name">pos.details.wizard.inherit</field>
+      <field name="model">pos.details.wizard</field>
+      <field name="inherit_id" ref="point_of_sale.view_pos_details_wizard"/>
+      <field name="arch" type="xml">
+        <xpath expr="//form/footer/button[@name='generate_report']" position="after">
+          <button name="sale_analysis_report" string="Sales Analysis Report" type="object" class="btn-primary"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
