@@ -8,9 +8,9 @@ class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
     project_id = fields.Many2one('project.project', string='Project')
-    project_count = fields.Integer(string='Projects', compute='_compute_project')
+    project_count = fields.Integer(string='Project counts', compute='_compute_project')
     task_ids = fields.One2many('project.task', 'purchase_id', string='Tasks')
-    task_count = fields.Integer(string='Tasks', compute='_compute_task_ids')
+    task_count = fields.Integer(string='Task counts', compute='_compute_task_ids')
 
     def _get_targeted_project_ids(self):
         project_ids = []
