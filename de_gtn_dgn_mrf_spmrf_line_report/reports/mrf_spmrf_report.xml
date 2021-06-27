@@ -1,12 +1,13 @@
 <odoo>
     <data>
-        <report
-                id="mrf_spmrf_report"
-                model="stock.transfer.order"
-                string="MRF/SPMRF Lines Report"
-                report_type="xlsx"
-                name="de_gtn_dgn_mrf_spmrf_line_report.mrf_spmrf_report_xlsx"
-                file="MRF/SPMRF Lines Report"
-        />
+        <record id="mrf_spmrf_report" model="ir.actions.report">
+            <field name="name">MRF/SPMRF Lines Report</field>
+            <field name="model">stock.transfer.order</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">de_gtn_dgn_mrf_spmrf_line_report.mrf_spmrf_report_xlsx</field>
+            <field name="report_file">MRF/SPMRF Lines Report</field>
+            <field name="binding_model_id" ref="de_gtn_dgn_mrf_spmrf_line_report.model_stock_transfer_order"/>
+            <field name="binding_type">report</field>
+        </record>
     </data>
 </odoo>
