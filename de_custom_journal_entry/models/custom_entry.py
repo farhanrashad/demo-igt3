@@ -519,7 +519,22 @@ class CustomEntryLine(models.Model):
             line.update({
                 't_amount_travel': total_amount_travel
             })
-            
+    
+    @api.onchange('date_departure','date_arrival')
+    def _number_of_days(self):
+        for line in self:
+            if line.date_departure and line.date_arrival:
+                if line.date_departure > line.date_arrival:
+                    raise UserError(("Arrival Date cant be before Departure Date."))
+                else:
+                    delta = line.date_arrival - line.date_departure
+                    if abs(delta.days) > 0:
+                        line.number_of_days = abs(delta.days)
+                    else:
+                        line.number_of_days = 1
+            else:
+                line.number_of_days = 0
+                
     #has fleet/rent vehicle
     f_fleet_id = fields.Many2one('fleet.vehicle', string="Car Detail")
     f_driver_id = fields.Many2one('res.partner', string="Driver", ondelete='cascade')
@@ -560,6 +575,21 @@ class CustomEntryLine(models.Model):
             line.update({
                 'h_amount': total_amount
             })
+            
+    @api.onchange('h_check_in','h_check_out')
+    def _number_of_nights(self):
+        for line in self:
+            if line.h_check_in and line.h_check_out:
+                if line.h_check_in > line.h_check_out:
+                    raise UserError(("Check Out cant be before Check in."))
+                else:
+                    delta = line.h_check_out - line.h_check_in
+                    if abs(delta.days) > 0:
+                        line.h_number_of_nights = abs(delta.days)
+                    else:
+                        line.h_number_of_nights = 1
+            else:
+                line.h_number_of_nights = 0
 
     #has electricity
     date_bill_from = fields.Date(string='Date From', )
@@ -632,11 +662,6 @@ class CustomEntryLine(models.Model):
             'f_price_subtotal': tot
         })
         
-    
-        
-    
-        
-    
     def _compute_state(self):
         for line in self:
             line.state_id = line.project_id.address_id.state_id.id
