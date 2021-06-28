@@ -632,11 +632,6 @@ class CustomEntryLine(models.Model):
             'f_price_subtotal': tot
         })
         
-    
-        
-    
-        
-    
     def _compute_state(self):
         for line in self:
             line.state_id = line.project_id.address_id.state_id.id
