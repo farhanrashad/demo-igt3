@@ -158,7 +158,6 @@ class CustomEntry(models.Model):
         
     def button_draft(self):
         self.write({'stage_id': self.next_stage_id.id})
-        return {}
     
     def button_submit(self):
         #self.ensure_one()
@@ -166,12 +165,12 @@ class CustomEntry(models.Model):
             group_id = order.custom_entry_type_id.group_id
             if group_id:
                 if not (group_id & self.env.user.groups_id):
-                    raise UserError(_("You are not authorize to submit requisition in category '%s'.", self.custom_entry_type_id.name))
+                    raise UserError(_("You are not authorize to submit requisition in category '%s'.", order.custom_entry_type_id.name))
             if not order.custom_entry_line:
                 raise UserError(_("You cannot submit transaction '%s' because there is no line.", self.name))
            
         self.update({
-            'date_submit' : fields.Datetime.now,
+            'date_submit' : fields.Date.today(),
             'stage_id' : self.stage_id.next_stage_id.id,
         })
         
