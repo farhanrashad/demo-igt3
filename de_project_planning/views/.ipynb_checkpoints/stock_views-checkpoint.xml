@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Stock Picking -->
+        <record id="view_picking_form_inherit_project" model="ir.ui.view">
+            <field name="name">view.picking.form.inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form" />
+            <field name="arch" type="xml">
+                 <xpath expr="//field[@name='origin']" position="after">
+                    <field name="project_id" optional="show"/>
+                    <field name="state_id" optional="hide" string="Region"/>
+                </xpath>
+                
+            </field>
+        </record>
+        
+        <!-- Stock Move -->
+        <record id="view_move_form_inehrit_project" model="ir.ui.view">
+            <field name="name">view.move.form.inherit.project</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="stock.view_move_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="project_id" optional="show"/>
+                    <field name="state_id" optional="hide" string="Region"/>
+                </xpath>
+                
+            </field>
+        </record>
+    </data>
+</odoo>
