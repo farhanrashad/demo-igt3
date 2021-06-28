@@ -31,7 +31,7 @@ class CustomEntry(models.Model):
     company_id = fields.Many2one('res.company', 'Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,                                 default=lambda self: self.env.company.currency_id.id)        
 
-    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, copy=False)
+    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, copy=False, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]")
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
     
     amount_advanced_total = fields.Float('Total Advanced', compute='_amount_all')
@@ -120,9 +120,8 @@ class CustomEntry(models.Model):
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
         for entry in self:
-            if entry.custom_entry_type_id:
-                if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
-                    entry.stage_id = entry.stage_find(order.custom_entry_type_id.id, [('fold', '=', False), ('stage_category', '=', 'draft')])
+            if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
+                entry.stage_id = entry.stage_find(order.custom_entry_type_id.id, [('fold', '=', False), ('stage_category', '=', 'draft')])
             else:
                 order.stage_id = False
     
@@ -170,7 +169,7 @@ class CustomEntry(models.Model):
                 raise UserError(_("You cannot submit transaction '%s' because there is no line.", self.name))
            
         self.update({
-            'date_submit' : fields.Date.today(),
+            'date_submit' : fields.Datetime.now(),
             'stage_id' : self.stage_id.next_stage_id.id,
         })
         
@@ -182,7 +181,7 @@ class CustomEntry(models.Model):
                     raise UserError(_("You are not authorize to approve '%s'.", order.stage_id.name))
                     
         self.update({
-            'date_approved' : fields.Datetime.now,
+            'date_approved' : fields.Datetime.now(),
             'stage_id' : self.stage_id.next_stage_id.id,
         })
         
@@ -335,7 +334,7 @@ class CustomEntry(models.Model):
             count = self.env['account.payment'].search_count([('custom_entry_id', '=', entry.id)])
             entry.payment_count = count
         
-    payment_count = fields.Integer(string='Payments', compute='get_payment_count', copy=False, default=0, store=True)
+    payment_count = fields.Integer(string='Payments', compute='get_payment_count')
     
     def action_view_payment(self):
         self.ensure_one()
