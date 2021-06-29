@@ -619,7 +619,7 @@ class CustomEntryLine(models.Model):
     e_paid_to = fields.Selection([
         ('govt', 'Government'),
         ('private', 'Private')],
-        string='Travel By', default='govt')
+        string='Paid To', default='govt')
     date_bill_from = fields.Date(string='Date From', )
     date_bill_to = fields.Date(string='Date To', )
     amount_advanced = fields.Float(string='Forecast', help='Advanced Amount')
