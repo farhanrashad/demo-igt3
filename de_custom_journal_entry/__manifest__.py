@@ -2,18 +2,23 @@
 {
     'name': "Third-Party Billing",
     'summary': """
-        Customize Journal Entries
+        Third Party Billing
         """,
     'description': """
-        Customize Journal Entry
+        Third Party Billing
+        - Admin
+        - Fleet
+        - Travel
+        - Electricity
+        - Fuel
         
     """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Accounting',
-    'version': '14.0.0.9',
+    'version': '14.0.5.1',
     
-    'depends': ['de_purchase_subscription','account', 'fleet', 'de_project_planning','project','stock','purchase_requisition','purchase','de_travel_request'],
+    'depends': ['de_purchase_subscription','account', 'analytic', 'fleet', 'de_project_planning','project','stock','purchase_requisition','purchase','de_travel_request'],
 
     # always loaded
     'data': [
