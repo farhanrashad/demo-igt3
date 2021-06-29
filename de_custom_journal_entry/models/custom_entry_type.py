@@ -37,6 +37,8 @@ class CustomEntryType(models.Model):
     generate_accounting = fields.Boolean(string='Generate Accounting')
     expense_advance = fields.Boolean(string='Pay Advance Expense')
     journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
+    debit_account_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
+    credit_account_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
     payment_journal_id = fields.Many2one('account.journal', string="Payment Journal", required=True, company_dependent=True, check_company=True,  domain="[('type', 'in', ['bank', 'cash'])]")
 
     group_id = fields.Many2one('res.groups', string='Security Group')
