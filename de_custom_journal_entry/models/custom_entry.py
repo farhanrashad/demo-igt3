@@ -549,7 +549,7 @@ class CustomEntryLine(models.Model):
         if self.product_id:
             self.product_uom_id = self.product_id.uom_id.id
             self.taxes_id = self.product_id.supplier_taxes_id.ids
-            
+        
             
     #has travel
     t_travel_category = fields.Selection([
