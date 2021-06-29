@@ -117,13 +117,39 @@ class CustomEntry(models.Model):
             else:
                 entry.account_entry_type = 'none'
             
+   
+                
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
         for entry in self:
-            if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
-                entry.stage_id = entry.stage_find(order.custom_entry_type_id.id, [('fold', '=', False), ('stage_category', '=', 'draft')])
+            if entry.project_id:
+                if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
+                    entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
+                        ('fold', '=', False)])
             else:
-                order.stage_id = False
+                entry.stage_id = False
+    
+    def stage_find(self, section_id, domain=[], order='sequence'):
+        """ Override of the base.stage method
+            Parameter of the stage search taken from the lead:
+            - section_id: if set, stages must belong to this section or
+              be a default stage; if not set, stages must be default
+              stages
+        """
+        # collect all section_ids
+        section_ids = []
+        if section_id:
+            section_ids.append(section_id)
+        section_ids.extend(self.mapped('custom_entry_type_id').ids)
+        search_domain = []
+        if section_ids:
+            search_domain = [('|')] * (len(section_ids) - 1)
+            for section_id in section_ids:
+                search_domain.append(('custom_entry_type_ids', '=', section_id))
+        search_domain += list(domain)
+        # perform search, return the first found
+        return self.env['account.custom.entry.type'].search(search_domain, order=order, limit=1).id
+    
     
     def stage_find(self, section_id, domain=[], order='sequence'):
         section_ids = category_ids = []
