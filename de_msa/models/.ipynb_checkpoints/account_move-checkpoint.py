@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from datetime import date
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError, UserError
     
