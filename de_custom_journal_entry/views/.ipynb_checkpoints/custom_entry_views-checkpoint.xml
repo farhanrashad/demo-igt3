@@ -53,11 +53,11 @@
                     <button name="button_cancel" string="Cancel" type="object" 
                         attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
                         
-                        <button name="%(action_custom_entry_to_bill)d" string="Create Bill" class="btn-primary" type="action" invisible="0" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>
+                        <button name="%(action_custom_entry_to_bill)d" string="Create Bill" type="action" invisible="1" />
                         <button string="Create Bill" name="create_advance_expense" type="object" class="btn-primary" invisible="1"/>
                         
-        
-                        <!--<button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>-->
+                        
+                        <button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>
 
                         <button string="Create Payment" name="create_payment" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','payment')]}" invisible="0"/>
 
@@ -65,7 +65,7 @@
 
 
 
-                        <field name="stage_id" widget="statusbar" />
+                        <field name="stage_id" widget="statusbar" domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]" />
 
                     </header>
                     <sheet>
@@ -189,7 +189,6 @@
                                     <field name="product_qty" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="price_unit" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="price_subtotal" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
-                                    <field name="taxes_id" widget="many2many_tags" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="advance_subtotal" attrs="{'column_invisible':[('parent.has_advanced','==','no')], 'required': [('parent.has_advanced','==','required')]}"/>
 
                                     <!-- Travel  -->

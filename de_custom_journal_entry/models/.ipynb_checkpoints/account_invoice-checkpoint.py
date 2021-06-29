@@ -8,7 +8,7 @@ from odoo.tools.misc import format_date
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    custom_entry_id = fields.Many2one('account.custom.entry', 'Custom Entry', ondelete='set null', index=True, copy=False)
+    custom_entry_id = fields.Many2one('account.custom.entry', 'Custom Entry', ondelete='set null', index=True)
     
     @api.onchange('custom_entry_id')
     def _onchange_custom_entry_id(self):
@@ -20,7 +20,7 @@ class AccountMove(models.Model):
         #del invoice_vals['ref']
         self.update(invoice_vals)
 
-        # Copy Bill lines.
+        # Copy purchase lines.
         custom_entry_lines = self.custom_entry_id.custom_entry_line - self.line_ids.mapped('custom_entry_line_id')
         new_lines = self.env['account.move.line']
         for line in custom_entry_lines:
@@ -33,5 +33,5 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    custom_entry_line_id = fields.Many2one('account.custom.entry.line', 'Custom Entry Line', ondelete='set null', index=True, copy=False)
+    custom_entry_line_id = fields.Many2one('account.custom.entry.line', 'Custom Entry Line', ondelete='set null', index=True)
     custom_entry_id = fields.Many2one('account.custom.entry', 'Custom Entry', related='custom_entry_line_id.custom_entry_id', readonly=True)
