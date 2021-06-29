@@ -133,8 +133,6 @@
                                 <field name="date_entry_month" attrs="{'invisible':[('has_period','==','no')], 'required': [('has_period','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
                                 <span class="mr-1" attrs="{'invisible':[('has_period','==','no')]}"> - </span>
                                 <field name="date_entry_year" attrs="{'invisible':[('has_period','==','no')], 'required': [('has_period','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                                <field name="date_entry_year" attrs="{'invisible':[('has_period','==','no')], 'required': [('has_period','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                                <field name="date_entry_year" attrs="{'invisible':[('has_period','==','no')], 'required': [('has_period','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
                             </div>
                             <!-- Fleet/Rent Fields -->
                             <label for="f_duration_from" attrs="{'invisible':[('has_rent_vechile','==','no')]}"/>
@@ -226,6 +224,7 @@
 
                                     
                                     <!-- Electricity -->
+                                    <field name="e_paid_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
                                     <field name="amount_advanced" sum="advanced" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
                                     <field name="date_bill_from" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
                                     <field name="date_bill_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>

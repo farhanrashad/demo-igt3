@@ -2,21 +2,27 @@
 {
     'name': "Third-Party Billing",
     'summary': """
-        Customize Journal Entries
+        Third Party Billing
         """,
     'description': """
-        Customize Journal Entry
+        Third Party Billing
+        - Admin
+        - Fleet
+        - Travel
+        - Electricity
+        - Fuel
         
     """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Accounting',
-    'version': '14.0.0.7',
+    'version': '14.0.5.2',
     
-    'depends': ['de_purchase_subscription','account', 'fleet', 'project','stock','purchase_requisition','purchase','de_travel_request'],
+    'depends': ['de_purchase_subscription','account', 'analytic', 'fleet', 'de_project_planning','project','stock','purchase_requisition','purchase','de_travel_request'],
 
     # always loaded
     'data': [
+        'security/entry_security.xml',
         'security/ir.model.access.csv',
         'views/custom_entry_menu.xml',
         'views/custom_entry_type_views.xml',
@@ -24,9 +30,5 @@
         'views/account_move_views.xml',
         'views/custom_entry_views.xml',
         'views/account_payment_views.xml',
-    ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
     ],
 }

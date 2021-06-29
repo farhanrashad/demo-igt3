@@ -31,7 +31,7 @@ class CustomEntry(models.Model):
     company_id = fields.Many2one('res.company', 'Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,                                 default=lambda self: self.env.company.currency_id.id)        
 
-    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, copy=False)
+    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, copy=False, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]")
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
     
     amount_advanced_total = fields.Float('Total Advanced', compute='_amount_all')
@@ -117,14 +117,39 @@ class CustomEntry(models.Model):
             else:
                 entry.account_entry_type = 'none'
             
+   
+                
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
         for entry in self:
-            if entry.custom_entry_type_id:
+            if entry.project_id:
                 if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
-                    entry.stage_id = entry.stage_find(order.custom_entry_type_id.id, [('fold', '=', False), ('stage_category', '=', 'draft')])
+                    entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
+                        ('fold', '=', False)])
             else:
-                order.stage_id = False
+                entry.stage_id = False
+    
+    def stage_find(self, section_id, domain=[], order='sequence'):
+        """ Override of the base.stage method
+            Parameter of the stage search taken from the lead:
+            - section_id: if set, stages must belong to this section or
+              be a default stage; if not set, stages must be default
+              stages
+        """
+        # collect all section_ids
+        section_ids = []
+        if section_id:
+            section_ids.append(section_id)
+        section_ids.extend(self.mapped('custom_entry_type_id').ids)
+        search_domain = []
+        if section_ids:
+            search_domain = [('|')] * (len(section_ids) - 1)
+            for section_id in section_ids:
+                search_domain.append(('custom_entry_type_ids', '=', section_id))
+        search_domain += list(domain)
+        # perform search, return the first found
+        return self.env['account.custom.entry.type'].search(search_domain, order=order, limit=1).id
+    
     
     def stage_find(self, section_id, domain=[], order='sequence'):
         section_ids = category_ids = []
@@ -158,7 +183,6 @@ class CustomEntry(models.Model):
         
     def button_draft(self):
         self.write({'stage_id': self.next_stage_id.id})
-        return {}
     
     def button_submit(self):
         #self.ensure_one()
@@ -166,12 +190,12 @@ class CustomEntry(models.Model):
             group_id = order.custom_entry_type_id.group_id
             if group_id:
                 if not (group_id & self.env.user.groups_id):
-                    raise UserError(_("You are not authorize to submit requisition in category '%s'.", self.custom_entry_type_id.name))
+                    raise UserError(_("You are not authorize to submit requisition in category '%s'.", order.custom_entry_type_id.name))
             if not order.custom_entry_line:
                 raise UserError(_("You cannot submit transaction '%s' because there is no line.", self.name))
            
         self.update({
-            'date_submit' : fields.Datetime.now,
+            'date_submit' : fields.Datetime.now(),
             'stage_id' : self.stage_id.next_stage_id.id,
         })
         
@@ -183,7 +207,7 @@ class CustomEntry(models.Model):
                     raise UserError(_("You are not authorize to approve '%s'.", order.stage_id.name))
                     
         self.update({
-            'date_approved' : fields.Datetime.now,
+            'date_approved' : fields.Datetime.now(),
             'stage_id' : self.stage_id.next_stage_id.id,
         })
         
@@ -318,7 +342,7 @@ class CustomEntry(models.Model):
             'custom_entry_id': self.id,
             'invoice_date': fields.Datetime.now(),
             'partner_id': self.partner_id.id,
-            'partner_shipping_id': self.partner_id.id,
+            #'partner_shipping_id': self.partner_id.id,
             'currency_id': self.currency_id.id,
             'journal_id': self.custom_entry_type_id.journal_id.id,
             'invoice_origin': self.name,
@@ -336,7 +360,7 @@ class CustomEntry(models.Model):
             count = self.env['account.payment'].search_count([('custom_entry_id', '=', entry.id)])
             entry.payment_count = count
         
-    payment_count = fields.Integer(string='Payments', compute='get_payment_count', copy=False, default=0, store=True)
+    payment_count = fields.Integer(string='Payments', compute='get_payment_count')
     
     def action_view_payment(self):
         self.ensure_one()
@@ -492,7 +516,7 @@ class CustomEntryLine(models.Model):
         domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', string="UOM Category")
     product_qty = fields.Float(string='Quantity', default=1.0, digits='Product Unit of Measure', )
-    price_unit = fields.Float(string='Unit Price', default=1.0, digits='Product Price')
+    price_unit = fields.Float(string='Unit Price', default=0.0, digits='Product Price')
     price_subtotal = fields.Monetary(compute='_compute_all_amount', string='Subtotal', store=True)
     advance_subtotal = fields.Monetary(string='Adv. Subtotal', store=True)
     
@@ -519,7 +543,22 @@ class CustomEntryLine(models.Model):
             line.update({
                 't_amount_travel': total_amount_travel
             })
-            
+    
+    @api.onchange('date_departure','date_arrival')
+    def _number_of_days(self):
+        for line in self:
+            if line.date_departure and line.date_arrival:
+                if line.date_departure > line.date_arrival:
+                    raise UserError(("Arrival Date cant be before Departure Date."))
+                else:
+                    delta = line.date_arrival - line.date_departure
+                    if abs(delta.days) > 0:
+                        line.number_of_days = abs(delta.days)
+                    else:
+                        line.number_of_days = 1
+            else:
+                line.number_of_days = 0
+                
     #has fleet/rent vehicle
     f_fleet_id = fields.Many2one('fleet.vehicle', string="Car Detail")
     f_driver_id = fields.Many2one('res.partner', string="Driver", ondelete='cascade')
@@ -560,8 +599,27 @@ class CustomEntryLine(models.Model):
             line.update({
                 'h_amount': total_amount
             })
+            
+    @api.onchange('h_check_in','h_check_out')
+    def _number_of_nights(self):
+        for line in self:
+            if line.h_check_in and line.h_check_out:
+                if line.h_check_in > line.h_check_out:
+                    raise UserError(("Check Out cant be before Check in."))
+                else:
+                    delta = line.h_check_out - line.h_check_in
+                    if abs(delta.days) > 0:
+                        line.h_number_of_nights = abs(delta.days)
+                    else:
+                        line.h_number_of_nights = 1
+            else:
+                line.h_number_of_nights = 0
 
     #has electricity
+    e_paid_to = fields.Selection([
+        ('govt', 'Government'),
+        ('private', 'Private')],
+        string='Paid To', default='govt')
     date_bill_from = fields.Date(string='Date From', )
     date_bill_to = fields.Date(string='Date To', )
     amount_advanced = fields.Float(string='Forecast', help='Advanced Amount')
@@ -632,11 +690,6 @@ class CustomEntryLine(models.Model):
             'f_price_subtotal': tot
         })
         
-    
-        
-    
-        
-    
     def _compute_state(self):
         for line in self:
             line.state_id = line.project_id.address_id.state_id.id
