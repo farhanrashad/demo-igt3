@@ -224,6 +224,7 @@
 
                                     
                                     <!-- Electricity -->
+                                    <field name="e_paid_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
                                     <field name="amount_advanced" sum="advanced" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
                                     <field name="date_bill_from" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
                                     <field name="date_bill_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>

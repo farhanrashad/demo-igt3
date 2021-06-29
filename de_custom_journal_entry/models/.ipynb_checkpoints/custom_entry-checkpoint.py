@@ -342,7 +342,7 @@ class CustomEntry(models.Model):
             'custom_entry_id': self.id,
             'invoice_date': fields.Datetime.now(),
             'partner_id': self.partner_id.id,
-            'partner_shipping_id': self.partner_id.id,
+            #'partner_shipping_id': self.partner_id.id,
             'currency_id': self.currency_id.id,
             'journal_id': self.custom_entry_type_id.journal_id.id,
             'invoice_origin': self.name,
@@ -516,7 +516,7 @@ class CustomEntryLine(models.Model):
         domain="[('category_id', '=', product_uom_category_id)]")
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', string="UOM Category")
     product_qty = fields.Float(string='Quantity', default=1.0, digits='Product Unit of Measure', )
-    price_unit = fields.Float(string='Unit Price', default=1.0, digits='Product Price')
+    price_unit = fields.Float(string='Unit Price', default=0.0, digits='Product Price')
     price_subtotal = fields.Monetary(compute='_compute_all_amount', string='Subtotal', store=True)
     advance_subtotal = fields.Monetary(string='Adv. Subtotal', store=True)
     
@@ -616,6 +616,10 @@ class CustomEntryLine(models.Model):
                 line.h_number_of_nights = 0
 
     #has electricity
+    e_paid_to = fields.Selection([
+        ('govt', 'Government'),
+        ('private', 'Private')],
+        string='Travel By', default='govt')
     date_bill_from = fields.Date(string='Date From', )
     date_bill_to = fields.Date(string='Date To', )
     amount_advanced = fields.Float(string='Forecast', help='Advanced Amount')
