@@ -666,6 +666,16 @@ class CustomEntryLine(models.Model):
     other_charges = fields.Float(string='Other Charges')
     amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount')
     
+    def _compute_total_units(self):
+        for rec in self:
+            rec.total_unit = (rec.closing_reading - rec.opening_reading) + rec.additional_unit
+
+    @api.depends('maintainence_fee','hp_fee','KHW_charges','other_charges')
+    def _compute_total_electricity_amount(self):
+        for rec in self:
+            rec.amount_total_electricity = rec.maintainence_fee + rec.hp_fee + rec.KHW_charges + rec.other_charges
+            
+            
     #has fuel Drawn
     d_date = fields.Date(string='Drawn Date')
     d_partner_id = fields.Many2one('res.partner',string='Drawn Purchase From', ondelete='cascade')
@@ -726,14 +736,7 @@ class CustomEntryLine(models.Model):
         for line in self:
             line.state_id = line.project_id.address_id.state_id.id
             
-    def _compute_total_units(self):
-        for rec in self:
-            rec.total_unit = rec.closing_reading - rec.opening_reading
-
-    @api.depends('maintainence_fee','hp_fee','KHW_charges','other_charges')
-    def _compute_total_electricity_amount(self):
-        for rec in self:
-            rec.amount_total_electricity = rec.maintainence_fee + rec.hp_fee + rec.KHW_charges + rec.other_charges
+    
     
     def _prepare_account_move_line(self, move=False):
         self.ensure_one()
