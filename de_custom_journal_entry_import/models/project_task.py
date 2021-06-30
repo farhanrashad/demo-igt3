@@ -167,3 +167,9 @@ class ProjectTask(models.Model):
                 custom.user_id = self.env.user.id
 
 
+class CustomEntryType(models.Model):
+    _inherit = 'account.custom.entry.type'
+    
+class IrAttachment(models.Model):
+    _inherit = 'ir.attachment'    
+
