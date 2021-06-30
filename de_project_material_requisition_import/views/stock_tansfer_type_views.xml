@@ -1,0 +1,20 @@
+<odoo>
+    <data>
+        
+        <record id="view_stock_transfer_order_type_import" model="ir.ui.view">
+            <field name="name">stock.transfer.order.type.import</field>
+            <field name="model">stock.transfer.order.type</field>
+            <field name="inherit_id" ref="de_stock_material_transfer.action_stock_transfer_order_type_form_view" />
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='group_id']" position="after">
+                    <field name="is_publish" />
+
+                </xpath>
+
+           </field>
+        </record>
+
+       
+    </data>
+</odoo>

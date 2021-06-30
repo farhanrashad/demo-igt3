@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Portal Material Requisition",
+    'name': "Portal Custom Entry",
 
     'summary': """
-        Portal Material Requisition
-        1- Check Material Requisition on Portal
+        Portal Custom Entry
+        1- Check Custom Entry on Portal
         2- Print Order From Portal
         """,
 
     'description': """
-        Portal Material Requisition
-        1- Check Material Requisition on Portal
+        Portal Custom Entry
+        1- Check Custom Entry on Portal
         2- Print Order From Portal
     """,
 
@@ -24,12 +24,12 @@
     'version': '14.0.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'portal',  'rating', 'resource', 'web', 'web_tour', 'digest', 'de_stock_material_transfer', 'de_project_material_requisition_import'],
+    'depends': ['base', 'portal',  'rating', 'resource', 'web', 'web_tour', 'digest', 'de_custom_journal_entry', 'de_custom_journal_entry_import'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
-        'views/stock_transfer_order_templates.xml',
+        'views/custom_entry_templates.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
