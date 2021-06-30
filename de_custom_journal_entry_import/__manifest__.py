@@ -20,7 +20,7 @@
     'version': '14.0.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'de_custom_journal_entry'],
+    'depends': ['base', 'de_custom_journal_entry', 'website_form'],
 
     # always loaded
     'data': [
@@ -28,6 +28,7 @@
         'wizard/custom_entry_wizard.xml',
         'security/ir.model.access.csv',
         'views/project_task_views.xml',
+        'views/custom_entry_type_views.xml', 
         'views/project_task_template.xml',
     ],
     # only loaded in demonstration mode

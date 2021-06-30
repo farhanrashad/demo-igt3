@@ -84,7 +84,7 @@ class ProjectTask(models.Model):
 
                         search_field = ir_model_fields_obj.sudo().search([
                             ("model", "=", "account.custom.entry.line"),
-                            ("name", "=", row_val),
+                            ("field_description", "=", row_val),
                         ], limit=1)
                         keys.append(search_field.name)
 
