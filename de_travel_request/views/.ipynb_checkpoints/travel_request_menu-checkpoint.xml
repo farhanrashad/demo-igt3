@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="de_travel_request_menu_root" name="Travel Request"  active="True"
+              sequence="2"/>
+
+    <menuitem id="travel_request" name="Travel request" parent="de_travel_request_menu_root"
+              action="action_travel_request_view"
+              sequence="1"/>
+
+</odoo>
