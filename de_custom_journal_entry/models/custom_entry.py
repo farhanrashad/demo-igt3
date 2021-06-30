@@ -50,6 +50,7 @@ class CustomEntry(models.Model):
     account_entry_type = fields.Char(string='Accounting Entry Type', compute='_account_entry_type', )
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
+    journal_type = fields.Selection(related='custom_entry_type_id.journal_type')
     
     partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', change_default=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     
@@ -102,9 +103,9 @@ class CustomEntry(models.Model):
     
     #travel fields
     t_travel_by = fields.Selection([
-        ('flight ticket', 'Flight Ticket'),
+        ('ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
-        string='Travel By',)
+        string='Travel By', default='ticket')
     
     invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
     invoice_count = fields.Integer(compute="_compute_invoice", string='Bill Count', copy=False, default=0, store=True)
@@ -312,6 +313,70 @@ class CustomEntry(models.Model):
     def create_advance_expense(self):
         res = self._create_bill()
         #return self.action_subscription_invoice()
+    
+    def create_journal_entry(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to create Journal Entry '%s'.", order.stage_id.name))
+        res = self._create_account_move()
+        self.update({
+            'stage_id' : self.stage_id.next_stage_id.id,
+        })
+    def _create_account_move(self):
+        move = self.env['account.move']
+        lines_data = []
+        debit = credit = 0
+        counter_debit = counter_credit = 0
+        for line in self.custom_entry_line:
+            if self.custom_entry_id.custom_entry_type_id.counterpart_mode == 'debit':
+                credit = line.price_subtotal
+            else:
+                debit = line.price_subtotal
+                
+            lines_data.append([0,0,{
+                'name': str(self.name) + ' ' + str(line.product_id.name),
+                'custom_entry_line_id': line.id,
+                'account_id': self.custom_entry_type_id.account_id.id,
+                'debit': debit,
+                'credit': credit,
+                'partner_id': line.partner_id.id,
+                'analytic_account_id': line.analytic_account_id.id,
+                'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                'project_id': line.project_id.id,
+            }])
+        if self.custom_entry_type_id.counterpart_mode == 'debit':
+            counter_debit = self.amount_total
+        else:
+            counter_credit = self.amount_total
+            
+        lines_data.append([0,0,{
+            'name': str(self.name),
+            'custom_entry_line_id': line.id,
+            'account_id': self.custom_entry_type_id.counterpart_account_id.id,
+            'debit': counter_debit,
+            'credit': counter_credit,
+            'partner_id': self.partner_id.id,
+        }])
+        move.create({
+            'move_type': 'in_invoice',
+            'custom_entry_id': self.id,
+            'invoice_date': fields.Datetime.now(),
+            'partner_id': self.partner_id.id,
+            #'partner_shipping_id': self.partner_id.id,
+            'currency_id': self.currency_id.id,
+            'journal_id': self.custom_entry_type_id.journal_id.id,
+            'invoice_origin': self.name,
+            #'fiscal_position_id': fpos.id,
+            'invoice_payment_term_id': self.partner_id.property_supplier_payment_term_id.id,
+            'narration': self.name,
+            'invoice_user_id': self.user_id.id,
+            #'partner_bank_id': company.partner_id.bank_ids.filtered(lambda b: not b.company_id or b.company_id == company)[:1].id,
+            'invoice_line_ids':lines_data,
+        })
+        return move
+    
         
     def create_bill(self):
         for order in self.sudo():

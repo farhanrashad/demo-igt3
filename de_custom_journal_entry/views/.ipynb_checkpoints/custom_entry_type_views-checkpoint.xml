@@ -47,8 +47,13 @@
                             
                         </group>
                         <group>
+                            <field name="default_product_id"/>
                             <field name="generate_accounting"/>
                             <field name="journal_id" options="{'no_create': True,'no_open':True}" attrs="{'invisible': [('generate_accounting', '=', False)], 'required': [('generate_accounting', '=', True)]}"/>
+                            <field name="journal_type" attrs="{'invisible':[('journal_id','=',False)]}"/>
+                            <field name="account_id" attrs="{'invisible':[('journal_type','in',['sale','purchase'])]}"/>
+                            <field name="counterpart_mode" attrs="{'invisible':[('journal_type','in',['sale','purchase'])]}"/>
+                            <field name="counterpart_account_id" attrs="{'invisible':[('journal_type','in',['sale','purchase'])]}"/>
 
                             <field name="expense_advance" attrs="{'invisible': [('generate_accounting', '=', False)]}"/>
                             <field name="payment_journal_id" attrs="{'invisible': [('expense_advance', '=', False)], 'required': [('expense_advance', '=', True)]}"/>
