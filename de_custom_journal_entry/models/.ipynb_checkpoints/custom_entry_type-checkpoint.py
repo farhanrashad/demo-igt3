@@ -66,6 +66,7 @@ class CustomEntryType(models.Model):
     has_advanced = fields.Selection(CATEGORY_SELECTION, string="Has Advanced Amount", default="no", required=True,)
     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Has Analytic", default="no", required=True,)
     has_employee = fields.Selection(CATEGORY_SELECTION, string="Has Employee", default="no", required=True,)
+    has_supplier = fields.Selection(CATEGORY_SELECTION, string="Has Supplier", default="no", required=True,)
     #feature options fields
     has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
     has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)
