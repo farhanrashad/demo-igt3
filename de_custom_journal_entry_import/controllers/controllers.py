@@ -50,7 +50,6 @@ def get_custom_entry_final(entry_type):
 
     custom_types = request.env['account.custom.entry.type'].search([('id', '=', entry_type)], limit=1)
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
-    sample_file = request.env['ir.attachment'].search([('name','=','custom_entry_import_csv.csv')], limit=1)
     tasks = 'project.task'
     return {
         'projects': projects.id,
@@ -59,7 +58,6 @@ def get_custom_entry_final(entry_type):
         'user': company_info.id,
         'title': custom_types.name +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
         'company_info': company_info,
-        'sample_file': sample_file,
         'tasks': tasks,
     }
 
