@@ -61,11 +61,11 @@ class CustomerPortal(CustomerPortal):
         }
                                                 
         searchbar_filters = {
-            'all': {'label': _('All'), 'domain': [('state', 'in', ['draft', 'progress','confirm','closed'])]},
-            'draft': {'label': _('Draft'), 'domain': [('state', '=', 'draft')]},
-            'progress': {'label': _('Ongoing'), 'domain': [('state', '=', 'progress')]},
-            'confirm': {'label': _('Confirmed'), 'domain': [('state', '=', 'confirm')]},
-            'closed': {'label': _('Done'), 'domain': [('state', '=', 'closed')]}, 
+            'all': {'label': _('All'), 'domain': [('stage_id.stage_category', 'in', ['draft', 'progress','confirm','closed'])]},
+            'draft': {'label': _('Draft'), 'domain': [('stage_id.stage_category', '=', 'draft')]},
+            'progress': {'label': _('Ongoing'), 'domain': [('stage_id.stage_category', '=', 'progress')]},
+            'confirm': {'label': _('Confirmed'), 'domain': [('stage_id.stage_category', '=', 'confirm')]},
+            'closed': {'label': _('Done'), 'domain': [('stage_id.stage_category', '=', 'closed')]}, 
         }
            
         searchbar_inputs = {
