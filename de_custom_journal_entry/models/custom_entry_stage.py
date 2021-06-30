@@ -36,7 +36,8 @@ class AccountCustomEntryStage(models.Model):
         ('none', 'None'),
         ('payment', 'Payment'),
         ('bill', 'Bill'),
-    ], string='Accounting Entry Type', default='none')
+        ('entry', 'Journal Entry'),
+    ], string='Accounting Entry', default='none')
     
     next_stage_id = fields.Many2one('account.custom.entry.stage', string='Next Stage' )
     prv_stage_id = fields.Many2one('account.custom.entry.stage', string='Previous Stage')

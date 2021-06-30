@@ -15,32 +15,14 @@ class CustomEntry(models.Model):
     _name = 'account.custom.entry'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Custom Entry'
+    _order = "date_entry desc"
     
-#     def _get_default_stage_id(self):
-#         return self.env['account.custom.entry.stage'].search([('stage_category','=','draft')], order='sequence', limit=1)
-    
-    @api.model
-    def create(self, vals):
-        id = None
-        rec = super(CustomEntry, self).create(vals)
-        
-        
-        record = self.env['account.custom.entry.stage'].search([('stage_category','=','draft')], order='sequence')
-        if record:
-            for line in record:
-                if line.custom_entry_type_ids:
-                    if rec.custom_entry_type_id.id in line.custom_entry_type_ids.ids:
-                        id = line.id
-                        break
-        rec.stage_id = id
-        return rec
-        
-        
-        
-        
-        
-        
-        
+    def _get_default_stage_id(self):
+        """ Gives default stage_id """
+        custom_entry_type_id = self.env.context.get('default_custom_entry_type_id')
+        if not custom_entry_type_id:
+            return False
+        return self.stage_find(custom_entry_type_id, [('fold', '=', False)])
     
     name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     date_entry = fields.Datetime(string='Entry Date', required=True, index=True, copy=False, default=fields.Datetime.now,)
@@ -52,11 +34,9 @@ class CustomEntry(models.Model):
 
     user_id = fields.Many2one('res.users', string="Request Owner",check_company=True, domain="[('company_ids', 'in', company_id)]", default=lambda self: self.env.user, required=True,readonly=True, )
     company_id = fields.Many2one('res.company', 'Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
-    currency_id = fields.Many2one('res.currency', 'Currency', required=True,                                 default=lambda self: self.env.company.currency_id.id)        
-
-    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, 
-#                                default=_get_default_stage_id, 
-                               copy=False, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]")
+    currency_id = fields.Many2one('res.currency', 'Currency', required=True,                                 default=lambda self: self.env.company.currency_id.id)
+    
+    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]", copy=False)
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
     
     amount_advanced_total = fields.Float('Total Advanced', compute='_amount_all')
@@ -70,6 +50,7 @@ class CustomEntry(models.Model):
     account_entry_type = fields.Char(string='Accounting Entry Type', compute='_account_entry_type', )
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
+    journal_type = fields.Selection(related='custom_entry_type_id.journal_type')
     
     partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', change_default=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     
@@ -122,9 +103,9 @@ class CustomEntry(models.Model):
     
     #travel fields
     t_travel_by = fields.Selection([
-        ('flight ticket', 'Flight Ticket'),
+        ('ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
-        string='Travel By',)
+        string='Travel By', default='ticket')
     
     invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
     invoice_count = fields.Integer(compute="_compute_invoice", string='Bill Count', copy=False, default=0, store=True)
@@ -147,10 +128,10 @@ class CustomEntry(models.Model):
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
         for entry in self:
-#             if entry.project_id:
-            if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
-                entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
-                    ('fold', '=', False)])
+            if entry.project_id:
+                if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
+                    entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
+                        ('fold', '=', False)])
             else:
                 entry.stage_id = False
     
@@ -332,6 +313,70 @@ class CustomEntry(models.Model):
     def create_advance_expense(self):
         res = self._create_bill()
         #return self.action_subscription_invoice()
+    
+    def create_journal_entry(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to create Journal Entry '%s'.", order.stage_id.name))
+        res = self._create_account_move()
+        self.update({
+            'stage_id' : self.stage_id.next_stage_id.id,
+        })
+    def _create_account_move(self):
+        move = self.env['account.move']
+        lines_data = []
+        debit = credit = 0
+        counter_debit = counter_credit = 0
+        for line in self.custom_entry_line:
+            if self.custom_entry_id.custom_entry_type_id.counterpart_mode == 'debit':
+                credit = line.price_subtotal
+            else:
+                debit = line.price_subtotal
+                
+            lines_data.append([0,0,{
+                'name': str(self.name) + ' ' + str(line.product_id.name),
+                'custom_entry_line_id': line.id,
+                'account_id': self.custom_entry_type_id.account_id.id,
+                'debit': debit,
+                'credit': credit,
+                'partner_id': line.partner_id.id,
+                'analytic_account_id': line.analytic_account_id.id,
+                'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                'project_id': line.project_id.id,
+            }])
+        if self.custom_entry_type_id.counterpart_mode == 'debit':
+            counter_debit = self.amount_total
+        else:
+            counter_credit = self.amount_total
+            
+        lines_data.append([0,0,{
+            'name': str(self.name),
+            'custom_entry_line_id': line.id,
+            'account_id': self.custom_entry_type_id.counterpart_account_id.id,
+            'debit': counter_debit,
+            'credit': counter_credit,
+            'partner_id': self.partner_id.id,
+        }])
+        move.create({
+            'move_type': 'in_invoice',
+            'custom_entry_id': self.id,
+            'invoice_date': fields.Datetime.now(),
+            'partner_id': self.partner_id.id,
+            #'partner_shipping_id': self.partner_id.id,
+            'currency_id': self.currency_id.id,
+            'journal_id': self.custom_entry_type_id.journal_id.id,
+            'invoice_origin': self.name,
+            #'fiscal_position_id': fpos.id,
+            'invoice_payment_term_id': self.partner_id.property_supplier_payment_term_id.id,
+            'narration': self.name,
+            'invoice_user_id': self.user_id.id,
+            #'partner_bank_id': company.partner_id.bank_ids.filtered(lambda b: not b.company_id or b.company_id == company)[:1].id,
+            'invoice_line_ids':lines_data,
+        })
+        return move
+    
         
     def create_bill(self):
         for order in self.sudo():
@@ -542,9 +587,35 @@ class CustomEntryLine(models.Model):
     product_uom_category_id = fields.Many2one(related='product_id.uom_id.category_id', string="UOM Category")
     product_qty = fields.Float(string='Quantity', default=1.0, digits='Product Unit of Measure', )
     price_unit = fields.Float(string='Unit Price', default=0.0, digits='Product Price')
-    price_subtotal = fields.Monetary(compute='_compute_all_amount', string='Subtotal', store=True)
+    taxes_id = fields.Many2many('account.tax', string='Taxes', compute='_compute_tax_id', domain=['|', ('active', '=', False), ('active', '=', True)])
+    price_subtotal = fields.Monetary(compute='_compute_all_amount', string='Subtotal')
     advance_subtotal = fields.Monetary(string='Adv. Subtotal', store=True)
     
+    def _compute_tax_id(self):
+        for line in self:
+            line = line.with_company(line.company_id)
+            #fpos = line.order_id.fiscal_position_id or line.order_id.fiscal_position_id.get_fiscal_position(line.order_id.partner_id.id)
+            # filter taxes by company
+            taxes = line.product_id.supplier_taxes_id.filtered(lambda r: r.company_id == line.env.company)
+            #line.taxes_id = fpos.map_tax(taxes, line.product_id, line.custom_entry_id.partner_id)
+            line.taxes_id = taxes.ids
+            
+    @api.depends('product_qty', 'price_unit')
+    def _compute_all_amount(self):
+        tot = 0
+        for line in self:
+            line.price_subtotal = line.product_qty * line.price_unit
+            #self.update({
+             #   'price_subtotal': 100
+            #})
+        
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if self.product_id:
+            self.product_uom_id = self.product_id.uom_id.id
+            self.taxes_id = self.product_id.supplier_taxes_id.ids
+        
+            
     #has travel
     t_travel_category = fields.Selection([
         ('domestic', 'Domestic'),
@@ -709,6 +780,7 @@ class CustomEntryLine(models.Model):
     def _compute_fuel_filled_total(self):
         tot = 0
         for line in self:
+            tot = 0
             if line.custom_entry_id.has_fuel_filling:
                 tot = line.f_product_qty * line.f_price_unit
         self.update({
@@ -728,23 +800,9 @@ class CustomEntryLine(models.Model):
         for rec in self:
             rec.amount_total_electricity = rec.maintainence_fee + rec.hp_fee + rec.KHW_charges + rec.other_charges
     
-    @api.depends('product_qty', 'price_unit')
-    def _compute_all_amount(self):
-        tot = 0
-        for line in self:
-            if line.custom_entry_id.has_product:
-                tot = line.product_qty * line.price_unit
-        self.update({
-            'price_subtotal': line.product_qty * line.price_unit
-        })
-        
-    @api.onchange('product_id')
-    def onchange_product_id(self):
-        if self.product_id:
-            self.product_uom_id = self.product_id.uom_id.id
-    
     def _prepare_account_move_line(self, move=False):
         self.ensure_one()
+        taxes_id = self.product_id.supplier_taxes_id
         res = {
             'name': '%s: ' % (self.custom_entry_id.name),
             'product_id': self.product_id.id,
@@ -752,6 +810,7 @@ class CustomEntryLine(models.Model):
             'quantity': self.product_qty,
             'price_unit': self.price_unit,
             #'tax_ids': [(6, 0, self.taxes_id.ids)],
+            #'tax_ids': [(6, 0, taxes_id.ids)],
             'analytic_account_id': self.analytic_account_id.id,
             'analytic_tag_ids': [(6, 0, self.analytic_tag_ids.ids)],
             'custom_entry_line_id': self.id,
