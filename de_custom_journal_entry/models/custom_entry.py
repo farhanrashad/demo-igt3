@@ -16,8 +16,31 @@ class CustomEntry(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Custom Entry'
     
-    def _get_default_stage_id(self):
-        return self.env['account.custom.entry.stage'].search([('stage_category','=','draft')], order='sequence', limit=1)
+#     def _get_default_stage_id(self):
+#         return self.env['account.custom.entry.stage'].search([('stage_category','=','draft')], order='sequence', limit=1)
+    
+    @api.model
+    def create(self, vals):
+        id = None
+        rec = super(CustomEntry, self).create(vals)
+        
+        
+        record = self.env['account.custom.entry.stage'].search([('stage_category','=','draft')], order='sequence')
+        if record:
+            for line in record:
+                if line.custom_entry_type_ids:
+                    if rec.custom_entry_type_id.id in line.custom_entry_type_ids.ids:
+                        id = line.id
+                        break
+        rec.stage_id = id
+        return rec
+        
+        
+        
+        
+        
+        
+        
     
     name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     date_entry = fields.Datetime(string='Entry Date', required=True, index=True, copy=False, default=fields.Datetime.now,)
@@ -31,7 +54,9 @@ class CustomEntry(models.Model):
     company_id = fields.Many2one('res.company', 'Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,                                 default=lambda self: self.env.company.currency_id.id)        
 
-    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, copy=False, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]")
+    stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, 
+#                                default=_get_default_stage_id, 
+                               copy=False, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]")
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
     
     amount_advanced_total = fields.Float('Total Advanced', compute='_amount_all')
@@ -122,10 +147,10 @@ class CustomEntry(models.Model):
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
         for entry in self:
-            if entry.project_id:
-                if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
-                    entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
-                        ('fold', '=', False)])
+#             if entry.project_id:
+            if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
+                entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
+                    ('fold', '=', False)])
             else:
                 entry.stage_id = False
     
