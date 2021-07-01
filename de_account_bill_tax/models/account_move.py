@@ -6,7 +6,7 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = "account.move"
     
-    amount_gst_tax_signed = fields.Monetary(string='Tax', store=True, readonly=True, compute='_compute_tax_amount', currency_field='company_currency_id')
+    amount_gst_tax_signed = fields.Monetary(string='Ctax', store=True, readonly=True, compute='_compute_tax_amount', currency_field='company_currency_id')
     amount_wht_tax_signed = fields.Monetary(string='WHT', store=True, readonly=True, compute='_compute_tax_amount', currency_field='company_currency_id')
     
     @api.depends(
