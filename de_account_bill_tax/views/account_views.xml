@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Account Move -->
+        <record id="view_in_invoice_tree_inherit" model="ir.ui.view">
+            <field name="name">view.in.invoice.tree.inehrit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_in_invoice_tree" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='state']" position="before">
+                    <field name="amount_gst_tax_signed" optional="hide"/>
+                    <field name="amount_wht_tax_signed" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+        
+    </data>
+</odoo>
