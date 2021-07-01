@@ -25,13 +25,13 @@ class StockPicking(models.Model):
                 for line in picking.move_ids_without_package:
                     line.quantity_done = (picking.task_id.completion_percent / 100) * line.purchase_line_id.product_qty
     
-    @api.constrains('task_id')
-    def _check_completion_percent(self):
-        for picking in self:
-            task_ids = self.env['project.task'].search([('project_id','=',picking.task_id.project_id.id),('id','!=',picking.task_id.id)])
-            for task in task_ids:
-                if task.task_sequence < picking.task_id.task_sequence:
-                    raise UserError(_('You cannot select %s before %s') % (picking.task_id.name, task.name))
+    #@api.constrains('task_id')
+    #def _check_completion_percent(self):
+    #    for picking in self:
+    #        task_ids = self.env['project.task'].search([('project_id','=',picking.task_id.project_id.id),('id','!=',picking.task_id.id),('delivery_assigned','=',False)])
+     #       for task in task_ids:
+      #          if task.task_sequence < picking.task_id.task_sequence:
+       #             raise UserError(_('You cannot select %s before %s') % (picking.task_id.name, task.name))
                 
     def button_validate(self):
         res = super(StockPicking, self).button_validate()
