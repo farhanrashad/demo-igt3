@@ -97,7 +97,22 @@ class PurchaseRequisition(models.Model):
                     raise UserError(_("You are not authorize to submit requisition in category '%s'.", requisition.type_id.name))
             if not requisition.line_ids:
                 raise UserError(_("You cannot submit transaction '%s' because there is no line.", self.name))
-           
+            if self.type_id.quantity_copy == 'none' and self.vendor_id:
+                for requisition_line in self.line_ids:
+                    if requisition_line.price_unit <= 0.0:
+                        raise UserError(_('You cannot confirm the blanket order without price.'))
+                    if requisition_line.product_qty <= 0.0:
+                        raise UserError(_('You cannot confirm the blanket order without quantity.'))
+                    requisition_line.create_supplier_info()
+                self.write({'state': 'ongoing'})
+            else:
+                self.write({'state': 'in_progress'})
+            # Set the sequence number regarding the requisition type
+            if self.name == 'New':
+                if self.is_quantity_copy != 'none':
+                    self.name = self.env['ir.sequence'].next_by_code('purchase.requisition.purchase.tender')
+                else:
+                    self.name = self.env['ir.sequence'].next_by_code('purchase.requisition.blanket.order')
         self.update({
             'date_submit' : fields.Datetime.now(),
             'stage_id' : self.stage_id.next_stage_id.id,
