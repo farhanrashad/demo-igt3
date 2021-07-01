@@ -169,5 +169,9 @@ class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
 class IrAttachment(models.Model):
-    _inherit = 'ir.attachment'    
+    _inherit = 'ir.attachment'   
+    
+    
+class ResGroups(models.Model):
+    _inherit = 'res.groups'     
 
