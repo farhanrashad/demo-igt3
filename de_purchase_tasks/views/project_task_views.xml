@@ -57,6 +57,6 @@
         
         
         <menuitem name="On Milestones" id="menu_purchase_tasks_pending_milestones" parent="purchase.menu_procurement_management"
-            action="action_view_pending_milestone" sequence="10" groups="base.group_no_one,project.group_project_user"/>
+            action="action_view_pending_milestone" sequence="20" groups="base.group_no_one,project.group_project_user"/>
     </data>
 </odoo>

@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    task_id = fields.Many2one('project.task', string='Milestone', domain="[('purchase_id', '=', purchase_id),('allow_picking', '=', allow_picking)]", copy=False)
+    task_id = fields.Many2one('project.task', string='Milestone', domain="[('purchase_id', '=', purchase_id),('allow_picking', '=', allow_picking),('stage_id.is_closed','=',True)]", copy=False)
     allow_picking = fields.Boolean(string='Allow on Picking', compute="_compute_allow_picking")
     
     @api.depends('purchase_id')
