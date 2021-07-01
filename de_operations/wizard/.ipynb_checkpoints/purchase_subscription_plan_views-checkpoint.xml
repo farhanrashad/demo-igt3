@@ -6,7 +6,6 @@
         <field name="model">purchase.subscription.plan.wizard</field>
         <field name="arch" type="xml">
             <form string="Payment Schedule">
-                
                 <group>
                     <group>
                         <field name="purchase_subscription_id" invisible="1"/>
@@ -17,21 +16,30 @@
                         </div>
                         <label for="recurring_interval"/>
                             <div class="o_row">
-                                <span class="mr-1">After Every</span>
+                                <span class="mr-1">Every</span>
                                 <field name="recurring_interval" required="1"/>
                                 <field name="recurring_interval_type" class="field_rule_type" required="1"/>
                             </div>
                     </group>
                 </group>
                 <group>
-                    
+                    <button name="populate_subscription" id="create_invoice_open" string="Populate Schedule" type="object" class="btn-primary"/>
+
                 </group>
-                
-                
+                <group>
+                    <field name="wizard_plan_line_ids" nolabel ="1">
+                        <tree editable="botttom" create = 'false'>
+                            <field name="date_from" />
+                            <field name="date_to" />
+                            <field name="recurring_price" />
+                            <field name="recurring_intervals" />
+                        </tree>
+                    </field>
+                </group>
                 
 
                 <footer>
-                    <button name="create_payment_schedule" id="payment_schedule_open" string="Plan Schedule" type="object" context="{'open_bills': True}" class="btn-primary"/>
+                    <button name="create_invoices" id="create_invoice_open" string="Plan Schedule" type="object" context="{'open_bills': True}" class="btn-primary"/>
                     
                     <button string="Cancel" class="btn btn-default" special="cancel"/>
                 </footer>

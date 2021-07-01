@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
-class PurchaseSubscriptionAdjustments(models.Model):
+class PurchaseSubscriptionAdjustments(models.TransientModel):
     _name = 'purchase.subscription.plan.wizard'
     _description = 'Purchase Subscription Plan'
     
@@ -25,68 +25,33 @@ class PurchaseSubscriptionAdjustments(models.Model):
     
     amount = fields.Float('Escalation %', digits='Account', help="The percentage of amount to be Billed in advance, taxes excluded.")
     currency_id = fields.Many2one('res.currency', string='Currency')
-    purchase_subscription_id = fields.Many2one('purchase.subscription','Subscription',)
-    recurring_interval = fields.Integer(string="Invoicing Period", help="Repeat every (Days/Week/Month/Year)", required=True, default=1)
+    purchase_subscription_id = fields.Many2one('purchase.subscription','Vendor Bill',)
+    recurring_interval = fields.Integer(string="Invoicing Period", help="Repeat every (Days/Week/Month/Year)", required=True, default=1, tracking=True)
     recurring_interval_type = fields.Selection([('daily', 'Days'), ('weekly', 'Weeks'),
                                                 ('monthly', 'Months'), ('yearly', 'Years'), ],
                                                string='Recurrence', required=True,
-                                               help="Invoice automatically repeat at specified interval", default='monthly')
-    
-    
-    
-    
-    def create_payment_schedule(self):
-        if self.purchase_subscription_id.purchase_subscription_schedule_line:
-            recuring_step = 1
-            payment_interval = 0
-            escalation = self.amount
-            if self.recurring_interval_type == 'yearly':
-                recuring_step = self.recurring_interval * 12
-            elif  self.recurring_interval_type == 'monthly': 
-                recuring_step = self.recurring_interval
-            elif  self.recurring_interval_type == 'weekly': 
-                recuring_step = (self.recurring_interval/4)
-            elif  self.recurring_interval_type == 'daily': 
-                recuring_step = (self.recurring_interval/30)    
-                
-                
-            for  paymentline in self.purchase_subscription_id.purchase_subscription_schedule_line:
-                payment_interval += paymentline.recurring_intervals
-                paymentline.get_recurring_total()
-                if  payment_interval == recuring_step:   
-                    paymentline.update({
-                        'escalation': self.amount,
+                                               help="Invoice automatically repeat at specified interval", default='monthly', tracking=True)
+    wizard_plan_line_ids = fields.One2many('purchase.subscription.plan.line.wizard', 'wizard_subscription_plan_id',string="Planned Line")
 
-                    })
-                    paymentline.get_recurring_total()
-                    payment_interval = 0
- 
-        else:
-            self.purchase_subscription_id.start_subscription()
-            recuring_step = 0
-            payment_interval = 0
-            escalation = self.amount
-            if self.recurring_interval_type == 'yearly':
-                recuring_step = self.recurring_interval * 12 
-            elif  self.recurring_interval_type == 'monthly': 
-                recuring_step = self.recurring_interval
-            elif  self.recurring_interval_type == 'weekly': 
-                recuring_step = (self.recurring_interval/4)
-            elif  self.recurring_interval_type == 'daily': 
-                recuring_step = (self.recurring_interval/30)      
-                
-            for  paymentline in self.purchase_subscription_id.purchase_subscription_schedule_line:
-                payment_interval += paymentline.recurring_intervals
-                paymentline.get_recurring_total()
-                if  payment_interval == recuring_step:   
-                    paymentline.update({
-                        'escalation': self.amount,
-                    })
-                    paymentline.get_recurring_total()
-                    payment_interval = 0
-    
-    
 
+    def populate_subscription(self):
+        self.ensure_one()
+        current_date = new_date = False
+        if self.wizard_plan_line_ids:
+            self.wizard_plan_line_ids.unlink()
+        #current_date = self.recurring_next_date or self.default_get(['recurring_next_date'])['recurring_next_date']
+        for schedule in self.purchase_subscription_id.subscription_plan_id.subscription_plan_schedule_ids:
+            #new_date = self.subscription_plan_id._get_recurring_next_date(self.recurring_interval_type, self.recurring_interval * schedule.recurring_interval, current_date, self.recurring_invoice_day)
+                
+            self.wizard_plan_line_ids.create({
+                'date_from': current_date,
+                'date_to': new_date,
+                'wizard_subscription_plan_id': self.purchase_subscription_id.id,
+                'recurring_intervals': schedule.recurring_interval,
+                'recurring_price': self.purchase_subscription_id.recurring_price,
+            })
+                #current_date = self._get_recurring_next_date(self.recurring_interval_type, self.recurring_interval * 1, new_date, self.recurring_invoice_day)
+        #return True
     
     def create_invoices(self):
         subscriptions = self.env['purchase.subscription'].browse(self._context.get('active_ids', []))
@@ -172,5 +137,3 @@ class SubscriptionPlanLineWizard(models.TransientModel):
     date_to = fields.Date(string='Date To', readonly=True)
     recurring_price = fields.Float(string="Recurring Price", required=True, readonly=True)
     recurring_intervals = fields.Integer(string="Intervals", required=True, readonly=True)
-
-
