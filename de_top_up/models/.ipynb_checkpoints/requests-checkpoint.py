@@ -35,7 +35,7 @@ class TopUpRequest(models.Model):
         ('cancelled', 'Cancelled'),
         ('refused', 'Refused'),
         ('distributed', 'Distributed')
-    ], string='State', index=True, copy=False, default='draft' , tracking=True)
+    ], string='State', index=True, copy=False, default='draft')
 
     topup_request_lines = fields.One2many('topup.request.line', 'request_id', string='Request Lines')
     topup_request_lines_category = fields.One2many('topup.request.category.line', 'request_id', string='Request Lines Category')
@@ -111,7 +111,7 @@ class TopUpRequest(models.Model):
     description = fields.Text(string="Description")
     period = fields.Char(string='Period', compute='_compute_account_period')
     
-    requester = fields.Many2one('res.users', default=lambda self: self.env.user, string="Requester", readonly=True, tracking=True)
+    requester = fields.Many2one('res.users', default=lambda self: self.env.user, string="Requester", readonly=True)
     manager = fields.Many2one('hr.employee', string="Line Manager", related='requester.employee_id.parent_id')
     department = fields.Many2one('hr.department', string="Department", related='requester.employee_id.department_id')
     representative_batch = fields.Selection(
@@ -129,7 +129,7 @@ class TopUpRequest(models.Model):
         string="Representative Batch", default='c-level')
     date = fields.Date(string="Date", default=fields.date.today())
     type = fields.Selection([('employee benfit', 'Employee Benefit'), ('category use', 'Category Use')],
-                            string="Type", default='employee benefit')
+                            string="Type", default='employee benfit')
     is_level = fields.Boolean(string='Is C-Level?')
     additional_req = fields.Boolean(string="Additional Request?")
     
@@ -162,7 +162,7 @@ class EmployeeRequestLine(models.Model):
     _name = 'topup.request.line'
     _description = 'Top Up Request model'
 
-    request_id = fields.Many2one('topup.request')
+    request_id = fields.Many2one('topup.request', string='Topup Request')
 
     employee = fields.Many2one('hr.employee', string="Employee", domain="[('active_emp','=', False)]")
     department = fields.Many2one('hr.department', string="Department", related="employee.department_id")
@@ -210,7 +210,7 @@ class EmployeeRequestLineCategory(models.Model):
     _name = 'topup.request.category.line'
     _description = 'Top Up Request model for Category'
 
-    request_id = fields.Many2one('topup.request')
+    request_id = fields.Many2one('topup.request', string='Request')
 
     category = fields.Selection([('BOD', 'BOD'),
                                  ('media', 'Media ( Facebook, Twitter, LinkedIn )'),
@@ -218,8 +218,7 @@ class EmployeeRequestLineCategory(models.Model):
                                  ('hr', 'HR Phone'),
                                  ('it', 'IT server room Alarm system'),
                                  ('cctv', 'CCTV')
-                                ],
-                            string="Category")
+                                ], string="Category", default='BOD')
     description = fields.Char(string="Description")
     telenor = fields.Integer(string="Telenor")
     ooredoo = fields.Integer(string="Ooredoo")

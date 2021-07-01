@@ -29,7 +29,7 @@ class TopUpBalance(models.Model):
         ('confirmed', 'Confirmed'),
         ('closed', 'Closed'),
         ('cancelled', 'Cancelled'),
-    ], string='State', index=True, copy=False, default='draft', tracking=True)
+    ], string='State', index=True, copy=False, default='draft')
 
     topup_balance_lines = fields.One2many('topup.balance.line', 'balance_id')
 
@@ -92,7 +92,7 @@ class TopUpBalance(models.Model):
 
     
 
-    date = fields.Date(string="Date", default=fields.date.today(), tracking=True)
+    date = fields.Date(string="Date", default=fields.date.today())
     pre_period = fields.Char(string="Previous Period", compute='_compute_previous_period')
     curr_period = fields.Char(string="Current Period",  compute='_compute_previous_period')
     is_populated = fields.Boolean('Is Populated')

@@ -35,7 +35,7 @@ class TopUpRequest(models.Model):
         ('cancelled', 'Cancelled'),
         ('refused', 'Refused'),
         ('distributed', 'Distributed')
-    ], string='State', index=True, copy=False, default='draft' , tracking=True)
+    ], string='State', index=True, copy=False, default='draft')
 
     topup_request_lines = fields.One2many('topup.request.line', 'request_id', string='Request Lines')
     topup_request_lines_category = fields.One2many('topup.request.category.line', 'request_id', string='Request Lines Category')
@@ -111,7 +111,7 @@ class TopUpRequest(models.Model):
     description = fields.Text(string="Description")
     period = fields.Char(string='Period', compute='_compute_account_period')
     
-    requester = fields.Many2one('res.users', default=lambda self: self.env.user, string="Requester", readonly=True, tracking=True)
+    requester = fields.Many2one('res.users', default=lambda self: self.env.user, string="Requester", readonly=True)
     manager = fields.Many2one('hr.employee', string="Line Manager", related='requester.employee_id.parent_id')
     department = fields.Many2one('hr.department', string="Department", related='requester.employee_id.department_id')
     representative_batch = fields.Selection(
