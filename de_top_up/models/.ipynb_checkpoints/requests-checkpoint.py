@@ -5,6 +5,7 @@ from datetime import date, timedelta, datetime
 
 class TopUpRequest(models.Model):
     _name = 'topup.request'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Top Up Request model'
 
 

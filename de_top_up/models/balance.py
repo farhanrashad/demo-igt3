@@ -5,6 +5,7 @@ from datetime import date, timedelta, datetime
 
 class TopUpBalance(models.Model):
     _name = 'topup.balance'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Top Up Balance'
 
     def unlink(self):
