@@ -86,5 +86,7 @@
             parent="purchase.menu_purchase_config" sequence="100"/>
     
     <menuitem id="purchase_task_template_menu" action="action_purchase_task_template" parent="menu_purchases_in_config_project_task" sequence="1" name="Milestone" groups="purchase.group_purchase_manager"/>
+    
+            <menuitem action="project.open_task_type_form" id="menu_purchase_tasks_project_config_project" name="Stages" parent="menu_purchases_in_config_project_task" sequence="3" groups="purchase.group_purchase_manager,base.group_no_one"/>
 
 </odoo>

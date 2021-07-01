@@ -1,5 +1,18 @@
 <odoo>
     <data>
+        
+        <record id="project_task_view_search_inherit_purchase_tasks" model="ir.ui.view">
+            <field name="name">project.task.search.inherit.purchase_tasks</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_search_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_tasks']" position="before">
+                    <filter string="Open Milestones" name="open_milesones" domain="[('stage_id.is_closed', '!=', True)]"/>
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
+        
         <record id="project_task_form_inherit" model="ir.ui.view">
             <field name="name">project.task.form.view.inherit</field>
             <field name="model">project.task</field>
@@ -14,11 +27,36 @@
                 <xpath expr="//field[@name='stage_id']" position="replace">
                     <field name="purchase_task_stage_ids" invisible="1"/>
                     <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" domain="[('id', 'in', purchase_task_stage_ids)]" attrs="{'invisible':[('purchase_id','=',False)]}"/>
-                    
-
-
                 </xpath>
             </field>
         </record>
+        
+        
+        <record id="action_view_pending_milestone" model="ir.actions.act_window">
+            <field name="name">On Milestones</field>
+            <field name="res_model">project.task</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="search_view_id" ref="project_task_view_search_inherit_purchase_tasks"/>
+            <!--
+            <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree', 'view_id': ref('project.open_view_task_list_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('project_task_form_inherit')})]"/>
+-->
+            <field name="domain">[('purchase_id', '!=', False)]</field>
+            <field name="context">{'create':False,'search_default_open_milesones': 1, 'all_task': 0}</field>
+            
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No tasks found. Let's create one!
+                </p><p>
+                     To get things done, use activities and status on tasks.<br/>
+                    Chat in real time or by email to collaborate efficiently.
+                </p>
+            </field>
+        </record>
+        
+        
+        <menuitem name="On Milestones" id="menu_purchase_tasks_pending_milestones" parent="purchase.menu_procurement_management"
+            action="action_view_pending_milestone" sequence="10" groups="base.group_no_one,project.group_project_user"/>
     </data>
 </odoo>
