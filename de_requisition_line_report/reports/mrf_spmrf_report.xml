@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <record id="mrf_spmrf_report" model="ir.actions.report">
+        <field name="name">MRF SPMRF Report</field>
+        <field name="model">stock.transfer.order</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">de_requisition_line_report.mrf_spmrf_report_xlsx</field>
+        <field name="report_file">MRF/SPMRF Lines Report</field>
+<!--         <field name="binding_model_id" ref="de_msa.model_master_service_agreement"/>
+        <field name="binding_type">report</field> -->
+    </record>
+<!--         <report
+                id="mrf_spmrf_report"
+                model="stock.transfer.order"
+                string="MRF/SPMRF Lines Report"
+                report_type="xlsx"
+                name="de_requisition_line_report.mrf_spmrf_report_xlsx"
+                file="MRF/SPMRF Lines Report"
+        /> -->
+    </data>
+</odoo>
