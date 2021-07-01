@@ -30,12 +30,18 @@ from odoo.exceptions import AccessError, MissingError, UserError
 
 def get_custom_entry(flag=0):
     projects = request.env['project.project'].search([])
-    custom_entry_types = request.env['account.custom.entry.type'].search([])
+    entry_type_list = []
+    custom_entry_types = request.env['account.custom.entry.type'].search([('is_publish','=',True)])
+    for group in custom_entry_types.group_id.users:
+        if group.id == http.request.env.context.get('uid'):
+            entry_type_list.append(custom_entry_types.id) 
+            
+    allow_custom_entry_types = request.env['account.custom.entry.type'].search([('id', 'in', entry_type_list)])
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
     tasks = 'project.task'
     return {
         'projects': projects,
-        'custom_entry_types': custom_entry_types,
+        'custom_entry_types': allow_custom_entry_types,
         'company_info': company_info,
         'tasks': tasks,
     }
