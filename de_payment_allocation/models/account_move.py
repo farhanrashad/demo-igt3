@@ -35,7 +35,12 @@ class AccountMove(models.Model):
         invoice_list = []
         partner = []
         
-        payments = self.env['account.payment'].search([('partner_id','=',self.partner_id.id),('state','=','posted'),('is_reconciled','=', False)])     
+        payments = self.env['account.payment'].search([('partner_id','=',self.partner_id.id),('is_reconciled','=', False)], limit=0)
+        if self.move_type == 'in_invoice':
+            payments = self.env['account.payment'].search([('partner_id','=',self.partner_id.id),('is_reconciled','=', False), ('payment_type','=', 'outbound')])
+        if self.move_type == 'out_invoice':
+            payments = self.env['account.payment'].search([('partner_id','=',self.partner_id.id),('is_reconciled','=', False), ('payment_type','=', 'inbound')])    
+            
         for  payment in  payments:
             payment_amount = 0.0
             currency = 0

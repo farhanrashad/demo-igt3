@@ -40,6 +40,7 @@ class AccountPayment(models.Model):
             accuracy = self.env['decimal.precision'].create(decimal_vals)
         payment_list = []
         invoice_list = []
+        refund_invoice_list = []
         partner = []
         for rec in self:
             selected_ids = rec.env.context.get('active_ids', [])
@@ -47,8 +48,8 @@ class AccountPayment(models.Model):
             
             
         for  payment in  selected_records:
-            if payment.state == 'draft':
-                raise UserError(_('Only Posted Payment are allow to Reconcile!'))
+#             if payment.state == 'draft':
+#                 raise UserError(_('Only Posted Payment are allow to Reconcile!'))
             if payment.is_reconciled == True:
                 raise UserError(_('This Payment Already Reconciled'))
             else:                
@@ -67,7 +68,14 @@ class AccountPayment(models.Model):
                 partner.append(payment.partner_id.id)
         uniq_partner =  set(partner) 
         for ppartner in uniq_partner:
-            invoices = self.env['account.move'].search([('partner_id','=',ppartner),('state','=','posted'),('payment_state','in', ('not_paid','partial'))])             
+            invoices = self.env['account.move'].search([('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))], limit=1)  
+            if self.payment_type == 'outbound':
+                invoices = self.env['account.move'].search([('move_type', '=', 'in_invoice'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
+                raise UserError('Partner'+str(invoices))
+            elif self.payment_type == 'inbound':
+                invoices = self.env['account.move'].search([('move_type', '=', 'out_invoice'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
+                
+                
             for  inv in invoices:
                 amount = 0.0
                 currency = 0
@@ -88,7 +96,35 @@ class AccountPayment(models.Model):
                     'allocate_amount': amount,
                     'currency_id': currency,
                     'original_currency_id': inv.currency_id.id, 
-                }))    
+                }))
+            refund_invoices = self.env['account.move'].search([('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))], limit=1)  
+            if self.payment_type == 'outbound':
+                refund_invoices = self.env['account.move'].search([('move_type', '=', 'in_refund'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
+            elif self.payment_type == 'inbound':
+                refund_invoices = self.env['account.move'].search([('move_type', '=', 'out_refund'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
+                
+                
+            for  refund_inv in refund_invoices:
+                amount = 0.0
+                currency = 0
+                if refund_inv.currency_id.id == self.currency_id.id:
+                    amount = refund_inv.amount_residual
+                    currency = refund_inv.currency_id.id 
+                else:
+                    amount = refund_inv.currency_id._convert(refund_inv.amount_residual, self.currency_id, self.company_id, self.date)
+                    currency = self.currency_id.id 
+
+                refund_invoice_list.append((0,0,{
+                    'move_id': refund_inv.id,
+                    'payment_date': refund_inv.invoice_date,
+                    'due_date': refund_inv.invoice_date_due,
+                    'invoice_amount': refund_inv.amount_total,
+                    'unallocate_amount': amount,
+                    'allocate': False,
+                    'allocate_amount': amount,
+                    'currency_id': currency,
+                    'original_currency_id': refund_inv.currency_id.id, 
+                }))      
         return {
             'name': ('Payment Allocation'),
             'view_type': 'form',
@@ -99,6 +135,7 @@ class AccountPayment(models.Model):
             'target': 'new',
             'context': {'default_payment_line_ids': payment_list, 
                         'default_invoice_move_ids': invoice_list, 
+                        'default_invoice_refund_ids': refund_invoice_list, 
                         'default_company_id': self.env.company.id,
                         'default_partner_id': self.partner_id.id,
                         'default_is_payment': True,

@@ -54,7 +54,25 @@
                           <field name='allocation_id'  invisible='1' />
                           <field name='currency_id'  invisible='0'  readonly='1'  force_save='1' />  
                         </tree>
+                    </field>  
+                    
+                    <group string="Refunds">                        
+                    </group>
+                    <field name='invoice_refund_ids'>
+                        <tree editable='bottom'   >
+                          <field name='move_id'  readonly='1' force_save='1'/>
+                          <field name='payment_date' readonly='1' force_save='1' />
+                          <field name='due_date'  readonly='1' force_save='1' />
+                          <field name='invoice_amount'  readonly='1' force_save='1' />
+                          <field name='original_currency_id' readonly='1'  invisible='0' force_save='1' />  
+                          <field name='unallocate_amount'  readonly='1' force_save='1' />
+                          <field name='allocate'   widget="boolean_toggle" force_save='1' />
+                          <field name='allocate_amount'  force_save='1' />
+                          <field name='allocation_id'  invisible='1' />
+                          <field name='currency_id'  invisible='0'  readonly='1'  force_save='1' />  
+                        </tree>
                     </field>    
+                    
                     
                     <footer>
                         <button name="action_allocate_payment" id="create_allocation" string="Allocate" type="object" attrs="{'invisible': [('is_payment','=',False)]}"      class="btn-primary"/>

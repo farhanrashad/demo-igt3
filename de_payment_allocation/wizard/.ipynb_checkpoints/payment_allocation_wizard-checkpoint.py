@@ -18,6 +18,7 @@ class PaymentAllocation(models.TransientModel):
     amount = fields.Float(string='Amount')
     payment_line_ids = fields.One2many('payment.allocation.wizard.line', 'allocation_id', string='Payment Lines')
     invoice_move_ids = fields.One2many('invoice.allocation.wizard.line', 'allocation_id', string='Invoice Lines')
+    invoice_refund_ids = fields.One2many('invoice.allocation.wizard.line.credit', 'allocation_id', string='Invoice Refund Lines')
     payment_id = fields.Many2one('account.payment', string='Payment')
     move_id = fields.Many2one('account.move', string='Move')
     allocated_amount = fields.Float(string='Allocated Amount', compute='_amount_all')
@@ -338,3 +339,42 @@ class InvoiceAllocationLine(models.TransientModel):
 
             
             
+class InvoiceAllocationLineCreditmemo(models.TransientModel):
+    _name = 'invoice.allocation.wizard.line.credit'
+    _description = 'Invoice Allocation Wizard Line Credit Memo'
+    
+    
+    move_id = fields.Many2one('account.move', string='Invoice', store=True)
+    allocation_id = fields.Many2one('payment.allocation.wizard', string='Allocation', store=True)
+    payment_date = fields.Date(string='Invoice Date', store=True)
+    due_date = fields.Date(string='Due Date', store=True)
+    invoice_amount = fields.Float(string='Invoice Amount', store=True)
+    unallocate_amount = fields.Float(string='Unallocated Amount', store=True)
+    allocate = fields.Boolean(string='Allocate', store=True)
+    allocate_amount = fields.Float(string='allocate Amount', store=True)
+    currency_id = fields.Many2one('res.currency', store=True, readonly=True, tracking=True, required=False,
+        string='Currency')
+    original_currency_id = fields.Many2one('res.currency', store=True, readonly=True, tracking=True, required=False,
+        string='Invoice Currency')
+    
+    
+    @api.onchange('allocate')
+    def onchange_allocate(self):
+        payment_amount = 0.0
+        inv_amount = 0.0
+        amount = 0.0
+        for payment in self.allocation_id.payment_line_ids:
+            payment_amount = payment.allocate_amount     
+        for inv in self:
+            if inv.allocate == True:
+                if inv.move_id.currency_id.id == inv.allocation_id.payment_id.currency_id.id:                
+                    inv_amount = inv_amount + inv.allocate_amount
+                else:
+                    inv_amount = inv_amount + inv.move_id.currency_id._convert(inv.allocate_amount, inv.allocation_id.payment_id.currency_id, inv.allocation_id.payment_id.company_id, inv.allocation_id.payment_id.date)
+
+
+        if  payment_amount <  inv_amount:
+            amount = inv_amount - payment_amount
+            raise UserError(_('Allocate Amount cannot be greater than '+str(payment_amount)))
+
+                        
