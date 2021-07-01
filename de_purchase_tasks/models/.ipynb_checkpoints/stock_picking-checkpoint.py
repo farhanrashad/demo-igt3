@@ -17,3 +17,10 @@ class StockPicking(models.Model):
             if task.allow_picking:
                 ap = task.allow_picking
         self.allow_picking = ap
+        
+    @api.onchange('task_id')
+    def _onchange_task_id(self):
+        for picking in self:
+            if picking.task_id.completion_percent > 0:
+                for line in picking.move_ids_without_package:
+                    line.quantity_done = (picking.task_id.completion_percent / 100) * line.purchase_line_id.product_qty

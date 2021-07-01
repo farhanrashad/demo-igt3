@@ -5,8 +5,8 @@ from odoo.exceptions import UserError
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    project_id = fields.Many2one('project.project', string='Project')
-    task_ids = fields.Many2many('project.task', string='Project Task')
+    project_id = fields.Many2one('project.project', string='Project', copy=False)
+    task_ids = fields.Many2many('project.task', string='Project Task', copy=False)
     project_count = fields.Integer(string='Project Count', compute='_compute_proj_count')
     task_count = fields.Integer(string='Task Count', compute='_compute_task_count')
 

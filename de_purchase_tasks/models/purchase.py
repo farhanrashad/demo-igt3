@@ -59,6 +59,8 @@ class PurchaseOrder(models.Model):
                     'date_deadline': fields.Date.to_string(self.date_approve + timedelta(template.completion_days)),
                     'allow_picking': template.allow_picking,
                     'allow_invoice': template.allow_invoice,
+                    'completion_days': template.completion_days,
+                    'completion_percent': template.completion_percent,
                     'stage_id': stage_id,
                     'purchase_task_stage_ids': [(6, 0, template.stage_ids.ids)],
                 })

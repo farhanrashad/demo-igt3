@@ -39,5 +39,7 @@ class ProjectTask(models.Model):
     
     allow_picking = fields.Boolean(string='Allow on Picking', help='User will provide the milestone on picking with purchase order reference')
     allow_invoice = fields.Boolean(string='Allow on invoice', help='User will provide the milestone on invoice with purchase order reference')
+    completion_days = fields.Integer(string='Completion Days', readonly=True)
+    completion_percent = fields.Float(string='Completion Percentage', readonly=True)
 
 
