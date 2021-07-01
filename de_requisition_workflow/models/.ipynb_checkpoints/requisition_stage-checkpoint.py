@@ -9,7 +9,7 @@ class PurchaseRequisitionStage(models.Model):
     _name = 'purchase.requisition.stage'
     _description = 'Requisition Stage'
     _order = 'sequence, stage_category, id'
-
+    
     def _get_default_requisition_type_ids(self):
         default_requisition_type_id = self.env.context.get('default_requisition_type_id')
         return [default_requisition_type_id] if default_requisition_type_id else None
@@ -30,13 +30,12 @@ class PurchaseRequisitionStage(models.Model):
         ('draft', 'Draft'),
         ('progress', 'In Progress'),
         ('confirm', 'Confirmed'),
-        ('transfer', 'Transferred'),
-        ('close', 'Closed'),
+        ('done', 'Done'),
         ('Cancel', 'Cancelled'),
     ], string='Stage Category', default='draft')
     
-    next_stage_id = fields.Many2one('stock.transfer.order.stage', string='Next Stage' )
-    prv_stage_id = fields.Many2one('stock.transfer.order.stage', string='Previous Stage')
+    next_stage_id = fields.Many2one('purchase.requisition.stage', string='Next Stage' )
+    prv_stage_id = fields.Many2one('purchase.requisition.stage', string='Previous Stage')
 
     group_id = fields.Many2one('res.groups', string='Security Group')
 

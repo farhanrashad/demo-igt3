@@ -30,8 +30,7 @@ class PurchaseRequisitionStage(models.Model):
         ('draft', 'Draft'),
         ('progress', 'In Progress'),
         ('confirm', 'Confirmed'),
-        ('transfer', 'Transferred'),
-        ('close', 'Closed'),
+        ('done', 'Done'),
         ('Cancel', 'Cancelled'),
     ], string='Stage Category', default='draft')
     
