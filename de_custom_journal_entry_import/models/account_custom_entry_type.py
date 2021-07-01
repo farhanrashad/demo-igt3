@@ -12,5 +12,7 @@ class IrAttachment(models.Model):
                                             column1="doc_id",
                                             column2="attachment_id",
                                             string="Attachment")
+    is_publish = fields.Bolean(string='Publish on Website')
+    
 
 
