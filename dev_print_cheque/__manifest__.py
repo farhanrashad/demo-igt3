@@ -2,15 +2,15 @@
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<http://www.devintellecs.com>).
+#    Copyright (C) 2015 DevIntelle Consulting Service Pvt.Ltd (<https://www.dynexcel.com>).
 #
-#    For Module Support : devintelle@gmail.com  or Skype : devintelle 
+#    For Module Support : info@gdynexcel.com  or Skype : Dynexcel 
 #
 ##############################################################################
 
 {
     'name': 'Dynamic Print Cheque - Check writing',
-    'version': '11.0.1.3',
+    'version': '14.0.0.2',
     'sequence':1,
     'category': 'Generic Modules/Accounting',
     'description': """
@@ -48,10 +48,10 @@ Cheque print, check print, check writing, bank check print, check dynamic, bank 
 
 
     """,
-    'author': 'DevIntelle Consulting Service Pvt.Ltd',
+    'author': 'Dynexcel',
     'summary':'App will  configure and print cheque/check Dynamically for any bank with different Cheque format',
-    'website': 'http://www.devintellecs.com/',
-    'depends': ['account','account_payment'],
+    'website': 'https://www.dynexcel.com/',
+    'depends': ['account_accountant','account_payment','account_check_printing'],
     'data': [
         'security/ir.model.access.csv',
         'views/report_print_cheque.xml',

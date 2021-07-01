@@ -232,7 +232,7 @@
                               <t t-if="o.cheque_formate_id.is_star_word">
                                 ***
                             </t>
-                        <!--
+                        
                             <t t-if="o.cheque_formate_id.is_word_bold">
                                 <span style="font-weight:bold" t-esc="o.check_amount_in_words"/>
                             </t>
@@ -242,9 +242,8 @@
                             <t t-if="o.cheque_formate_id.is_star_word">
                                 ***
                             </t>
--->
                         </div>  
-<!--                           <div t-attf-style="margin-left:#{o.cheque_formate_id.amt_w_s_m_left}px;margin-top:#{o.cheque_formate_id.amt_w_s_m_top}px;position: absolute;};">
+                      <div t-attf-style="margin-left:#{o.cheque_formate_id.amt_w_s_m_left}px;margin-top:#{o.cheque_formate_id.amt_w_s_m_top}px;position: absolute;};">
                           
                            <t t-if="o.cheque_formate_id.is_word_bold">
                                 <span style="font-weight:bold" t-esc="amount_word(o)[0]"/>                                 
@@ -253,7 +252,7 @@
                                 <span t-esc="amount_word(o)[1]"/>
                             </t>
                            
-                        </div> -->
+                        </div>
                     </t>
 
 
@@ -320,7 +319,7 @@
                                         </td>
 
                                         <td>
-                                           <span t-field="o.communication"/>
+                                           <span t-field="o.ref"/>
                                         </td>
 
                                         <td class="text-right">
@@ -361,7 +360,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="sale_tbody">
-                                    <tr t-foreach="o.move_line_ids" t-as="l">
+                                    <tr t-foreach="o.line_ids" t-as="l">
                                         <td>
                                            <span t-field="l.move_id.name"/>
                                         </td>
@@ -694,7 +693,7 @@
                                         </td>
 
                                         <td>
-                                           <span t-field="o.communication"/>
+                                           <span t-field="o.ref"/>
                                         </td>
 
                                         <td class="text-right">
@@ -735,7 +734,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="sale_tbody">
-                                    <tr t-foreach="o.move_line_ids" t-as="l">
+                                    <tr t-foreach="o.line_ids" t-as="l">
                                         <td>
                                            <span t-field="l.move_id.name"/>
                                         </td>

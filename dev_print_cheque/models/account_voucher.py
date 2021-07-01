@@ -125,7 +125,7 @@ class account_voucher(models.Model):
             if payment.check_narration: 
                 move_vals = {
                     'date': payment.date,
-                    'ref': payment.communication,
+                    'ref': payment.ref,
                     'journal_id': payment.journal_id.id,
                     'currency_id': payment.journal_id.currency_id.id or payment.company_id.currency_id.id,
                     'partner_id': payment.partner_id.id,
@@ -172,7 +172,7 @@ class account_voucher(models.Model):
             else:
                 move_vals = {
                     'date': payment.date,
-                    'ref': payment.communication,
+                    'ref': payment.ref,
                     'journal_id': payment.journal_id.id,
                     'currency_id': payment.journal_id.currency_id.id or payment.company_id.currency_id.id,
                     'partner_id': payment.partner_id.id,
@@ -238,7 +238,7 @@ class account_voucher(models.Model):
                 if payment.check_narration:
                     transfer_move_vals = {
                         'date': payment.date,
-                        'ref': payment.communication,
+                        'ref': payment.ref,
                         'partner_id': payment.partner_id.id,
                         'journal_id': payment.destination_journal_id.id,
                         'line_ids': [
@@ -271,7 +271,7 @@ class account_voucher(models.Model):
                 else:
                     transfer_move_vals = {
                         'date': payment.date,
-                        'ref': payment.communication,
+                        'ref': payment.ref,
                         'partner_id': payment.partner_id.id,
                         'journal_id': payment.destination_journal_id.id,
                         'line_ids': [
