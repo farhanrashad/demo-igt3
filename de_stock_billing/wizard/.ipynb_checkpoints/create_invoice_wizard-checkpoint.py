@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-
-from odoo import models, fields, api, _
+from datetime import datetime, timedelta
+from odoo import api, fields, models, tools, SUPERUSER_ID, _
+from odoo.exceptions import UserError, AccessError, ValidationError
+from odoo.tools.safe_eval import safe_eval
+from odoo.tools.misc import format_date
 
 
 class CreateInvoiceWizard(models.Model):
@@ -10,13 +13,9 @@ class CreateInvoiceWizard(models.Model):
     def get_default_journal(self):
         journal = self.env['account.journal'].search([('type','=','purchase')], limit=1)
         return journal
-    
-    
     journal_id = fields.Many2one('account.journal', string='Journal', required=True, default=get_default_journal)
     invoice_date = fields.Datetime(string='Invoice Date' , default=fields.Datetime.now)
     picking_ids = fields.Many2many('stock.picking', string='Picking')
-    
-    
     
     def action_create_bill(self):
         """Create the invoice associated to the PO.
@@ -26,8 +25,11 @@ class CreateInvoiceWizard(models.Model):
             move_type = 'in_invoice'
         elif self.journal_id.type == 'sale':
             move_type = 'out_invoice'    
-            
+        
+        
         for picking in self.picking_ids:
+            if not picking.state == 'done':
+                raise UserError(_("Please validate delivery to create bill '%s'.", picking.name))
             if picking.invoice_control == '2binvoice':
                 partner = 0
                 product_list = []

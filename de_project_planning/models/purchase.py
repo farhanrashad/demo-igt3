@@ -12,12 +12,12 @@ from odoo.addons.purchase.models.purchase import PurchaseOrder as Purchase
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
     
-    project_id = fields.Many2one('project.project', string='Project')
+    project_id = fields.Many2one('project.project', string='Project', domain="[('allow_site_planning','=',True)]")
     
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
     
-    project_id = fields.Many2one('project.project', string='Project')
+    project_id = fields.Many2one('project.project', string='Project', domain="[('allow_site_planning','=',True)]")
     state_id = fields.Many2one('res.country.state', compute='_compute_project_state')
     
     @api.depends('project_id')
