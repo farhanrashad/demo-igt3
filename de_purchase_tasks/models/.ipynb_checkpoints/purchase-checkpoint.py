@@ -7,9 +7,9 @@ from odoo.exceptions import UserError
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    project_id = fields.Many2one('project.project', string='Project')
+    project_id = fields.Many2one('project.project', string='Project', copy=False)
     project_count = fields.Integer(string='Project counts', compute='_compute_project')
-    task_ids = fields.One2many('project.task', 'purchase_id', string='Tasks')
+    task_ids = fields.One2many('project.task', 'purchase_id', string='Tasks', copy=False)
     task_count = fields.Integer(string='Task counts', compute='_compute_task_ids')
 
     def _get_targeted_project_ids(self):
@@ -78,7 +78,7 @@ class PurchaseOrder(models.Model):
     
     def _compute_proj_count(self):
         for rec in self:
-            self.project_count = self.env['project.project'].search_count([('purchase_order_id', '=', self.id)])
+            self.project_count = self.env['project.project'].search_count([('project_id', '=', self.id)])
 
     def action_view_project(self):
         """
@@ -98,7 +98,7 @@ class PurchaseOrder(models.Model):
 
     def _compute_task_count(self):
         for rec in self:
-            self.task_count = self.env['project.task'].search_count([('purchase_order_id', '=', self.id)])
+            self.task_count = self.env['project.task'].search_count([('purchase_id', '=', self.id)])
 
     def action_view_tasks(self):
         """

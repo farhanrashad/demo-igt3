@@ -25,6 +25,7 @@
                     <field name="allow_invoice" invisible="1"/>
                     <field name="completion_days" />
                     <field name="completion_percent" />
+                    <field name="delivery_assigned" readonly="1"/>
                 </xpath>
                 <xpath expr="//field[@name='stage_id']" position="replace">
                     <field name="purchase_task_stage_ids" invisible="1"/>
