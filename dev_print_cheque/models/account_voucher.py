@@ -18,10 +18,10 @@ class account_voucher(models.Model):
     
     
     
-    cheque_formate_id = fields.Many2one('cheque.setting', 'Cheque Formate', required=False)
-    cheque_no = fields.Char('Cheque No')
-    text_free = fields.Char('Free Text')
-    partner_text = fields.Char('Partner Title')
+    cheque_formate_id = fields.Many2one('cheque.setting', string='Cheque Format', required=False)
+    cheque_no = fields.Char(string='Cheque No')
+    text_free = fields.Char(string='Free Text')
+    partner_text = fields.Char(string='Partner Title')
     pay_by = fields.Char(string='Payee')
     check_narration = fields.Char(string='Check Narration')
 

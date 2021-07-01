@@ -237,7 +237,7 @@
                                 <span style="font-weight:bold" t-esc="o.check_amount_in_words"/>
                             </t>
                             <t t-if="not o.cheque_formate_id.is_word_bold">
-                                <span t-esc="o.check_amount_in_words"/>test
+                                <span t-esc="o.check_amount_in_words"/>
                             </t>
                             <t t-if="o.cheque_formate_id.is_star_word">
                                 ***

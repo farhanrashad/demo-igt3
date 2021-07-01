@@ -13,6 +13,7 @@ from num2words import num2words
 
 class print_check(models.AbstractModel): 
     _name = 'report.dev_print_cheque.report_print_cheque'
+    _description = 'Report Print Cheque'
 
     def get_date(self,date):
         print('=========================',date)
