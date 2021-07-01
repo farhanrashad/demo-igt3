@@ -22,7 +22,7 @@
     'version': '14.0.0.6',
 
     # any module necessary for this one to work correctly
-    'depends': ['de_purchase_requisition_type','de_project_planning'],
+    'depends': ['de_purchase_requisition_type','de_project_planning','de_stock_billing'],
     # always loaded
     'data': [
         'security/ir.model.access.csv',

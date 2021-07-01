@@ -10,8 +10,14 @@ class AccountMove(models.Model):
     milestone_purchase_id = fields.Many2one('purchase.order', readonly=True, compute="_compute_allow_picking")
     allow_picking = fields.Boolean(string='Allow on Picking', compute="_compute_allow_picking")
 
-    task_id = fields.Many2one('project.task', string='Milestone', domain="[('purchase_id', '=', milestone_purchase_id),('allow_picking', '=', allow_picking)]", copy=False)
+    task_id = fields.Many2one('project.task', string='Milestone', compute="_compute_milestone")
     
+    def _compute_milestone(self):
+        picking = self.env['stock.picking']
+        for move in self:
+            picking = self.env['stock.picking'].search([('move_id','=',move.id)],limit=1)
+            move.task_id = picking.task_id.id
+            
     @api.depends('purchase_id')
     def _compute_allow_picking(self):
         ap = False
