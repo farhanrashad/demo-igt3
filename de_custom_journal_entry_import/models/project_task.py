@@ -100,6 +100,14 @@ class ProjectTask(models.Model):
                     'custom_entry_type_id': self.custom_entry_type_id.id,
                 }
                 custom_entry = self.env['account.custom.entry'].create(custom_vals)
+                attachment_vals = {
+                    'name': custom.entry_attachment_id.name,
+                    'datas': custom.entry_attachment_id.datas,
+                    'res_id': custom_entry.id,
+                    'res_model': 'account.custom.entry',
+                }
+                attachment = self.env['ir.attachment'].create(attachment_vals)
+                
                 for data_row in file_reader:
                     inner_vals = {}
                     index = 0
@@ -163,6 +171,7 @@ class ProjectTask(models.Model):
                 custom.is_entry_processed = True
                 custom.un_processed_entry = False
                 custom.user_id = self.env.user.id
+                
 
 
 class CustomEntryType(models.Model):
