@@ -28,6 +28,9 @@
                             <field name='mother'/>
                             <field name='child'/>
                             <field name='wage'/>
+                            <field name='currency_convert'/>
+                            <field name='currency_rate' attrs="{'invisible': [('currency_convert', '=', False)],'required': [('currency_convert', '!=', False)]}"/>
+                            <field name='final_wage' attrs="{'invisible': [('currency_convert', '=', False)]}"/>
                             <field name='annual_wage'/>
                             <field name='tax_income'/>
                             <field name='ss_amount'/>

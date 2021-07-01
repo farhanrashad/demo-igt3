@@ -47,6 +47,9 @@ class EmployeeIncomeTax(models.Model):
     employee_id = fields.Many2one('hr.employee', string="Employee")
     department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id')
     wage = fields.Float(string="Contract Wage", compute='employee_count')
+    currency_convert = fields.Boolean(string="Currency Conversion?")
+    currency_rate = fields.Float(string="Currency Rate")
+    final_wage = fields.Float( string="Converted Wage" , compute='employee_count' )
     marital_stat = fields.Selection([
         ('single', 'Single'),
         ('married', 'Married'),
@@ -77,14 +80,22 @@ class EmployeeIncomeTax(models.Model):
             if rec.employee_id.contract_id:
                 for contract in rec.employee_id.contract_id:
                     if contract.state == 'open':
-                        rec.wage = contract.wage
-                        rec.annual_wage = contract.wage * 12
+                        if rec.currency_convert == True:
+                            rec.wage = contract.wage
+                            rec.final_wage = contract.wage * rec.currency_rate
+                            rec.annual_wage = rec.final_wage * 12
+                        else:
+                            rec.wage = contract.wage
+                            rec.final_wage = 0
+                            rec.annual_wage = contract.wage * 12
                     else:
                         rec.wage = 0
                         rec.annual_wage = 0
+                        rec.final_wage = 0
             else:
                 rec.wage = 0
                 rec.annual_wage = 0
+                rec.final_wage = 0
 
             if rec.employee_id.employee_family_ids:
                 for dependant in rec.employee_id.employee_family_ids:
@@ -173,7 +184,10 @@ class EmployeeIncomeTaxLine(models.Model):
     @api.onchange('month_salary')
     def compute_monthly_salary(self):
         for rec in self:
-            rec.month_salary = rec.employee_income_tax_id.wage
+            if rec.employee_income_tax_id.currency_convert == True:
+                rec.month_salary = rec.employee_income_tax_id.final_wage
+            else:
+                rec.month_salary = rec.employee_income_tax_id.wage
 
     @api.depends('conversion_rate')
     def compute_converted_tax(self):
@@ -196,7 +210,7 @@ class EmployeeIncomeTaxLine(models.Model):
                 #                 rec.month_tax = 0
 
                 if ((rec.month_salary*12) * 0.20) > 10000000:
-                    rec.taxable_income = (((record.month_salary*12) - 10000000) - (
+                    rec.taxable_income = (((rec.month_salary*12) - 10000000) - (
                             (record.no_of_children * 500000) + (record.parent_count * 1000000) + (
                             record.ss_amount * 12) + (record.wife_count * 1000000)))
                 
@@ -206,7 +220,7 @@ class EmployeeIncomeTaxLine(models.Model):
                 if rec.arrears:
                     
                     if (((rec.month_salary*12)+rec.arrears) * 0.20) > 10000000:
-                        taxable_income_with_arrears = (((record.month_salary*12) - 10000000) - (
+                        taxable_income_with_arrears = (((rec.month_salary*12) - 10000000) - (
                             (record.no_of_children * 500000) + (record.parent_count * 1000000) + (
                             record.ss_amount * 12) + (record.wife_count * 1000000)))
                 

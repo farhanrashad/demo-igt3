@@ -6,8 +6,8 @@
     'author': "Dynexcel",
     'website': "http://www.dynexcel.co",
     'category': 'Uncategorized',
-    'version': '14.0.0.2',
-    'depends': ['base','hr', 'hr_payroll'],
+    'version': '14',
+    'depends': ['base', 'hr'],
     'data': [
         'security/ir.model.access.csv',
         'data/form_name.xml',

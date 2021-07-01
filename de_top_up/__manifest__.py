@@ -7,7 +7,7 @@
     'website': "http://www.dynexcel.co",
     'category': 'Uncategorized',
     'version': '14',
-    'depends': ['base', 'hr',],
+    'depends': ['base', 'hr','digest','base_setup'],
     'data': [
         'security/ir.model.access.csv',
         'views/request_view.xml',
