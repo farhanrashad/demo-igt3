@@ -9,7 +9,7 @@
     "description": """"Generate Requisition Lines Report """,
     "author": "Dynexcel",
     "website": "http://www.dynexcel.co",
-    'depends': ['base','stock','purchase','hr','de_stock_material_transfer'],
+    'depends': ['base','stock','purchase','hr','de_stock_material_transfer','report_xlsx'],
     'data': [
         'security/ir.model.access.csv',
         'wizards/gtn_dgn_mrf_spmrf_wizard.xml',
