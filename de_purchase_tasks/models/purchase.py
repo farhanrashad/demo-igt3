@@ -61,6 +61,7 @@ class PurchaseOrder(models.Model):
                     'allow_invoice': template.allow_invoice,
                     'completion_days': template.completion_days,
                     'completion_percent': template.completion_percent,
+                    'task_sequence': template.sequence,
                     'stage_id': stage_id,
                     'purchase_task_stage_ids': [(6, 0, template.stage_ids.ids)],
                 })

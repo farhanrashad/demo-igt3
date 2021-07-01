@@ -42,5 +42,7 @@ class ProjectTask(models.Model):
     completion_days = fields.Integer(string='Completion Days', readonly=True)
     completion_percent = fields.Float(string='Completion Percentage', readonly=True)
     delivery_assigned = fields.Boolean(string='Delivery Assigned', readonly=True)
+    task_sequence = fields.Integer(string='Task Sequence', readonly=True)
+    
 
 

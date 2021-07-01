@@ -21,7 +21,7 @@ class PurchaseTaskTemplate(models.Model):
     _description = 'Purchase Task Template'
 
     name = fields.Char("Name", required=True)
-    sequence = fields.Integer(default=1)
+    sequence = fields.Integer(string='Sequence', default=1)
     requisition_type_id = fields.Many2one('purchase.requisition.type', string="Requisition Type", required=True, )
     completion_days = fields.Integer(string='Completion Days')
     completion_percent = fields.Float(string='Completion Percentage')

@@ -19,7 +19,7 @@
     # Check https://github.com/odoo/odoo/blob/13.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Project',
-    'version': '14.0.0.5',
+    'version': '14.0.0.6',
 
     # any module necessary for this one to work correctly
     'depends': ['de_purchase_requisition_type','de_project_planning'],
