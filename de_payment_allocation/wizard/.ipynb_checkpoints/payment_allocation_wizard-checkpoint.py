@@ -81,6 +81,13 @@ class PaymentAllocation(models.TransientModel):
                     tot_payment_amount = tot_payment_amount + payment_line.allocate_amount
                 else:
                     tot_payment_amount = tot_payment_amount + payment_line.payment_id.currency_id._convert(payment_line.allocate_amount, self.move_id.currency_id, self.move_id.company_id, self.move_id.date)
+                    
+        for refund_line in self.invoice_refund_ids: 
+            if refund_line.allocate == True:
+                if refund_line.currency_id.id == self.move_id.currency_id.id:
+                    tot_payment_amount = tot_payment_amount + refund_line.allocate_amount
+                else:
+                    tot_payment_amount = tot_payment_amount + refund_line.currency_id._convert(refund_line.allocate_amount, self.move_id.currency_id, self.move_id.company_id, self.move_id.date)            
 
         if tot_payment_amount > tot_invoice_amount :
             raise UserError(_('You Are Not Allowed To Enter Amount greater than '+str(tot_invoice_amount)))
@@ -115,6 +122,65 @@ class PaymentAllocation(models.TransientModel):
                     'debit_move_id': payment_debit_line,
                     'credit_amount_currency': amount_reconcile,
                     'debit_amount_currency': amount_reconcile,
+                }
+                partial_payment = self.env['account.partial.reconcile'].create(vals)
+                
+        for refund in self.invoice_refund_ids:
+            if refund.allocate == True:
+                debit_line = 0
+                credit_line = 0
+                refund_debit_line = 0
+                for line in self.move_id.line_ids:
+                    if line.credit != 0.0:
+                        credit_line = line.id 
+                    if line.credit == 0.0:
+                        debit_line = line.id  
+                        
+                for invoice_line in refund.move_id.line_ids:                    
+                    refund_debit_line = invoice_line.id
+                recocile_vals = {
+                    'exchange_move_id': self.move_id.id,
+                }
+                reconcile_id = self.env['account.full.reconcile'].create(recocile_vals)
+                refund_amount_reconcile = 0.0
+                if refund.move_id.currency_id.id == self.move_id.currency_id.id:
+                    refund_amount_reconcile = refund.allocate_amount
+                else:
+                    refund_amount_reconcile = refund.allocate_amount
+                    
+                vals = {
+                    'full_reconcile_id': reconcile_id.id,
+                    'amount':  refund.allocate_amount,
+                    'credit_move_id':  credit_line,
+                    'debit_move_id': refund_debit_line,
+                    'credit_amount_currency': refund_amount_reconcile,
+                    'debit_amount_currency': refund_amount_reconcile,
+                }
+                partial_payment = self.env['account.partial.reconcile'].create(vals)
+                
+                refund_debit_line = 0
+                refund_credit_line = 0
+                move_debit_line = 0
+                for line in refund.move_id.line_ids:
+                    if line.credit != 0.0:
+                        refund_credit_line = line.id 
+                    if line.credit == 0.0:
+                        refund_debit_line = line.id  
+                        
+                for inv_line in self.move_id.line_ids:                    
+                    move_debit_line = inv_line.id
+                    
+                refund_recocile_vals = {
+                    'exchange_move_id': refund.move_id.id,
+                } 
+                refund_reconcile_id = self.env['account.full.reconcile'].create(refund_recocile_vals)
+                vals = {
+                    'full_reconcile_id': refund_reconcile_id.id,
+                    'amount':  refund.allocate_amount,
+                    'credit_move_id':  refund_credit_line,
+                    'debit_move_id': move_debit_line,
+                    'credit_amount_currency': refund_amount_reconcile,
+                    'debit_amount_currency': refund_amount_reconcile,
                 }
                 partial_payment = self.env['account.partial.reconcile'].create(vals)
                 
@@ -204,6 +270,71 @@ class PaymentAllocation(models.TransientModel):
                         'debit_amount_currency': exchange_amount,
                         }
                     inv_payment = self.env['account.partial.reconcile'].create(ext_vals)
+                    
+        for refund in self.invoice_refund_ids:
+            if refund.allocate == True:
+                refund_debit_line = 0
+                refund_credit_line = 0
+                refund_payment_debit_line = 0
+                for line in refund.move_id.line_ids:
+                    if line.credit != 0.0:
+                        refund_credit_line = line.id 
+                    if line.credit == 0.0:
+                        refund_debit_line = line.id    
+                refund.move_id.id
+                for refund_payment_line in self.payment_id.move_id.line_ids:                    
+                    refund_payment_debit_line = refund_payment_line.id
+                
+                refund_reconcile_amount = 0.0
+                if refund.move_id.currency_id.id != self.payment_id.currency_id.id:
+                    refund_reconcile_amount = refund.currency_id._convert(refund.allocate_amount, self.payment_id.currency_id, self.payment_id.company_id, self.payment_id.date)    
+                refund_recocile_vals = {
+                    'exchange_move_id': refund.move_id.id,
+                }
+                refund_reconcile_id = self.env['account.full.reconcile'].create(refund_recocile_vals)
+                 
+                
+                refund_amount_reconcile = 0.0
+                if refund.move_id.currency_id.id == self.payment_id.currency_id.id:
+                    refund_amount_reconcile = refund.allocate_amount
+                else:
+                    refund_amount_reconcile = self.payment_id.currency_id._convert(refund.allocate_amount, refund.move_id.currency_id, refund.move_id.company_id, refund.move_id.date) 
+                vals = {
+                    'full_reconcile_id': refund_reconcile_id.id,
+                    'amount':  refund.allocate_amount,
+                    'credit_move_id':  refund_credit_line,
+                    'debit_move_id': refund_payment_debit_line,
+                    'credit_amount_currency': refund_amount_reconcile,
+                    'debit_amount_currency': refund_amount_reconcile,
+                }
+                refund_payment = self.env['account.partial.reconcile'].create(vals)
+                
+                if refund_reconcile_amount == refund.allocate_amount:
+                    
+                    refund_exchange_amount = refund.move_id.amount_residual 
+                    
+                    refund_exchange_moves = self.action_exchange_rate(refund.currency_id.id, refund_exchange_amount)
+                    refund_ext_payment_debit_line = 0
+                    for refund_ext_line in refund_exchange_moves.line_ids:
+                        refund_ext_payment_debit_line = ext_line.id
+                        break
+                    for refund_ext_line in refund_exchange_moves.line_ids:
+                        if refund_ext_line.account_id.id == self.payment_id.destination_account_id.id:
+                            refund_ext_payment_debit_line = refund_ext_line.id
+                    refund_ext_recocile_vals = {
+                        'exchange_move_id': refund.move_id.id,
+                        }
+                        
+                    refund_ext_reconcile_id = self.env['account.full.reconcile'].create(refund_ext_recocile_vals)                       
+                    refund_ext_vals = {
+                        'full_reconcile_id': refund_ext_reconcile_id.id,
+                        'amount':  refund.allocate_amount,
+                        'credit_move_id':  refund_credit_line,
+                        'debit_move_id': refund_ext_payment_debit_line,
+                        'credit_amount_currency': refund_exchange_amount,
+                        'debit_amount_currency': refund_exchange_amount,
+                        }
+                    refund_inv_payment = self.env['account.partial.reconcile'].create(refund_ext_vals)            
                     
                     
     def action_exchange_rate(self, currency, exchange_amount):
@@ -358,23 +489,23 @@ class InvoiceAllocationLineCreditmemo(models.TransientModel):
         string='Invoice Currency')
     
     
-    @api.onchange('allocate')
-    def onchange_allocate(self):
-        payment_amount = 0.0
-        inv_amount = 0.0
-        amount = 0.0
-        for payment in self.allocation_id.payment_line_ids:
-            payment_amount = payment.allocate_amount     
-        for inv in self:
-            if inv.allocate == True:
-                if inv.move_id.currency_id.id == inv.allocation_id.payment_id.currency_id.id:                
-                    inv_amount = inv_amount + inv.allocate_amount
-                else:
-                    inv_amount = inv_amount + inv.move_id.currency_id._convert(inv.allocate_amount, inv.allocation_id.payment_id.currency_id, inv.allocation_id.payment_id.company_id, inv.allocation_id.payment_id.date)
+#     @api.onchange('allocate')
+#     def onchange_allocate(self):
+#         payment_amount = 0.0
+#         inv_amount = 0.0
+#         amount = 0.0
+#         for payment in self.allocation_id.payment_line_ids:
+#             payment_amount = payment.allocate_amount     
+#         for inv in self:
+#             if inv.allocate == True:
+#                 if inv.move_id.currency_id.id == inv.allocation_id.payment_id.currency_id.id:                
+#                     inv_amount = inv_amount + inv.allocate_amount
+#                 else:
+#                     inv_amount = inv_amount + inv.move_id.currency_id._convert(inv.allocate_amount, inv.allocation_id.payment_id.currency_id, inv.allocation_id.payment_id.company_id, inv.allocation_id.payment_id.date)
 
 
-        if  payment_amount <  inv_amount:
-            amount = inv_amount - payment_amount
-            raise UserError(_('Allocate Amount cannot be greater than '+str(payment_amount)))
+#         if  payment_amount <  inv_amount:
+#             amount = inv_amount - payment_amount
+#             raise UserError(_('Allocate Amount cannot be greater than '+str(payment_amount)))
 
                         

@@ -68,12 +68,12 @@ class AccountPayment(models.Model):
                 partner.append(payment.partner_id.id)
         uniq_partner =  set(partner) 
         for ppartner in uniq_partner:
-            invoices = self.env['account.move'].search([('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))], limit=1)  
+            invoices = self.env['account.move'].search([('partner_id','=',ppartner)])  
             if self.payment_type == 'outbound':
-                invoices = self.env['account.move'].search([('move_type', '=', 'in_invoice'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
-                raise UserError('Partner'+str(invoices))
+                invoices = self.env['account.move'].search([('move_type', 'in', ('in_invoice','entry')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
+                
             elif self.payment_type == 'inbound':
-                invoices = self.env['account.move'].search([('move_type', '=', 'out_invoice'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
+                invoices = self.env['account.move'].search([('move_type', 'in', ('out_invoice','entry')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
                 
                 
             for  inv in invoices:
@@ -97,11 +97,11 @@ class AccountPayment(models.Model):
                     'currency_id': currency,
                     'original_currency_id': inv.currency_id.id, 
                 }))
-            refund_invoices = self.env['account.move'].search([('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))], limit=1)  
+            refund_invoices = self.env['account.move'].search([('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))], limit=0)  
             if self.payment_type == 'outbound':
-                refund_invoices = self.env['account.move'].search([('move_type', '=', 'in_refund'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
+                refund_invoices = self.env['account.move'].search([('move_type','=','in_refund'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
             elif self.payment_type == 'inbound':
-                refund_invoices = self.env['account.move'].search([('move_type', '=', 'out_refund'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
+                refund_invoices = self.env['account.move'].search([('move_type','=','out_refund'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
                 
                 
             for  refund_inv in refund_invoices:
