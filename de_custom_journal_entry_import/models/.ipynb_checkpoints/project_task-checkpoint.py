@@ -84,7 +84,7 @@ class ProjectTask(models.Model):
 
                         search_field = ir_model_fields_obj.sudo().search([
                             ("model", "=", "account.custom.entry.line"),
-                            ("name", "=", row_val),
+                            ("field_description", "=", row_val),
                         ], limit=1)
                         keys.append(search_field.name)
 
@@ -92,16 +92,22 @@ class ProjectTask(models.Model):
                 rowvals = []
                 vals = []
                 line_vals = {}
-                partner = custom.user_id.id
+                partner = custom.entry_partner_id.id
                
                 custom_vals = {
                     'date_entry': fields.datetime.now(),
                     'partner_id': partner,
                     'custom_entry_type_id': self.custom_entry_type_id.id,
-                    'duration_from': fields.date.today(),
-                    'duration_to': fields.date.today(),
                 }
                 custom_entry = self.env['account.custom.entry'].create(custom_vals)
+                attachment_vals = {
+                    'name': custom.entry_attachment_id.name,
+                    'datas': custom.entry_attachment_id.datas,
+                    'res_id': custom_entry.id,
+                    'res_model': 'account.custom.entry',
+                }
+                attachment = self.env['ir.attachment'].create(attachment_vals)
+                
                 for data_row in file_reader:
                     inner_vals = {}
                     index = 0
@@ -165,11 +171,16 @@ class ProjectTask(models.Model):
                 custom.is_entry_processed = True
                 custom.un_processed_entry = False
                 custom.user_id = self.env.user.id
+                
 
 
 class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
 class IrAttachment(models.Model):
-    _inherit = 'ir.attachment'    
+    _inherit = 'ir.attachment'   
+    
+    
+class ResGroups(models.Model):
+    _inherit = 'res.groups'     
 
