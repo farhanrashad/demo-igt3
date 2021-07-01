@@ -30,15 +30,19 @@ class CustomEntryType(models.Model):
     automated_sequence = fields.Boolean('Automated Sequence?',
         help="If checked, the Approval Requests will have an automated generated name based on the given code.")
     sequence_code = fields.Char(string="Code")
-
     sequence_id = fields.Many2one('ir.sequence', 'Reference Purchase Subscription Sequence',
         copy=False, check_company=True)
-    
+    default_product_id = fields.Many2one('product.product', string="Product")
     generate_accounting = fields.Boolean(string='Generate Accounting')
     expense_advance = fields.Boolean(string='Pay Advance Expense')
-    journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
-    #debit_account_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
-    #credit_account_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True,)
+    journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True, domain="[('type', 'not in', ['bank', 'cash'])]")
+    journal_type = fields.Selection(related='journal_id.type', string="Journal Type")
+    account_id = fields.Many2one('account.account', string="GL Account", company_dependent=True, check_company=True)
+    counterpart_mode = fields.Selection([
+        ('debit', 'Debit'),
+        ('credit', 'Credit')],
+        string='Counterpart Mode', default='debit')
+    counterpart_account_id = fields.Many2one('account.account', string="Counterpart Account", company_dependent=True, check_company=True)
     payment_journal_id = fields.Many2one('account.journal', string="Payment Journal", required=True, company_dependent=True, check_company=True,  domain="[('type', 'in', ['bank', 'cash'])]")
 
     group_id = fields.Many2one('res.groups', string='Security Group')
@@ -62,6 +66,7 @@ class CustomEntryType(models.Model):
     has_advanced = fields.Selection(CATEGORY_SELECTION, string="Has Advanced Amount", default="no", required=True,)
     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Has Analytic", default="no", required=True,)
     has_employee = fields.Selection(CATEGORY_SELECTION, string="Has Employee", default="no", required=True,)
+    has_supplier = fields.Selection(CATEGORY_SELECTION, string="Has Supplier", default="no", required=True,)
     #feature options fields
     has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
     has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)
