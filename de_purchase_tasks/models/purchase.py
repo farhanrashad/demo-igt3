@@ -66,6 +66,12 @@ class PurchaseOrder(models.Model):
                     'purchase_task_stage_ids': [(6, 0, template.stage_ids.ids)],
                 })
                 task_id = self.env['project.task'].sudo().create(task)
+                for tdoc in template.template_doc_ids:
+                    docs = ({
+                        'name': tdoc.name,
+                        'task_id': task_id.id,
+                    })
+                    doc_id = self.env['project.task.documents'].sudo().create(docs)
         return res
 
     def button_cancel(self):

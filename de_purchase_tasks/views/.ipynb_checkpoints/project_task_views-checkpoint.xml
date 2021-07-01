@@ -32,6 +32,17 @@
                     <field name="purchase_task_stage_ids" invisible="1"/>
                     <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" domain="[('id', 'in', purchase_task_stage_ids)]" attrs="{'invisible':[('purchase_id','=',False)]}"/>
                 </xpath>
+                <xpath expr="//page[@name='extra_info']" position="after">
+                    <page string="Documents" name="task_documents" attrs="{'invisible': [('purchase_id', '=', False)]}">
+                        <field name="task_doc_ids" widget="one2many_list" >
+                            <tree string="Task Documents" editable="bottom">
+                                <field name="name" readonly="1"/>
+                                <field filename="task_attachment_filename" name="task_attachment" required="1" />
+
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
             </field>
         </record>
         

@@ -23,7 +23,6 @@ class Project(models.Model):
     
 class ProjectTask(models.Model):
     _inherit = 'project.task'
-    _description = 'Project Task with Purchase Order'
     
     def _get_default_stage_id(self):
         """ Gives default stage_id """
@@ -43,6 +42,17 @@ class ProjectTask(models.Model):
     completion_percent = fields.Float(string='Completion Percentage', readonly=True)
     delivery_assigned = fields.Boolean(string='Delivery Assigned', readonly=True)
     task_sequence = fields.Integer(string='Task Sequence', readonly=True)
+    
+    task_doc_ids = fields.One2many('project.task.documents', 'task_id', string='Task Documents', copy=True, auto_join=True, )
+
+    
+class ProjectTaskDocument(models.Model):
+    _name = 'project.task.documents'
+    _description = 'Project Task Documents'
+    
+    task_id = fields.Many2one('project.task', string='Task', required=True, ondelete='cascade', index=True, copy=False)
+    name = fields.Char(string='Name', required=True)
+    task_attachment = fields.Binary(string='Attachment')
     
 
 
