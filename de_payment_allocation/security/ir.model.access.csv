@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_payment_allocation_wizard,access.payment.allocation.wizard,model_payment_allocation_wizard,,1,1,1,1
+access_payment_allocation_wizard_line,access.payment.allocation.wizard.line,model_payment_allocation_wizard_line,,1,1,1,1
+access_invoice_allocation_wizard_line,access.invoice.allocation.wizard.line,model_invoice_allocation_wizard_line,,1,1,1,1
