@@ -84,7 +84,7 @@ class ProjectTask(models.Model):
 
                         search_field = ir_model_fields_obj.sudo().search([
                             ("model", "=", "account.custom.entry.line"),
-                            ("name", "=", row_val),
+                            ("field_description", "=", row_val),
                         ], limit=1)
                         keys.append(search_field.name)
 
@@ -92,14 +92,12 @@ class ProjectTask(models.Model):
                 rowvals = []
                 vals = []
                 line_vals = {}
-                partner = custom.user_id.id
+                partner = custom.entry_partner_id.id
                
                 custom_vals = {
                     'date_entry': fields.datetime.now(),
                     'partner_id': partner,
                     'custom_entry_type_id': self.custom_entry_type_id.id,
-                    'duration_from': fields.date.today(),
-                    'duration_to': fields.date.today(),
                 }
                 custom_entry = self.env['account.custom.entry'].create(custom_vals)
                 for data_row in file_reader:
