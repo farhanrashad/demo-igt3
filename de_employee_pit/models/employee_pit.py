@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 
 class EmployeeIncomeTax(models.Model):
     _name = 'employee.income.tax'
-    _description = 'Employee PIT model'
+    _description = 'Employee Income Tax'
 
     def unlink(self):
         for r in self:
@@ -22,9 +22,9 @@ class EmployeeIncomeTax(models.Model):
         return super(EmployeeIncomeTax, self).create(values)
 
     crnt_year = fields.Integer(string="Current Year", default=datetime.now().year)
-    employee_pit = fields.Char('Name', required=True, copy=False, readonly=True, index=True,
+    employee_pit = fields.Char(String='PIT', required=True, copy=False, readonly=True, index=True,
                                default=lambda self: _('New'))
-    name = fields.Char('Name')
+    name = fields.Char(String='Name')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
@@ -63,10 +63,10 @@ class EmployeeIncomeTax(models.Model):
     child = fields.Boolean(string="Child", readonly=True)
     annual_wage = fields.Float(string="Annual Wage", compute='employee_count')
     tax_income = fields.Float(string="Tax Income", compute='employee_count')
-    monthly_tax = fields.Float('Monthly tax amount')
-    ss_amount = fields.Float('Social Security Amount')
+    monthly_tax = fields.Float(string='Monthly tax amount')
+    ss_amount = fields.Float(string='Social Security Amount')
 
-    employee_income_tax_ids = fields.One2many('employee.income.tax.line', 'employee_income_tax_id')
+    employee_income_tax_ids = fields.One2many('employee.income.tax.line', 'employee_income_tax_id', string='Income Tax Ids')
 
     @api.onchange('ss_amount', 'employee_id')
     def employee_count(self):
@@ -171,15 +171,15 @@ class EmployeeIncomeTax(models.Model):
 class EmployeeIncomeTaxLine(models.Model):
     _name = 'employee.income.tax.line'
 
-    employee_income_tax_id = fields.Many2one('employee.income.tax')
-    months = fields.Char('Months')
+    employee_income_tax_id = fields.Many2one('employee.income.tax', string='Income Tax ID')
+    months = fields.Char(string='Months')
     month_salary = fields.Float(string="Month Salary", compute='compute_monthly_salary')
     month_tax = fields.Float(string="Monthly Tax")
     conversion_rate = fields.Float(string="Conversion rate")
-    converted_tax_amount = fields.Float("Converted Tax amount", compute='compute_converted_tax')
-    arrears = fields.Float("Arrears")
-    gross_salary = fields.Float('Gross Salary', compute='compute_gross_ammount')
-    taxable_income = fields.Float('Taxable Income')
+    converted_tax_amount = fields.Float(string="Converted Tax amount", compute='compute_converted_tax')
+    arrears = fields.Float(string="Arrears")
+    gross_salary = fields.Float(string='Gross Salary', compute='compute_gross_ammount')
+    taxable_income = fields.Float(string='Taxable Income')
 
     @api.onchange('month_salary')
     def compute_monthly_salary(self):
