@@ -8,7 +8,7 @@ from odoo.tools.misc import format_date
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
     
-    project_id = fields.Many2one('project.project', string='Project', )
+    project_id = fields.Many2one('project.project', string='Project',domain="[('allow_site_planning','=',True)]")
     state_id = fields.Many2one('res.country.state', compute='_compute_project_state')
     
     @api.depends('project_id')
@@ -24,7 +24,7 @@ class StockPicking(models.Model):
 class StockMove(models.Model):
     _inherit = 'stock.move'
     
-    project_id = fields.Many2one('project.project', string='Project', )
+    project_id = fields.Many2one('project.project', string='Project', domain="[('allow_site_planning','=',True)]")
     state_id = fields.Many2one('res.country.state', compute='_compute_project_state')
     
     @api.depends('project_id')
