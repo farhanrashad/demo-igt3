@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 
 class TopUpRequest(models.Model):
     _name = 'topup.request'
-    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Top Up Request model'
 
 
@@ -23,9 +23,9 @@ class TopUpRequest(models.Model):
         return super(TopUpRequest, self).create(values)
 
     crnt_year = fields.Integer(string="Current Year", default=datetime.now().year)
-    topup_req = fields.Char('Name', required=True, copy=False, readonly=True, index=True,
+    topup_req = fields.Char(string='Topup Request', required=True, copy=False, readonly=True, index=True,
                             default=lambda self: _('New'))
-    name = fields.Char('Name')
+    name = fields.Char(string='Name')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('submitted', 'Submitted'),
@@ -36,10 +36,10 @@ class TopUpRequest(models.Model):
         ('cancelled', 'Cancelled'),
         ('refused', 'Refused'),
         ('distributed', 'Distributed')
-    ], string='State', index=True, copy=False, default='draft' , tracking=True)
+    ], string='State', index=True, copy=False, default='draft')
 
-    topup_request_lines = fields.One2many('topup.request.line', 'request_id')
-    topup_request_lines_category = fields.One2many('topup.request.category.line', 'request_id')
+    topup_request_lines = fields.One2many('topup.request.line', 'request_id', string='Request Lines')
+    topup_request_lines_category = fields.One2many('topup.request.category.line', 'request_id', string='Request Lines Category')
 
     # @api.constrains('participants_ids')
     # def constraints_on_selection(self):
@@ -73,7 +73,7 @@ class TopUpRequest(models.Model):
         self.state = 'cancelled'
         
     def action_refuse(self):
-        self.state = 'refused'
+        self.state = 'draft'
 
     def action_distributed(self):
         self.state = 'distributed'
@@ -109,12 +109,12 @@ class TopUpRequest(models.Model):
     current_date = date.today()
     end_date = current_date + timedelta(days=30)
 
-    description = fields.Text(String="Description")
+    description = fields.Text(string="Description")
     period = fields.Char(string='Period', compute='_compute_account_period')
     
-    requester = fields.Many2one('res.users', default=lambda self: self.env.user, String="Requester", readonly=True, tracking=True)
-    manager = fields.Many2one('hr.employee', String="Line Manager", related='requester.employee_id.parent_id')
-    department = fields.Many2one('hr.department', String="Department", related='requester.employee_id.department_id')
+    requester = fields.Many2one('res.users', default=lambda self: self.env.user, string="Requester", readonly=True)
+    manager = fields.Many2one('hr.employee', string="Line Manager", related='requester.employee_id.parent_id')
+    department = fields.Many2one('hr.department', string="Department", related='requester.employee_id.department_id')
     representative_batch = fields.Selection(
         [('c-level', 'C-Level'), ('admin & fleet', 'Admin & Fleet'), ('documentation', 'Documentation'),
          ('engineering', 'Engineering'), ('accounting and finance', 'Accounting and Finance'),
@@ -127,12 +127,12 @@ class TopUpRequest(models.Model):
          ('o&m rms', 'O&M RMS'), ('o&m support', 'O&M Support'), ('project management', 'Project Management'),
          ('rollout & colocation', 'Rollout & Colocation'), ('procurement', 'Procurement'),
          ('supply chain', 'Supply Chain')],
-        String="Representative Batch")
-    date = fields.Date(String="Date", default=fields.date.today(),  tracking=True)
+        string="Representative Batch", default='c-level')
+    date = fields.Date(string="Date", default=fields.date.today())
     type = fields.Selection([('employee benfit', 'Employee Benefit'), ('category use', 'Category Use')],
-                            String="Type")
-    is_level = fields.Boolean(String='Is C-Level?')
-    additional_req = fields.Boolean(String="Additional Request?")
+                            string="Type", default='employee benfit')
+    is_level = fields.Boolean(string='Is C-Level?')
+    additional_req = fields.Boolean(string="Additional Request?")
     
     @api.depends('date')
     def _compute_account_period(self):
@@ -163,7 +163,7 @@ class EmployeeRequestLine(models.Model):
     _name = 'topup.request.line'
     _description = 'Top Up Request model'
 
-    request_id = fields.Many2one('topup.request')
+    request_id = fields.Many2one('topup.request', string='Topup Request')
 
     employee = fields.Many2one('hr.employee', string="Employee", domain="[('active_emp','=', False)]")
     department = fields.Many2one('hr.department', string="Department", related="employee.department_id")
@@ -211,7 +211,7 @@ class EmployeeRequestLineCategory(models.Model):
     _name = 'topup.request.category.line'
     _description = 'Top Up Request model for Category'
 
-    request_id = fields.Many2one('topup.request')
+    request_id = fields.Many2one('topup.request', string='Request')
 
     category = fields.Selection([('BOD', 'BOD'),
                                  ('media', 'Media ( Facebook, Twitter, LinkedIn )'),
@@ -219,8 +219,7 @@ class EmployeeRequestLineCategory(models.Model):
                                  ('hr', 'HR Phone'),
                                  ('it', 'IT server room Alarm system'),
                                  ('cctv', 'CCTV')
-                                ],
-                            String="Category")
+                                ], string="Category", default='BOD')
     description = fields.Char(string="Description")
     telenor = fields.Integer(string="Telenor")
     ooredoo = fields.Integer(string="Ooredoo")

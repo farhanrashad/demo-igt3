@@ -5,8 +5,8 @@ from datetime import date, timedelta, datetime
 
 class TopUpBalance(models.Model):
     _name = 'topup.balance'
-    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
-    _description = 'Top Up Balance model'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'Top Up Balance'
 
     def unlink(self):
         for r in self:
@@ -22,7 +22,7 @@ class TopUpBalance(models.Model):
         return super(TopUpBalance, self).create(values)
 
     crnt_year = fields.Integer(string="Current Year", default=datetime.now().year)
-    topup_balance = fields.Char('Name', required=True, copy=False, readonly=True, index=True,
+    topup_balance = fields.Char(string='Topup Balance', required=True, copy=False, readonly=True, index=True,
                                 default=lambda self: _('New'))
     name = fields.Char('Name')
     state = fields.Selection([
@@ -30,7 +30,7 @@ class TopUpBalance(models.Model):
         ('confirmed', 'Confirmed'),
         ('closed', 'Closed'),
         ('cancelled', 'Cancelled'),
-    ], string='State', index=True, copy=False, default='draft', tracking=True)
+    ], string='State', index=True, copy=False, default='draft')
 
     topup_balance_lines = fields.One2many('topup.balance.line', 'balance_id')
 
@@ -93,16 +93,16 @@ class TopUpBalance(models.Model):
 
     
 
-    date = fields.Date(string="Date", default=fields.date.today(), tracking=True)
+    date = fields.Date(string="Date", default=fields.date.today())
     pre_period = fields.Char(string="Previous Period", compute='_compute_previous_period')
     curr_period = fields.Char(string="Current Period",  compute='_compute_previous_period')
-    is_populated = fields.Boolean('Is Populated')
-    balance_month = fields.Char(string="Current Period", store=True, compute='_compute_previous_period')
+    is_populated = fields.Boolean(string='Is Populated')
+    balance_month = fields.Char(string="Month Balance", compute='_compute_previous_period')
     
-    _sql_constraints = [
-        ('balance_month_uniq', 'unique(balance_month)',
-            'Balance can be requested once in a Month')       
-    ]
+    #_sql_constraints = [
+     #   ('balance_month_uniq', 'unique(balance_month)',
+      #      'Balance can be requested once in a Month')       
+    #]
 
     
     
@@ -124,16 +124,17 @@ class TopUpBalance(models.Model):
     def _compute_previous_period(self):
         curr_date = fields.date.today()
         pre_date = fields.date.today() - timedelta(days=30)
-        self.pre_period = pre_date.strftime('%B-%Y')
-        self.curr_period = curr_date.strftime('%B-%Y')
-        self.balance_month = self.date.strftime('%B-%Y')
+        for record in self:
+        	record.pre_period = pre_date.strftime('%B-%Y')
+        	record.curr_period = curr_date.strftime('%B-%Y')
+        	record.balance_month = record.date.strftime('%B-%Y')
 
 
 class TopUpBalanceLine(models.Model):
     _name = 'topup.balance.line'
     _description = 'Top Up Balance model'
 
-    balance_id = fields.Many2one('topup.balance')
+    balance_id = fields.Many2one('topup.balance', string='Balance Ref')
 
     operator = fields.Selection([('mytel', 'Mytel'), ('mpt', 'MPT'), ('ooredoo', 'Ooredoo'), ('telenor', 'Telenor')],
                                 string="Operator")

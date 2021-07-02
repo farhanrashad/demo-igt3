@@ -5,7 +5,7 @@ from datetime import date, timedelta, datetime
 
 class EmployeeIncomeTax(models.Model):
     _name = 'employee.income.tax'
-    _description = 'Employee PIT model'
+    _description = 'Employee Income Tax'
 
     def unlink(self):
         for r in self:
@@ -22,15 +22,15 @@ class EmployeeIncomeTax(models.Model):
         return super(EmployeeIncomeTax, self).create(values)
 
     crnt_year = fields.Integer(string="Current Year", default=datetime.now().year)
-    employee_pit = fields.Char('Name', required=True, copy=False, readonly=True, index=True,
+    employee_pit = fields.Char(string='PIT', required=True, copy=False, readonly=True, index=True,
                                default=lambda self: _('New'))
-    name = fields.Char('Name')
+    name = fields.Char(string='Name')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
         ('closed', 'Closed'),
         ('cancelled', 'Cancelled'),
-    ], string='State', index=True, copy=False, default='draft', track_visibility='onchange')
+    ], string='State', index=True, copy=False, default='draft')
 
     def action_confirm(self):
         self.state = 'confirmed'
@@ -47,6 +47,9 @@ class EmployeeIncomeTax(models.Model):
     employee_id = fields.Many2one('hr.employee', string="Employee")
     department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id')
     wage = fields.Float(string="Contract Wage", compute='employee_count')
+    currency_convert = fields.Boolean(string="Currency Conversion?")
+    currency_rate = fields.Float(string="Currency Rate")
+    final_wage = fields.Float( string="Converted Wage" , compute='employee_count' )
     marital_stat = fields.Selection([
         ('single', 'Single'),
         ('married', 'Married'),
@@ -60,10 +63,10 @@ class EmployeeIncomeTax(models.Model):
     child = fields.Boolean(string="Child", readonly=True)
     annual_wage = fields.Float(string="Annual Wage", compute='employee_count')
     tax_income = fields.Float(string="Tax Income", compute='employee_count')
-    monthly_tax = fields.Float('Monthly tax amount')
-    ss_amount = fields.Float('Social Security Amount')
+    monthly_tax = fields.Float(string='Monthly tax amount')
+    ss_amount = fields.Float(string='Social Security Amount')
 
-    employee_income_tax_ids = fields.One2many('employee.income.tax.line', 'employee_income_tax_id')
+    employee_income_tax_ids = fields.One2many('employee.income.tax.line', 'employee_income_tax_id', string='Income Tax Ids')
 
     @api.onchange('ss_amount', 'employee_id')
     def employee_count(self):
@@ -77,14 +80,22 @@ class EmployeeIncomeTax(models.Model):
             if rec.employee_id.contract_id:
                 for contract in rec.employee_id.contract_id:
                     if contract.state == 'open':
-                        rec.wage = contract.wage
-                        rec.annual_wage = contract.wage * 12
+                        if rec.currency_convert == True:
+                            rec.wage = contract.wage
+                            rec.final_wage = contract.wage * rec.currency_rate
+                            rec.annual_wage = rec.final_wage * 12
+                        else:
+                            rec.wage = contract.wage
+                            rec.final_wage = 0
+                            rec.annual_wage = contract.wage * 12
                     else:
                         rec.wage = 0
                         rec.annual_wage = 0
+                        rec.final_wage = 0
             else:
                 rec.wage = 0
                 rec.annual_wage = 0
+                rec.final_wage = 0
 
             if rec.employee_id.employee_family_ids:
                 for dependant in rec.employee_id.employee_family_ids:
@@ -159,21 +170,25 @@ class EmployeeIncomeTax(models.Model):
 
 class EmployeeIncomeTaxLine(models.Model):
     _name = 'employee.income.tax.line'
+    _description = 'Employee Income Tax Line'
 
-    employee_income_tax_id = fields.Many2one('employee.income.tax')
-    months = fields.Char('Months')
+    employee_income_tax_id = fields.Many2one('employee.income.tax', string='Income Tax ID')
+    months = fields.Char(string='Months')
     month_salary = fields.Float(string="Month Salary", compute='compute_monthly_salary')
     month_tax = fields.Float(string="Monthly Tax")
     conversion_rate = fields.Float(string="Conversion rate")
-    converted_tax_amount = fields.Float("Converted Tax amount", compute='compute_converted_tax')
-    arrears = fields.Float("Arrears")
-    gross_salary = fields.Float('Gross Salary', compute='compute_gross_ammount')
-    taxable_income = fields.Float('Taxable Income')
+    converted_tax_amount = fields.Float(string="Converted Tax amount", compute='compute_converted_tax')
+    arrears = fields.Float(string="Arrears")
+    gross_salary = fields.Float(string='Gross Salary', compute='compute_gross_ammount')
+    taxable_income = fields.Float(string='Taxable Income')
 
     @api.onchange('month_salary')
     def compute_monthly_salary(self):
         for rec in self:
-            rec.month_salary = rec.employee_income_tax_id.wage
+            if rec.employee_income_tax_id.currency_convert == True:
+                rec.month_salary = rec.employee_income_tax_id.final_wage
+            else:
+                rec.month_salary = rec.employee_income_tax_id.wage
 
     @api.depends('conversion_rate')
     def compute_converted_tax(self):
@@ -189,32 +204,68 @@ class EmployeeIncomeTaxLine(models.Model):
         for rec in self:
             for record in self.employee_income_tax_id:
                 if rec.arrears or rec.month_salary:
-                    rec.gross_salary = rec.arrears + rec.month_salary
+                    rec.gross_salary = (rec.arrears) + (rec.month_salary)
                 #                 rec.month_tax = rec.gross_salary / 12
                 else:
                     rec.gross_salary = 0
                 #                 rec.month_tax = 0
 
-                if ((rec.gross_salary*12) * 0.20) > 10000000:
-                    rec.taxable_income = (record.annual_wage - 10000000) - (
+                if ((rec.month_salary*12) * 0.20) > 10000000:
+                    rec.taxable_income = (((rec.month_salary*12) - 10000000) - (
                             (record.no_of_children * 500000) + (record.parent_count * 1000000) + (
-                            record.ss_amount * 12) + (record.wife_count * 1000000))
-                #             if (rec.annual_wage*20) < 10000000:
+                            record.ss_amount * 12) + (record.wife_count * 1000000)))
+                
                 else:
-                    rec.taxable_income = ((rec.gross_salary*12) * 0.80) - (
+                    rec.taxable_income = (((rec.month_salary*12) * 0.80) - ((record.no_of_children * 500000) + (record.parent_count * 1000000) + (record.ss_amount * 12) + (record.wife_count * 1000000)))
+                
+                if rec.arrears:
+                    
+                    if (((rec.month_salary*12)+rec.arrears) * 0.20) > 10000000:
+                        taxable_income_with_arrears = (((rec.month_salary*12) - 10000000) - (
                             (record.no_of_children * 500000) + (record.parent_count * 1000000) + (
-                            record.ss_amount * 12) + (record.wife_count * 1000000))
-
-                if rec.taxable_income > 1 and rec.taxable_income <= 2000000:
+                            record.ss_amount * 12) + (record.wife_count * 1000000)))
+                
+                    else:
+                        taxable_income_with_arrears = ((((rec.month_salary*12)+rec.arrears) * 0.80) - ((record.no_of_children * 500000) + (record.parent_count * 1000000) + (record.ss_amount * 12) + (record.wife_count * 1000000)))
+                    
                     if rec.taxable_income > 2000001 and rec.taxable_income <= 5000000:
                         taxable_total = ((rec.taxable_income - 2000000) * 0.05)
-                if rec.taxable_income > 5000001 and rec.taxable_income <= 10000000:
-                    taxable_total = (((rec.taxable_income - 5000000) * 0.10) + 150000)
-                if rec.taxable_income > 10000001 and rec.taxable_income <= 20000000:
-                    taxable_total = (((rec.taxable_income - 10000000) * 0.15) + 650000)
-                if rec.taxable_income > 20000001 and rec.taxable_income <= 30000000:
-                    taxable_total = (((rec.taxable_income - 20000000) * 0.20) + 2150000)
-                if rec.taxable_income > 30000001:
-                    taxable_total = (((rec.taxable_income - 30000000) * 0.25) + 4150000)
+                    if rec.taxable_income > 5000001 and rec.taxable_income <= 10000000:
+                        taxable_total = (((rec.taxable_income - 5000000) * 0.10) + 150000)
+                    if rec.taxable_income > 10000001 and rec.taxable_income <= 20000000:
+                        taxable_total = (((rec.taxable_income - 10000000) * 0.15) + 650000)
+                    if rec.taxable_income > 20000001 and rec.taxable_income <= 30000000:
+                        taxable_total = (((rec.taxable_income - 20000000) * 0.20) + 2150000)
+                    if rec.taxable_income > 30000001:
+                        taxable_total = (((rec.taxable_income - 30000000) * 0.25) + 4150000)
+                                          
+                    
+                                          
+                    if  taxable_income_with_arrears > 2000001 and  taxable_income_with_arrears <= 5000000:
+                        taxable_total_arrears = (( taxable_income_with_arrears - 2000000) * 0.05)
+                    if  taxable_income_with_arrears > 5000001 and taxable_income_with_arrears <= 10000000:
+                        taxable_total_arrears = ((( taxable_income_with_arrears - 5000000) * 0.10) + 150000)
+                    if  taxable_income_with_arrears > 10000001 and taxable_income_with_arrears <= 20000000:
+                        taxable_total_arrears = ((( taxable_income_with_arrears - 10000000) * 0.15) + 650000)
+                    if  taxable_income_with_arrears > 20000001 and taxable_income_with_arrears <= 30000000:
+                        taxable_total_arrears = (((taxable_income_with_arrears - 20000000) * 0.20) + 2150000)
+                    if taxable_income_with_arrears > 30000001:
+                        taxable_total_arrears = (((taxable_income_with_arrears - 30000000) * 0.25) + 4150000)
 
-                rec.month_tax = taxable_total
+                    rec.month_tax = (taxable_total/12) + (taxable_total_arrears - taxable_total)
+                
+                else:
+
+                    if rec.taxable_income > 1 and rec.taxable_income <= 2000000:
+                        if rec.taxable_income > 2000001 and rec.taxable_income <= 5000000:
+                            taxable_total = ((rec.taxable_income - 2000000) * 0.05)
+                    if rec.taxable_income > 5000001 and rec.taxable_income <= 10000000:
+                        taxable_total = (((rec.taxable_income - 5000000) * 0.10) + 150000)
+                    if rec.taxable_income > 10000001 and rec.taxable_income <= 20000000:
+                        taxable_total = (((rec.taxable_income - 10000000) * 0.15) + 650000)
+                    if rec.taxable_income > 20000001 and rec.taxable_income <= 30000000:
+                        taxable_total = (((rec.taxable_income - 20000000) * 0.20) + 2150000)
+                    if rec.taxable_income > 30000001:
+                        taxable_total = (((rec.taxable_income - 30000000) * 0.25) + 4150000)
+
+                    rec.month_tax = (taxable_total/12)
