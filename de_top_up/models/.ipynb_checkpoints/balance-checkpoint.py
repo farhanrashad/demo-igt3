@@ -22,7 +22,7 @@ class TopUpBalance(models.Model):
         return super(TopUpBalance, self).create(values)
 
     crnt_year = fields.Integer(string="Current Year", default=datetime.now().year)
-    topup_balance = fields.Char('Name', required=True, copy=False, readonly=True, index=True,
+    topup_balance = fields.Char(string='Topup Balance', required=True, copy=False, readonly=True, index=True,
                                 default=lambda self: _('New'))
     name = fields.Char('Name')
     state = fields.Selection([
@@ -96,8 +96,8 @@ class TopUpBalance(models.Model):
     date = fields.Date(string="Date", default=fields.date.today())
     pre_period = fields.Char(string="Previous Period", compute='_compute_previous_period')
     curr_period = fields.Char(string="Current Period",  compute='_compute_previous_period')
-    is_populated = fields.Boolean('Is Populated')
-    balance_month = fields.Char(string="Current Period", store=True, compute='_compute_previous_period')
+    is_populated = fields.Boolean(string='Is Populated')
+    balance_month = fields.Char(string="Month Balance", compute='_compute_previous_period')
     
     #_sql_constraints = [
      #   ('balance_month_uniq', 'unique(balance_month)',
@@ -134,7 +134,7 @@ class TopUpBalanceLine(models.Model):
     _name = 'topup.balance.line'
     _description = 'Top Up Balance model'
 
-    balance_id = fields.Many2one('topup.balance')
+    balance_id = fields.Many2one('topup.balance', string='Balance Ref')
 
     operator = fields.Selection([('mytel', 'Mytel'), ('mpt', 'MPT'), ('ooredoo', 'Ooredoo'), ('telenor', 'Telenor')],
                                 string="Operator")
