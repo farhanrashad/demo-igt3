@@ -2,14 +2,14 @@
 
 {
     "name": "Requisition Lines Report",
-    'version': '14.0.0.0',
+    'version': '14.0.0.3',
     "category": 'Requisition Lines Report',
     "summary": ' Requisition Lines Report',
     'sequence': 1,
     "description": """"Generate Requisition Lines Report """,
     "author": "Dynexcel",
-    "website": "http://www.dynexcel.co",
-    'depends': ['base','stock','purchase','hr','de_stock_material_transfer','report_xlsx'],
+    "website": "https://www.dynexcel.com",
+    'depends': ['de_stock_material_transfer','report_xlsx'],
     'data': [
         'security/ir.model.access.csv',
         'wizards/gtn_dgn_mrf_spmrf_wizard.xml',
