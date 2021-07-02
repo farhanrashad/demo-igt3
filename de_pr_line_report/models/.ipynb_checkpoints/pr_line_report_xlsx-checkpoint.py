@@ -27,6 +27,7 @@ class GenerateXLSXReport(models.Model):
         sheet.write(3, 15, 'Currency', format1)
         sheet.write(3, 16, 'PR Created by', format1)
 
+        
         format2 = workbook.add_format({'font_size': '12', 'align': 'vcenter'})
         row = 4
         sheet.set_column(row, 0, 50)

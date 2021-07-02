@@ -49,8 +49,6 @@ class GenerateXLSXReport(models.Model):
         sheet.set_column(row, 15, 20)
         sheet.set_column(row, 16, 20)
 
-        #purchase_order_ids = self.env['purchase.order'].browse(data['id'])
-
         for id in lines:
             if id.user_id:
                 username = id.user_id.name
