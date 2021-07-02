@@ -6,7 +6,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Payroll',
-    'version': '14.0.0.2',
+    'version': '14.0.0.3',
     'depends': ['base', 'hr','hr_payroll'],
     'data': [
         'security/ir.model.access.csv',

@@ -22,15 +22,15 @@ class EmployeeIncomeTax(models.Model):
         return super(EmployeeIncomeTax, self).create(values)
 
     crnt_year = fields.Integer(string="Current Year", default=datetime.now().year)
-    employee_pit = fields.Char(String='PIT', required=True, copy=False, readonly=True, index=True,
+    employee_pit = fields.Char(string='PIT', required=True, copy=False, readonly=True, index=True,
                                default=lambda self: _('New'))
-    name = fields.Char(String='Name')
+    name = fields.Char(string='Name')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
         ('closed', 'Closed'),
         ('cancelled', 'Cancelled'),
-    ], string='State', index=True, copy=False, default='draft', track_visibility='onchange')
+    ], string='State', index=True, copy=False, default='draft')
 
     def action_confirm(self):
         self.state = 'confirmed'
@@ -170,6 +170,7 @@ class EmployeeIncomeTax(models.Model):
 
 class EmployeeIncomeTaxLine(models.Model):
     _name = 'employee.income.tax.line'
+    _description = 'Employee Income Tax Line'
 
     employee_income_tax_id = fields.Many2one('employee.income.tax', string='Income Tax ID')
     months = fields.Char(string='Months')
