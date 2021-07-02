@@ -50,7 +50,7 @@ class GenerateXLSXReport(models.Model):
 
         purchase_ids = self.env['purchase.requisition'].browse(data['id'])
         
-        for id in purchase_ids:
+        for id in lines:
             if id.name:
                 name = id.name
             else:

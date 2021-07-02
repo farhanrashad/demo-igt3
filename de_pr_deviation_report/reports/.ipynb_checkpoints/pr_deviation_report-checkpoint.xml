@@ -6,8 +6,8 @@
             <field name="report_type">xlsx</field>
             <field name="report_name">de_pr_deviation_report.pr_deviation_report_xlsx</field>
             <field name="report_file">Purchase Requisition Report</field>
-<!--             <field name="binding_model_id" ref="de_pr_deviation_report.model_purchase_requisition"/>
-            <field name="binding_type">report</field> -->
+            <field name="binding_model_id" ref="purchase_requisition.model_purchase_requisition"/>
+            <field name="binding_type">report</field>
         </record>
     </data>
 </odoo>
