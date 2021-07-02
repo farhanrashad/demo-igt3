@@ -40,11 +40,10 @@
                     <t t-foreach="grouped_entry" t-as="entrys">
                         <thead>
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
-                                <th class="text-left">No#</th>
-                                <th class="text-left">Number</th>
-                                <th class="text-left">Date</th>
-                                <th class="text-left">Reference</th>
-                                <th class="text-left">Supplier Invoice Number</th>
+                                <th class="text-left">Document Number</th>
+                                <th class="text-left">Entry Date</th>
+                                <th class="text-left">Entry Type</th>
+                                <th class="text-left">Status</th>
 
                             </tr>
                         </thead>
@@ -52,21 +51,28 @@
                             <t t-foreach="entrys" t-as="custom">
                                 <t t-if="custom.user_id.id==uid" >
                                 <tr>
-                                    <td class="text-left">
-                                          <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}">#<span t-field="custom.id"/></a>
-                                    </td>
+
                                      <td>
-                                        <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}"><span t-field="custom.name"/></a>
+<!--                                         <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}"><span t-field="custom.name"/></a>  -->
+                                       <span t-esc="custom.name" />  
+                                         
                                     </td>
                                      <td class="text-left">
                                         <span t-esc="custom.date_entry" />
                                     </td>
                                     <td class="text-left">
-                                        <span t-esc="custom.ref_fleet" />
+                                        <span t-esc="custom.custom_entry_type_id.name" />
                                     </td>
 
                                     <td class="text-left">
-                                        <span t-esc="custom.supplier_inv_no_fleet" />
+                                        <span t-esc="custom.stage_id.name" />
+                                    </td>
+                                    
+                                    <td class="text-left">
+                                         <a t-attf-href="/web/content/#{custom.custom_entry_type_id.attachment_id.id}?download=true" title="Dowload"><div class="btn btn-primary"><i class="fa fa-download"></i></div></a>
+                                    </td>
+                                    <td class="text-left">
+                                        <a t-attf-href="/custom/entry" title="Upload"><div class="btn btn-primary"><i class="fa fa-upload"></i></div></a>
                                     </td>
 
 
@@ -114,7 +120,7 @@
                                             <div class="col-3 col-md-3 text-left">
                                               <small class="text-right">State:</small>
 
-                                                    <span t-field="entry.state" class=" badge badge-pill badge-info" title="Current stage of this entry Order"/>
+                                                    <span t-field="entry.stage_id.name" class=" badge badge-pill badge-info" title="Current stage of this entry Order"/>
 
                                             </div>
                                         </h5>
@@ -156,9 +162,9 @@
                          <div class="col-12 col-md-12 pb-2">
                             <div class="row">
                                 <div class="col-md-5"> <strong>Reference : </strong>
-                                    <t t-if="entry.ref_fleet">
+<!--                                     <t t-if="entry.ref_fleet">
                                         <span t-esc="entry.ref_fleet"/>
-                                    </t>
+                                    </t> -->
                                 </div>
                                 <div class="col-md-5"> <strong>Date: </strong>
                                     <t t-if="entry.date_entry">
@@ -207,23 +213,6 @@
                                 
                             </div>
                              </t>
-<!--                             <div class="row">-->
-<!--                                 <t t-if="entry.amount_total_fleet"> -->
-<!--                                <div class="col-md-5"> <strong>Fleet Bill Total : </strong>                                   -->
-<!--                                        <span t-esc="entry.amount_total_fleet"/>-->
-<!--                                </div>-->
-<!--                                </t> -->
-<!--                                 <t t-if="entry.amount_total_accom"> -->
-<!--                                <div class="col-md-5"> <strong>Accomodation Bill Total: </strong>-->
-<!--                                        <span t-esc="entry.amount_total_accom"/>-->
-<!--                                </div>-->
-<!--                                </t> -->
-<!--                                 <t t-if="entry.amount_total_travel"> -->
-<!--                                    <div class="col-md-5"> <strong>Travel Bill Total : </strong>-->
-<!--                                            <span t-esc="entry.amount_total_travel"/>-->
-<!--                                    </div>-->
-<!--                                </t> -->
-<!--                            </div>-->
                              
                              <div class="row">
                                  <t t-if="entry.text"> 
@@ -264,13 +253,6 @@
             </div>
         </t>
     </template>
-    
-    
-    
-    
-    
-    
-
            
 </odoo>
 
