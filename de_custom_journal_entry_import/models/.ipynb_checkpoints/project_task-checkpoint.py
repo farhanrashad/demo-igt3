@@ -50,7 +50,7 @@ class ProjectTask(models.Model):
 
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type')
     entry_partner_id = fields.Many2one('res.partner', string='Contractor')
-
+    custom_entry_id = fields.Many2one('account.custom.entry', string='Entry')
     is_entry_attachment = fields.Boolean(string='Is Entry Attachment')
     is_entry_processed = fields.Boolean(string='Entry Processed')
     un_processed_entry = fields.Boolean(string='Un-Processed Entry')
@@ -92,14 +92,23 @@ class ProjectTask(models.Model):
                 rowvals = []
                 vals = []
                 line_vals = {}
-                partner = custom.entry_partner_id.id
-               
-                custom_vals = {
-                    'date_entry': fields.datetime.now(),
-                    'partner_id': partner,
-                    'custom_entry_type_id': self.custom_entry_type_id.id,
-                }
-                custom_entry = self.env['account.custom.entry'].create(custom_vals)
+                custom_entry = False
+                if self.custom_entry_id:
+                    custom_entry = self.custom_entry_id
+                    entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
+                    for entry_line in entry:
+                        entry_line.unlink()    
+                            
+                else:    
+                    partner = custom.entry_partner_id.id
+                    user = custom.user_id.id
+                    custom_vals = {
+                        'date_entry': fields.datetime.now(),
+                        'partner_id': partner,
+                        'user_id': user,
+                        'custom_entry_type_id': self.custom_entry_type_id.id,
+                    }
+                    custom_entry = self.env['account.custom.entry'].create(custom_vals)
                 for data_row in file_reader:
                     inner_vals = {}
                     index = 0

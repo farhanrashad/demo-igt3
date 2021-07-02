@@ -4,8 +4,6 @@
 
 <odoo>
 
-
-
             <template id="portal_custom_entry_type" name="Custom Entry Documents type">
         <t t-call="portal.portal_layout">
                <div id="wrap">
@@ -214,6 +212,7 @@
                     <span class="s_website_form_label_content"/>
                   </label>
                   <div class="col-sm">
+                      <input type="hidden" class="form-control s_website_form_input" name="custom_entry_id" t-att-value="user"/>
                       <input type="hidden" class="form-control s_website_form_input" name="user_id" t-att-value="user"/>
                       <input type="hidden" class="form-control s_website_form_input" name="entry_partner_id" t-att-value="partner"/>
                       <input type="hidden" class="form-control s_website_form_input" name="custom_entry_type_id" t-att-value="entry_types.id"/>
