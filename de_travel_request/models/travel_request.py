@@ -45,10 +45,17 @@ class TravelRequest(models.Model):
         if year_balance:
             for line in year_balance.balance_line_ids:
                 if line.employee_id.id == self.employee_id.id:
+                    if self.round_trip == True:
+                        line.update({
+                            'used_balance':   line.used_balance + 1,
+                            })
+                    elif self.one_way_trip == True:
+                        line.update({
+                            'used_balance':   line.used_balance + 0.5,
+                            })    
                     allocated_balance = line.allocated_balance 
                     remaining_balance = allocated_balance - line.used_balance
                     line.update({
-                        'used_balance':   line.used_balance + 1,
                         'remaining_balance':   remaining_balance,
                         })
                         

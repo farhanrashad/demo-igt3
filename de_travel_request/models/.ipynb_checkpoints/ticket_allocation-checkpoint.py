@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 class TicketAllocation(models.Model):
     _name = 'ticket.allocation'
+    _description = 'Ticket Allocation Line'
     _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
 
 
@@ -45,6 +46,7 @@ class TicketAllocation(models.Model):
         self.state = 'approved'
         year_balance = self.env['travel.balance'].search([('crnt_year', '=', datetime.now().year)], limit=1)
         if year_balance:
+            raise UserError(str(year_balance))
             for line in year_balance.balance_line_ids:
                 for  inn_line in self.allocation_line_ids:
                     if line.employee_id.id == inn_line.employee_id.id:
@@ -91,6 +93,7 @@ class TicketAllocation(models.Model):
 
 class TicketAllocationLine(models.Model):
     _name = 'ticket.allocation.line'
+    _description = 'Ticket Allocation Line'
 
     allocation_id = fields.Many2one('ticket.allocation')
     employee_id = fields.Many2one('hr.employee', string='Employee')
