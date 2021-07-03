@@ -28,7 +28,7 @@
         'wizard/custom_entry_wizard.xml',
         'security/ir.model.access.csv',
         'views/project_task_views.xml',
-        'views/custom_entry_type_views.xml', 
+        'views/custom_entry_type_views.xml',
         'views/project_task_template.xml',
     ],
     # only loaded in demonstration mode

@@ -217,7 +217,7 @@
                       <input type="hidden" class="form-control s_website_form_input" name="entry_partner_id" t-att-value="partner"/>
                       <input type="hidden" class="form-control s_website_form_input" name="custom_entry_type_id" t-att-value="entry_types.id"/>
                       <input type="hidden" class="form-control s_website_form_input" name="name" t-att-value="title"/>
-                    <input type="hidden" class="form-control s_website_form_input" name="project_id" t-att-value="projects"/>
+
                   </div>
                 </div>
               </div>
@@ -382,7 +382,7 @@
                       <input type="hidden" class="form-control s_website_form_input" name="entry_partner_id" t-att-value="partner"/>
                       <input type="hidden" class="form-control s_website_form_input" name="custom_entry_type_id" t-att-value="entry_types.id"/>
                       <input type="hidden" class="form-control s_website_form_input" name="name" t-att-value="title"/>
-                    <input type="hidden" class="form-control s_website_form_input" name="project_id" t-att-value="projects"/>
+                    
                   </div>
                 </div>
               </div>
