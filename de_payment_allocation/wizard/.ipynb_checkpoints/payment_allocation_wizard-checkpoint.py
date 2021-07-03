@@ -127,36 +127,6 @@ class PaymentAllocation(models.TransientModel):
                 
         for refund in self.invoice_refund_ids:
             if refund.allocate == True:
-                debit_line = 0
-                credit_line = 0
-                refund_debit_line = 0
-                for line in self.move_id.line_ids:
-                    if line.credit != 0.0:
-                        credit_line = line.id 
-                    if line.credit == 0.0:
-                        debit_line = line.id  
-                        
-                for invoice_line in refund.move_id.line_ids:                    
-                    refund_debit_line = invoice_line.id
-                recocile_vals = {
-                    'exchange_move_id': self.move_id.id,
-                }
-                reconcile_id = self.env['account.full.reconcile'].create(recocile_vals)
-                refund_amount_reconcile = 0.0
-                if refund.move_id.currency_id.id == self.move_id.currency_id.id:
-                    refund_amount_reconcile = refund.allocate_amount
-                else:
-                    refund_amount_reconcile = refund.allocate_amount
-                    
-                vals = {
-                    'full_reconcile_id': reconcile_id.id,
-                    'amount':  refund.allocate_amount,
-                    'credit_move_id':  credit_line,
-                    'debit_move_id': refund_debit_line,
-                    'credit_amount_currency': refund_amount_reconcile,
-                    'debit_amount_currency': refund_amount_reconcile,
-                }
-                partial_payment = self.env['account.partial.reconcile'].create(vals)
                 
                 refund_debit_line = 0
                 refund_credit_line = 0
@@ -167,13 +137,19 @@ class PaymentAllocation(models.TransientModel):
                     if line.credit == 0.0:
                         refund_debit_line = line.id  
                         
-                for inv_line in self.move_id.line_ids:                    
+                for inv_line in self.payment_id.move_id.line_ids:                    
                     move_debit_line = inv_line.id
+                    
                     
                 refund_recocile_vals = {
                     'exchange_move_id': refund.move_id.id,
                 } 
                 refund_reconcile_id = self.env['account.full.reconcile'].create(refund_recocile_vals)
+                refund_amount_reconcile = 0.0
+                if refund.move_id.currency_id.id == self.payment_id.currency_id.id:
+                    refund_amount_reconcile = refund.allocate_amount
+                else:
+                    refund_amount_reconcile = refund.allocate_amount
                 vals = {
                     'full_reconcile_id': refund_reconcile_id.id,
                     'amount':  refund.allocate_amount,
@@ -310,9 +286,7 @@ class PaymentAllocation(models.TransientModel):
                 refund_payment = self.env['account.partial.reconcile'].create(vals)
                 
                 if refund_reconcile_amount == refund.allocate_amount:
-                    
                     refund_exchange_amount = refund.move_id.amount_residual 
-                    
                     refund_exchange_moves = self.action_exchange_rate(refund.currency_id.id, refund_exchange_amount)
                     refund_ext_payment_debit_line = 0
                     for refund_ext_line in refund_exchange_moves.line_ids:
@@ -328,7 +302,7 @@ class PaymentAllocation(models.TransientModel):
                     refund_ext_reconcile_id = self.env['account.full.reconcile'].create(refund_ext_recocile_vals)                       
                     refund_ext_vals = {
                         'full_reconcile_id': refund_ext_reconcile_id.id,
-                        'amount':  refund.allocate_amount,
+                        'amount':  - refund.allocate_amount,
                         'credit_move_id':  refund_credit_line,
                         'debit_move_id': refund_ext_payment_debit_line,
                         'credit_amount_currency': refund_exchange_amount,
