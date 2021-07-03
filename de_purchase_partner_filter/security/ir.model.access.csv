@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_de_purchase_partner_filter_de_purchase_partner_filter,de_purchase_partner_filter.de_purchase_partner_filter,model_de_purchase_partner_filter_de_purchase_partner_filter,base.group_user,1,1,1,1
