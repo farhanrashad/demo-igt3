@@ -44,10 +44,11 @@ class PayslipBatch(models.TransientModel):
         file_.close()
         
         with open('batch.txt') as f:
+            raise UserError(f)
             attachment_vals = {
                     'name': filename,
                     'type': 'binary',
-                    'datas': base64.b64decode(f),
+                    'datas': base64.b64decode(f.read()),
                     'res_id': self.batch_id.id,
                     'res_name': self.batch_id.name,
                     'res_model': 'hr.payslip.run',
