@@ -29,7 +29,6 @@ from odoo.exceptions import AccessError, MissingError, UserError
 
 
 def get_custom_entry(flag=0):
-    projects = request.env['project.project'].search([])
     entry_type_list = []
     custom_entry_types = request.env['account.custom.entry.type'].search([('is_publish','=',True)])
     for entry in custom_entry_types:
@@ -41,25 +40,18 @@ def get_custom_entry(flag=0):
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
     tasks = 'project.task'
     return {
-        'projects': projects,
         'custom_entry_types': allow_custom_entry_types,
         'company_info': company_info,
         'tasks': tasks,
     }
 
 def get_custom_entry_final(entry_type):
-    projects = request.env['project.project'].search([('name', '=', 'Third Party Billing')], limit=1)
-    if not projects:
-        vals = {
-            'name': 'Third Party Billing',
-        }
-        projects = request.env['project.project'].create(vals)
+
 
     custom_types = request.env['account.custom.entry.type'].search([('id', '=', entry_type)], limit=1)
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
     tasks = 'project.task'
     return {
-        'projects': projects.id,
         'entry_types': custom_types ,
         'partner': company_info.partner_id.id,
         'user': company_info.id,
@@ -70,19 +62,13 @@ def get_custom_entry_final(entry_type):
 
 
 def get_custom_entry_final_update(entry_type, entry):
-    projects = request.env['project.project'].search([('name', '=', 'Third Party Billing')], limit=1)
-    if not projects:
-        vals = {
-            'name': 'Third Party Billing',
-        }
-        projects = request.env['project.project'].create(vals)
+
 
     custom_entry = request.env['account.custom.entry'].search([('id', '=', entry)], limit=1)
     custom_types = request.env['account.custom.entry.type'].search([('id', '=', entry_type)], limit=1)
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
     tasks = 'project.task'
     return {
-        'projects': projects.id,
         'entry_types': custom_types ,
         'partner': company_info.partner_id.id,
         'custom_entry': custom_entry.id, 
