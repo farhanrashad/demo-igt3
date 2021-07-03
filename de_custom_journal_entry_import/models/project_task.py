@@ -8,6 +8,15 @@ from datetime import date, datetime
 from odoo.exceptions import Warning, UserError
 from odoo import models, fields, exceptions, api, _
 from dateutil import parser
+import ast
+from datetime import timedelta, datetime
+from random import randint
+
+from odoo import api, fields, models, tools, SUPERUSER_ID, _
+from odoo.exceptions import UserError, AccessError, ValidationError, RedirectWarning
+from odoo.tools.misc import format_date, get_lang
+from odoo.osv.expression import OR
+
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -50,10 +59,53 @@ class ProjectTask(models.Model):
 
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type')
     entry_partner_id = fields.Many2one('res.partner', string='Contractor')
-
+    custom_entry_id = fields.Many2one('account.custom.entry', string='Entry')
     is_entry_attachment = fields.Boolean(string='Is Entry Attachment')
     is_entry_processed = fields.Boolean(string='Entry Processed')
     un_processed_entry = fields.Boolean(string='Un-Processed Entry')
+    
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        default_stage = dict()
+        for vals in vals_list:
+            project_id = vals.get('project_id') or self.env.context.get('default_project_id')
+            if project_id and not "company_id" in vals:
+                vals["company_id"] = self.env["project.project"].browse(
+                    project_id
+                ).company_id.id or self.env.company.id
+            if project_id and "stage_id" not in vals:
+                # 1) Allows keeping the batch creation of tasks
+                # 2) Ensure the defaults are correct (and computed once by project),
+                # by using default get (instead of _get_default_stage_id or _stage_find),
+                if project_id not in default_stage:
+                    default_stage[project_id] = self.with_context(
+                        default_project_id=project_id
+                    ).default_get(['stage_id']).get('stage_id')
+                vals["stage_id"] = default_stage[project_id]
+            # user_id change: update date_assign
+            if vals.get('user_id'):
+                vals['date_assign'] = fields.Datetime.now()
+            # Stage change: Update date_end if folded stage and date_last_stage_update
+            if vals.get('stage_id'):
+                vals.update(self.update_date_end(vals['stage_id']))
+                vals['date_last_stage_update'] = fields.Datetime.now()
+            # recurrence
+            rec_fields = vals.keys() & self._get_recurrence_fields()
+            if rec_fields and vals.get('recurring_task') is True:
+                rec_values = {rec_field: vals[rec_field] for rec_field in rec_fields}
+                rec_values['next_recurrence_date'] = fields.Datetime.today()
+                recurrence = self.env['project.task.recurrence'].create(rec_values)
+                vals['recurrence_id'] = recurrence.id
+        tasks = super().create(vals_list)
+        for task in tasks:
+            if task.project_id.privacy_visibility == 'portal':
+                task._portal_ensure_token()
+#         if  tasks.entry_attachment_id.id:       
+#             tasks.action_journal_entry_import()
+                
+        return tasks
+    
 
     @api.constrains('entry_attachment_id')
     def _check_attachment(self):
@@ -92,29 +144,32 @@ class ProjectTask(models.Model):
                 rowvals = []
                 vals = []
                 line_vals = {}
-                partner = custom.entry_partner_id.id
-               
-                custom_vals = {
-                    'date_entry': fields.datetime.now(),
-                    'partner_id': partner,
-                    'custom_entry_type_id': self.custom_entry_type_id.id,
-                }
-                custom_entry = self.env['account.custom.entry'].create(custom_vals)
-                attachment_vals = {
-                    'name': custom.entry_attachment_id.name,
-                    'datas': custom.entry_attachment_id.datas,
-                    'res_id': custom_entry.id,
-                    'res_model': 'account.custom.entry',
-                }
-                attachment = self.env['ir.attachment'].create(attachment_vals)
-                
+                custom_entry_id_vals = self.custom_entry_id.id
+                if self.custom_entry_id:
+                    custom_entry_id_vals = self.custom_entry_id.id
+                    entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
+                    for entry_line in entry.custom_entry_line:
+                        entry_line.unlink()    
+                            
+                else:    
+                    partner = custom.entry_partner_id.id
+                    user = custom.user_id.id
+                    custom_vals = {
+                        'date_entry': fields.datetime.now(),
+                        'partner_id': partner,
+                        'user_id': user,
+                        'custom_entry_type_id': self.custom_entry_type_id.id,
+                    }
+                    custom_entry = self.env['account.custom.entry'].create(custom_vals)
+                    custom_entry_id_vals = custom_entry.id
                 for data_row in file_reader:
                     inner_vals = {}
                     index = 0
                     i = 0
                     for data_column in data_row:
+#                         raise UserError(str(custom_entry.id))
                         inner_vals.update({
-                            'custom_entry_id': custom_entry.id
+                            'custom_entry_id': custom_entry_id_vals
                         })
                         rowvals.append(data_row)
                         search_field = ir_model_fields_obj.sudo().search([
@@ -171,7 +226,6 @@ class ProjectTask(models.Model):
                 custom.is_entry_processed = True
                 custom.un_processed_entry = False
                 custom.user_id = self.env.user.id
-                
 
 
 class CustomEntryType(models.Model):

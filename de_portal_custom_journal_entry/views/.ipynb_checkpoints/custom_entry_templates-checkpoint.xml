@@ -4,8 +4,8 @@
     <template id="portal_layout_custom_entry" name="Portal layout: Stock Order menu entry" inherit_id="portal.portal_breadcrumbs" priority="25">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
             <li t-if="page_name == 'entry' or entry" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not entry else ''}">
-                <a t-if="entry" t-attf-href="/entry/orders?{{ keep_query() }}">Custom Entry</a>
-                <t t-else="">Custom Entry</t>
+                <a t-if="entry" t-attf-href="/entry/orders?{{ keep_query() }}">Third Party Billing</a>
+                <t t-else="">Third Party Billing</t>
             </li>
             <li t-if="entry" class="breadcrumb-item active text-truncate col-8 col-lg-10">
                 <t t-esc="entry.name"/>
@@ -16,7 +16,7 @@
     <template id="portal_my_home_entry" name="entry Order" customize_show="True" inherit_id="portal.portal_my_home" priority="25">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-call="portal.portal_docs_entry">
-                <t t-set="title">Custom Entry</t>
+                <t t-set="title">Third Party Billing</t>
                 <t t-set="url" t-value="'/entry/orders'"/>
                 <t t-set="placeholder_count" t-value="'entry_count'"/>
             </t>
@@ -28,11 +28,11 @@
         <t t-call="portal.portal_layout">
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
             <t t-call="portal.portal_searchbar">
-                <t t-set="title">Custom Entry</t>
+                <t t-set="title">Third Party Billing</t>
             </t>
             <t t-if="not grouped_entry">
                 <div class="alert alert-warning mt8" role="alert">
-                    There are no Custom Entry.
+                    There are no Third Party Billing.
                 </div>
             </t>
             <t t-if="grouped_entry">
@@ -40,52 +40,57 @@
                     <t t-foreach="grouped_entry" t-as="entrys">
                         <thead>
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
-                                <th class="text-left">No#</th>
-                                <th class="text-left">Number</th>
-                                <th class="text-left">Date</th>
-                                <th class="text-left">Reference</th>
-                                <th class="text-left">Supplier Invoice Number</th>
-                                <th class="text-left">Fleet Bill Total</th>
-                                <th class="text-left">Accomodation Bill Total</th>
-                                <th class="text-left">Travel Bill Total</th>
+                                <th class="text-left">Document Number</th>
+                                <th class="text-left">Entry Date</th>
+                                <th class="text-left">Entry Type</th>
+                                <th class="text-left">Status</th>
+
                             </tr>
                         </thead>
                         <tbody>
                             <t t-foreach="entrys" t-as="custom">
                                 <t t-if="custom.user_id.id==uid" >
                                 <tr>
-                                    <td class="text-left">
-                                          <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}">#<span t-field="custom.id"/></a>
-                                    </td>
+
                                      <td>
-                                        <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}"><span t-field="custom.name"/></a>
+<!--                                         <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}"><span t-field="custom.name"/></a>  -->
+                                       <span t-esc="custom.name" />  
+                                         
                                     </td>
                                      <td class="text-left">
                                         <span t-esc="custom.date_entry" />
                                     </td>
                                     <td class="text-left">
-                                        <span t-esc="custom.ref_fleet" />
+                                        <span t-esc="custom.custom_entry_type_id.name" />
                                     </td>
 
                                     <td class="text-left">
-                                        <span t-esc="custom.supplier_inv_no_fleet" />
+                                        <span t-esc="custom.stage_id.name" />
+                                    </td>
+                                    
+                                    <td class="text-left">
+                                         <a t-attf-href="/web/content/#{custom.custom_entry_type_id.attachment_id.id}?download=true" title="Dowload"><div class="btn btn-primary"><i class="fa fa-download"></i></div></a>
                                     </td>
                                     <td class="text-left">
-                                        <span t-esc="custom.amount_total_fleet" />
+                                        <t t-if="custom.stage_id.stage_category =='draft' ">
+                                            <a t-attf-href="/entry/type/update/#{custom.id}?" title="Upload"><div class="btn btn-primary"><i class="fa fa-upload"></i></div></a>
+                                        </t>    
                                     </td>
-                                    <td class="text-left">
-                                        <span t-esc="custom.amount_total_accom" />
-                                    </td>
-                                    <td class="text-left">
-                                        <span t-esc="custom.amount_total_travel" />
-                                    </td>
+
 
                                 </tr>
                                </t>
                             </t>
                             <tr>
 
-                            </tr>   
+                            </tr>
+                            <tr>
+                                <div>
+                                    <t class="col-lg-7 col-md-8" >
+                                        <a href="/custom/entry" > <div class="btn btn-primary pull-left" style="height:30px; line-height:100%; ">Create</div> </a>
+                                    </t>
+                                </div>
+                            </tr>
                         </tbody>
                     </t>
                 </t>
@@ -117,7 +122,7 @@
                                             <div class="col-3 col-md-3 text-left">
                                               <small class="text-right">State:</small>
 
-                                                    <span t-field="entry.state" class=" badge badge-pill badge-info" title="Current stage of this entry Order"/>
+                                                    <span t-field="entry.stage_id.name" class=" badge badge-pill badge-info" title="Current stage of this entry Order"/>
 
                                             </div>
                                         </h5>
@@ -152,16 +157,16 @@
                             <span t-field="entry.name" />
                         </div>
                         <div class="col-12 col-md-6" t-if="entry.id">
-                            <strong>Partner:</strong> <span t-field="entry.partner_id.partner_id.name" />
+                            <strong>Partner:</strong> <span t-field="entry.partner_id.name" />
                         </div>
                     </div>
                      <div class="row mb-12">
                          <div class="col-12 col-md-12 pb-2">
                             <div class="row">
                                 <div class="col-md-5"> <strong>Reference : </strong>
-                                    <t t-if="entry.ref_fleet">
+<!--                                     <t t-if="entry.ref_fleet">
                                         <span t-esc="entry.ref_fleet"/>
-                                    </t>
+                                    </t> -->
                                 </div>
                                 <div class="col-md-5"> <strong>Date: </strong>
                                     <t t-if="entry.date_entry">
@@ -170,7 +175,9 @@
                                 </div>
                                
                             </div>
-                             <div class="row"> 
+
+                             <t t-if="entry.has_fleet_fields != 'no'">
+                             <div class="row" >
                                 <table class="table-striped table">
                                 <thead style="font-size:12px;">
                                     <tr>
@@ -207,24 +214,7 @@
                                  
                                 
                             </div>
-                             
-                             <div class="row">
-                                 <t t-if="entry.amount_total_fleet"> 
-                                <div class="col-md-5"> <strong>Fleet Bill Total : </strong>                                   
-                                        <span t-esc="entry.amount_total_fleet"/>
-                                </div>
-                                </t> 
-                                 <t t-if="entry.amount_total_accom"> 
-                                <div class="col-md-5"> <strong>Accomodation Bill Total: </strong>
-                                        <span t-esc="entry.amount_total_accom"/>
-                                </div>
-                                </t> 
-                                 <t t-if="entry.amount_total_travel"> 
-                                    <div class="col-md-5"> <strong>Travel Bill Total : </strong>
-                                            <span t-esc="entry.amount_total_travel"/>
-                                    </div>
-                                </t> 
-                            </div>
+                             </t>
                              
                              <div class="row">
                                  <t t-if="entry.text"> 
@@ -265,13 +255,6 @@
             </div>
         </t>
     </template>
-    
-    
-    
-    
-    
-    
-
            
 </odoo>
 

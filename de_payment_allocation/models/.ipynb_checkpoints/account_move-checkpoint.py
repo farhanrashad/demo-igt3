@@ -136,7 +136,9 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit= 'account.move.line'
     
-#     payment_date = fields.Date(string='Payment Date')
-#     due_date = fields.Date(string='Payment Date')
+
+    
+class AccountMove(models.Model):
+    _inherit = 'decimal.precision'    
 
     
