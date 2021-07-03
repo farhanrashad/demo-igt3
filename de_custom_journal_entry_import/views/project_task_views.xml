@@ -18,8 +18,6 @@
                     <field name="is_entry_attachment"  invisible="1"/>
                     <field name="un_processed_entry"  invisible="1" />
                 </xpath>
-
-
               
            </field>
         </record>
