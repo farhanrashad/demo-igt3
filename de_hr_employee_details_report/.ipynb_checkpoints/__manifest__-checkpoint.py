@@ -10,7 +10,7 @@
     'sequence':1,
     'category': 'Human Resource',
     'version': '14.0.0.2',
-    'depends': ['hr','base','stock','purchase','sale','account','report_xlsx'],
+    'depends': ['hr','account','report_xlsx'],
     'data': [
         'security/ir.model.access.csv',
         'reports/employee_details_report.xml',

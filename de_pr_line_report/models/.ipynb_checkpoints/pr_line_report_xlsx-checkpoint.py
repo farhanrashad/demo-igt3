@@ -48,7 +48,7 @@ class GenerateXLSXReport(models.Model):
         sheet.set_column(row, 15, 20)
         sheet.set_column(row, 16, 20)
 
-        purchase_ids = self.env['purchase.requisition'].browse(data['id'])
+        #purchase_ids = self.env['purchase.requisition'].browse(data['id'])
         
         for id in lines:
             if id.name:
