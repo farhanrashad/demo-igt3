@@ -72,7 +72,9 @@
                                          <a t-attf-href="/web/content/#{custom.custom_entry_type_id.attachment_id.id}?download=true" title="Dowload"><div class="btn btn-primary"><i class="fa fa-download"></i></div></a>
                                     </td>
                                     <td class="text-left">
-                                        <a t-attf-href="/custom/entry" title="Upload"><div class="btn btn-primary"><i class="fa fa-upload"></i></div></a>
+                                        <t t-if="custom.stage_id.stage_category =='draft' ">
+                                            <a t-attf-href="/entry/type/update/#{custom.id}?" title="Upload"><div class="btn btn-primary"><i class="fa fa-upload"></i></div></a>
+                                        </t>    
                                     </td>
 
 
