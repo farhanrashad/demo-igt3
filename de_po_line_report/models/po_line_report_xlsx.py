@@ -104,9 +104,9 @@ class GenerateXLSXReport(models.Model):
         sheet.set_column(row, 42, 20)
         sheet.set_column(row, 43, 20)
 
-        purchase_order_ids = self.env['purchase.order'].browse(data['id'])
+        #purchase_order_ids = self.env['purchase.order'].browse(data['id'])
         
-        for id in purchase_order_ids:
+        for id in lines:
             date = id.date_order
             if date:
                 ordering_date = date.strftime("%m/%d/%Y")

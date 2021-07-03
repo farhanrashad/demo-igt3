@@ -9,8 +9,8 @@
     'website': "https://www.dynexcel.co",
     'sequence':1,
     'category': 'Agreement',
-    'version': '14.0.0.2',
-    'depends': ['base','stock','purchase','purchase_requisition','report_xlsx'],
+    'version': '14.0.0.3',
+    'depends': ['purchase_requisition','report_xlsx'],
     'data': [
         'security/ir.model.access.csv',
         'views/view_purchase_requisition.xml',
