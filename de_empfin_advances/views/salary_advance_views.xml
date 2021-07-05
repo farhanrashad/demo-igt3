@@ -70,7 +70,6 @@
                                 <field name="currency_id" groups="base.group_multi_currency" attrs="{'readonly':[('state','!=','draft')]}" />
                                 <field name="company_id"  groups="base.group_multi_currency" attrs="{'readonly':[('state','!=','draft')]}" />
                                 <field name="employee_contract_id" required="1" invisible="1" groups="hr.group_hr_manager,hr.group_hr_user"/>
-                                <field name="product_id" required="1" string="Advance/Expense Type" attrs="{'readonly':[('state','!=','draft')]}" />
 	                    	</group>
                     	</group>
                         <notebook>
