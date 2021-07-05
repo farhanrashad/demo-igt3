@@ -24,6 +24,10 @@ class CustomEntry(models.Model):
             return False
         return self.stage_find(custom_entry_type_id, [('fold', '=', False)])
     
+    def _get_default_currency_id(self):
+        default_currency_id = self.env.context.get('default_currency_id')
+        return [default_currency_id] if default_currency_id else None
+    
     name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     date_entry = fields.Datetime(string='Entry Date', required=True, index=True, copy=False, default=fields.Datetime.now,)
     date_entry_month = fields.Selection(MONTH_LIST, string='Month')
@@ -34,7 +38,7 @@ class CustomEntry(models.Model):
 
     user_id = fields.Many2one('res.users', string="Request Owner",check_company=True, domain="[('company_ids', 'in', company_id)]", default=lambda self: self.env.user, required=True,readonly=True, )
     company_id = fields.Many2one('res.company', 'Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
-    currency_id = fields.Many2one('res.currency', 'Currency', required=True,                                 default=lambda self: self.env.company.currency_id.id)
+    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=_get_default_currency_id)
     
     stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]", copy=False)
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
@@ -44,6 +48,11 @@ class CustomEntry(models.Model):
     amount_balance = fields.Float('Balance', compute='_amount_all')
  
     custom_entry_line = fields.One2many('account.custom.entry.line', 'custom_entry_id', string='Entry Line', copy=True, auto_join=True,)
+    
+    @api.onchange('custom_entry_type_id')
+    def _onchange_entry_type(self):
+        for entry in self:
+            entry.currency_id = entry.custom_entry_type_id.currency_id.id
     
     #account related fields
     stage_category = fields.Selection(related='stage_id.stage_category')
@@ -337,19 +346,28 @@ class CustomEntry(models.Model):
         })
     def _create_account_move(self):
         move = self.env['account.move']
+        company = self.company_id
         lines_data = []
-        debit = credit = 0
-        counter_debit = counter_credit = 0
+        debit = credit = amount = balance = 0
+        counter_debit = counter_credit = counter_amount = counter_balance = 0
         for line in self.custom_entry_line:
             if self.custom_entry_type_id.counterpart_mode == 'debit':
-                credit = line.price_subtotal
+                #credit = line.price_subtotal
+                amount = line.price_subtotal * -1
             else:
-                debit = line.price_subtotal
+                #debit = line.price_subtotal
+                amount = line.price_subtotal
+            balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+            debit = balance if balance > 0.0 else 0.0
+            credit = -balance if balance < 0.0 else 0.0
+                
                 
             lines_data.append([0,0,{
                 'name': str(self.name) + ' ' + str(line.product_id.name),
                 'custom_entry_line_id': line.id,
                 'account_id': self.custom_entry_type_id.account_id.id,
+                'amount_currency': amount,
+                'currency_id': self.currency_id.id,
                 'debit': debit,
                 'credit': credit,
                 'partner_id': line.supplier_id.id,
@@ -358,9 +376,15 @@ class CustomEntry(models.Model):
                 'project_id': line.project_id.id,
             }])
         if self.custom_entry_type_id.counterpart_mode == 'debit':
-            counter_debit = self.amount_total
+            #counter_debit = self.amount_total
+            counter_amount = self.amount_total
         else:
-            counter_credit = self.amount_total
+            #counter_credit = self.amount_total
+            counter_amount = self.amount_total * -1
+            
+        counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+        counter_debit = counter_balance if counter_balance > 0.0 else 0.0
+        counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
             
         lines_data.append([0,0,{
             'name': str(self.name),
@@ -368,6 +392,8 @@ class CustomEntry(models.Model):
             'account_id': self.custom_entry_type_id.counterpart_account_id.id,
             'debit': counter_debit,
             'credit': counter_credit,
+            'amount_currency': counter_amount,
+            'currency_id': self.currency_id.id,
             'partner_id': self.partner_id.id,
         }])
         move.create({

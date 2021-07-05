@@ -58,6 +58,7 @@
                             <field name="expense_advance" attrs="{'invisible': [('generate_accounting', '=', False)]}"/>
                             <field name="payment_journal_id" attrs="{'invisible': [('expense_advance', '=', False)], 'required': [('expense_advance', '=', True)]}"/>
                             <field name="group_id" options="{'no_create': True,'no_open':True}" />
+                            <field name="currency_id" groups="base.group_multi_currency" force_save="1"/>
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                     </group>
