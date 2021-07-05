@@ -35,7 +35,7 @@
                             <field name="user_id" widget="many2one_avatar_user"/>
                             <field name="completion_days" sting="Completion Days(From PO)"/>
                             <field name="completion_percent" />
-                            <field name="stage_ids" widget="many2many_tags" />
+                            <field name="stage_ids" widget="many2many_tags" domain="[('allow_milestone','=',True)]" options="{'no_create':True}"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
 
                         </group>
