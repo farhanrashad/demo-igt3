@@ -119,7 +119,6 @@ class CustomEntry(http.Controller):
         if entry:            
            entry_types = request.env['account.custom.entry'].search([('id', '=', entry)], limit=1).custom_entry_type_id.id
         else:
-            raise UserError('test')
             entry_types = request.env['account.custom.entry.type'].search([('name', '=', kw.get('name'))], limit=1).id
         return request.render("de_custom_journal_entry_import.portal_custom_entry_final_update",
                               get_custom_entry_final_update(entry_types, entry))
