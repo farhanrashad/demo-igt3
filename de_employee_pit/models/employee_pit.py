@@ -221,7 +221,7 @@ class EmployeeIncomeTaxLine(models.Model):
                 if rec.arrears:
                     
                     if (((rec.month_salary*12)+rec.arrears) * 0.20) > 10000000:
-                        taxable_income_with_arrears = (((rec.month_salary*12) - 10000000) - (
+                        taxable_income_with_arrears = ((((rec.month_salary*12)+rec.arrears) - 10000000) - (
                             (record.no_of_children * 500000) + (record.parent_count * 1000000) + (
                             record.ss_amount * 12) + (record.wife_count * 1000000)))
                 
