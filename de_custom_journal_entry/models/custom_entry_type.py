@@ -44,6 +44,7 @@ class CustomEntryType(models.Model):
         string='Counterpart Mode', default='debit')
     counterpart_account_id = fields.Many2one('account.account', string="Counterpart Account", company_dependent=True, check_company=True)
     payment_journal_id = fields.Many2one('account.journal', string="Payment Journal", required=True, company_dependent=True, check_company=True,  domain="[('type', 'in', ['bank', 'cash'])]")
+    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=lambda self: self.env.company.currency_id.id)
 
     group_id = fields.Many2one('res.groups', string='Security Group')
 
