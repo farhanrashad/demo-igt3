@@ -63,48 +63,7 @@ class ProjectTask(models.Model):
     is_entry_attachment = fields.Boolean(string='Is Entry Attachment')
     is_entry_processed = fields.Boolean(string='Entry Processed')
     un_processed_entry = fields.Boolean(string='Un-Processed Entry')
-    
-    
-    @api.model_create_multi
-    def create(self, vals_list):
-        default_stage = dict()
-        for vals in vals_list:
-            project_id = vals.get('project_id') or self.env.context.get('default_project_id')
-            if project_id and not "company_id" in vals:
-                vals["company_id"] = self.env["project.project"].browse(
-                    project_id
-                ).company_id.id or self.env.company.id
-            if project_id and "stage_id" not in vals:
-                # 1) Allows keeping the batch creation of tasks
-                # 2) Ensure the defaults are correct (and computed once by project),
-                # by using default get (instead of _get_default_stage_id or _stage_find),
-                if project_id not in default_stage:
-                    default_stage[project_id] = self.with_context(
-                        default_project_id=project_id
-                    ).default_get(['stage_id']).get('stage_id')
-                vals["stage_id"] = default_stage[project_id]
-            # user_id change: update date_assign
-            if vals.get('user_id'):
-                vals['date_assign'] = fields.Datetime.now()
-            # Stage change: Update date_end if folded stage and date_last_stage_update
-            if vals.get('stage_id'):
-                vals.update(self.update_date_end(vals['stage_id']))
-                vals['date_last_stage_update'] = fields.Datetime.now()
-            # recurrence
-            rec_fields = vals.keys() & self._get_recurrence_fields()
-            if rec_fields and vals.get('recurring_task') is True:
-                rec_values = {rec_field: vals[rec_field] for rec_field in rec_fields}
-                rec_values['next_recurrence_date'] = fields.Datetime.today()
-                recurrence = self.env['project.task.recurrence'].create(rec_values)
-                vals['recurrence_id'] = recurrence.id
-        tasks = super().create(vals_list)
-        for task in tasks:
-            if task.project_id.privacy_visibility == 'portal':
-                task._portal_ensure_token()
-#         if  tasks.entry_attachment_id.id:       
-#             tasks.action_journal_entry_import()
-                
-        return tasks
+
     
 
     @api.constrains('entry_attachment_id')
@@ -112,6 +71,8 @@ class ProjectTask(models.Model):
         if self.entry_attachment_id:
             self.is_entry_attachment = True
             self.un_processed_entry = True
+        if self.is_entry_attachment == True:
+            self.action_journal_entry_import()
 
 	
     def action_journal_entry_import(self):
@@ -154,10 +115,21 @@ class ProjectTask(models.Model):
                 else:    
                     partner = custom.entry_partner_id.id
                     user = custom.user_id.id
+                    entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
+                    entry_id = 0
+                    entry_id = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')], limit=1)
+                    for entry in entry_stage:
+                        if entry.custom_entry_type_ids:
+                            if self.custom_entry_type_id.id in entry.custom_entry_type_ids.ids:
+                                entry_id = entry.id
+                            for group in entry.group_id.users:
+                                if group.id == self.env.uid:
+                                    entry_id = entry.id
                     custom_vals = {
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
                         'user_id': user,
+                        'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
