@@ -76,7 +76,7 @@
 								<span t-esc="emp.job_title" />
 							</td>
                             <td>
-								<span t-esc="emp.date" />
+								<span t-esc="emp.first_contract_date" />
 							</td>
 							<td>
 								<span t-esc="emp.departure_date" />

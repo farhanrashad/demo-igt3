@@ -47,7 +47,7 @@ class TerminationXLSXReport(models.AbstractModel):
             sheet.write(row, 1, emp.name, format2)
             sheet.write(row, 2, str(emp.department_id.name), format2)
             sheet.write(row, 3, str(emp.job_title), format2)
-            sheet.write(row, 4, str(emp.date), format2)
+            sheet.write(row, 4, str(emp.first_contract_date), format2)
             sheet.write(row, 5, str(emp.departure_date), format2)
             sheet.write(row, 6, emp.departure_reason, format2)
             sheet.write(row, 7, emp.departure_description, format2)
