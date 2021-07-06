@@ -69,7 +69,7 @@ class ReportPartnerLedgerExcel(models.Model):
         sheet.write('J6', "Credit", format3)
         sheet.write('K6', "Balance", format3)
         sheet.write('L6', "Currency", format3)
-        
+        sheet.write('M6', "Amount In Currency", format3)
         currency_obj = self.env['res.currency'].search([('id','=',data['currency_id'])])
         row = 6
         col = 0
@@ -81,7 +81,7 @@ class ReportPartnerLedgerExcel(models.Model):
             sheet.write(row, col + 9, result['sum_partner'](result['data'], o, 'credit', data['currency_id']), format5)
             sheet.write(row, col + 10, result['sum_partner'](result['data'], o, 'debit - credit', data['currency_id']),
                         format5)
-            sheet.write(row, col + 11, str(currency_obj.name) + "(" + str(data['currency_symbol']) + ")", format5)
+#             sheet.write(row, col + 11, str(currency_obj.name) + "(" + str(data['currency_symbol']) + ")", format5)
             row += 1
             for line in result['lines'](result['data'], o, data['currency_id']):
                 sheet.write(row, col, line['date'], format8)
@@ -95,6 +95,7 @@ class ReportPartnerLedgerExcel(models.Model):
                 sheet.write(row, col + 8, (line['debit']), format7)
                 sheet.write(row, col + 9, (line['credit']), format7)
                 sheet.write(row, col + 10, (line['progress']), format7)
-                sheet.write(row, col + 11, str(currency_obj.name)+"("+str(data['currency_symbol'])+")", format7)
+                sheet.write(row, col + 11, (str(line['currency_name']) + '('+ line['currency_code']+')'), format7)
+                sheet.write(row, col + 12, (line['amount_currency']), format7)
                 
                 row += 1
