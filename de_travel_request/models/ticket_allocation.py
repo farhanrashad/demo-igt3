@@ -46,25 +46,25 @@ class TicketAllocation(models.Model):
         self.state = 'approved'
         year_balance = self.env['travel.balance'].search([('crnt_year', '=', datetime.now().year)], limit=1)
         if year_balance:
-            raise UserError(str(year_balance))
-            for line in year_balance.balance_line_ids:
-                for  inn_line in self.allocation_line_ids:
-                    if line.employee_id.id == inn_line.employee_id.id:
-                        allocated_balance = line.allocated_balance + inn_line.amount
-                        remaining_balance = allocated_balance - line.used_balance
-                        line.update({
-                            'allocated_balance': allocated_balance,
-                            'remaining_balance':   remaining_balance,
-                        })
-                    else:
-                        line_vals = {
-                            'balance_id': year_balance.id,
-                            'employee_id': inn_line.employee_id.id,
-                            'allocated_balance': inn_line.amount,
-                            'remaining_balance': inn_line.amount,
-                        }
-                        balance_line = self.env['travel.balance.line'].create(line_vals)
+            for  inn_line in self.allocation_line_ids:
+                balance_line = self.env['travel.balance.line'].search([('id','=', year_balance.id), ('employee_id','=', inn_line.employee_id.id)], limit=1)
+                if balance_line:
+                    for line in year_balance.balance_line_ids:
+                        if line.employee_id.id == balance_line.employee_id.id:
+                            allocated_balance = line.allocated_balance + inn_line.amount
+                            remaining_balance = allocated_balance - line.used_balance
+                            line.allocated_balance = allocated_balance
+                            line.remaining_balance =  remaining_balance
                         
+                else:                              
+                    line_vals = {
+                        'balance_id': year_balance.id,
+                        'employee_id': inn_line.employee_id.id,
+                        'allocated_balance': inn_line.amount,
+                        'remaining_balance': inn_line.amount,
+                    }
+                    balance_line = self.env['travel.balance.line'].create(line_vals)
+
         else:        
             travel_balance_line = []
             for line in self.allocation_line_ids:
@@ -77,6 +77,7 @@ class TicketAllocation(models.Model):
 
             ticket_vals = {
                 'crnt_year': datetime.now().year,
+                'name': self.env['ir.sequence'].next_by_code('ticket.balance.seq') if self.env['ir.sequence'].next_by_code('ticket.balance.seq') else   _('New'),
             }
             travel_balance = self.env['travel.balance'].create(ticket_vals)
             travel_balance.balance_line_ids = travel_balance_line

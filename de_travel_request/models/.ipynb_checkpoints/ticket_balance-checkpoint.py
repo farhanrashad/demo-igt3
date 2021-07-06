@@ -20,7 +20,7 @@ class TicketBalance(models.Model):
     @api.model
     def create(self, values):
         if values.get('name', _('New')) == _('New'):
-            values['name'] = self.env['ir.sequence'].next_by_code('travel.balance.seq') or _('New')
+            values['name'] = self.env['ir.sequence'].next_by_code('ticket.balance.seq') or _('New')
         return super(TicketBalance, self).create(values)
 
     crnt_year = fields.Char(string="Current Year", default=datetime.now().year)
