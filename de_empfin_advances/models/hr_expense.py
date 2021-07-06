@@ -18,7 +18,7 @@ class HrExpenseSheet(models.Model):
     
     hr_salary_advance_id  = fields.Many2one('hr.salary.advance', string='Advances Request', domain='[("employee_id","=", employee_id), ("state","in", ("paid","close"))]')
     
-    hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', string='Expense Sheet')
+    hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', string='Expense Type')
 
     
     # --------------------------------------------
@@ -60,7 +60,7 @@ class HrExpenseType(models.Model):
     _description = 'Expense Type'
     
     name = fields.Char(string='Expense Category', required=True, translate=True)
-    hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', string='Expense Sheet')
+    hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', string='Expense Type')
 
 class HrExpense(models.Model):
     _inherit = 'hr.expense'
@@ -69,9 +69,9 @@ class HrExpense(models.Model):
 
     hr_salary_advance_id  = fields.Many2one('hr.salary.advance', string='Advances Request', )
     advance_line_id  = fields.Many2one('hr.salary.advance.line', string='Advances Line', domain='[("advance_id","=", hr_salary_advance_id)]')
-    
+    hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', related='sheet_id.hr_expense_sheet_type_id')
     expense_type_id = fields.Many2one('hr.expense.type', string='Expense Category', 
-        domain="[('project_ids', '=', project_id)]", copy=False)
+        domain="[('hr_expense_sheet_type_id', '=', hr_expense_sheet_type_id)]", copy=False)
 
 
     
