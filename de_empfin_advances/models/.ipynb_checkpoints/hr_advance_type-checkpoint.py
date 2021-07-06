@@ -8,4 +8,5 @@ class HrAdvanceType(models.Model):
     _description = 'Advance Type'
 
     name = fields.Char(string='Name')
+    product_id = fields.Many2one('product.product', string='Product', domain=[('type', '=', 'service')], change_default=True)
 
