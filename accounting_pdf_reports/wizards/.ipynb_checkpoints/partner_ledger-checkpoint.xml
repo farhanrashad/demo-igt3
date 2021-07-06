@@ -10,7 +10,7 @@
         <xpath expr="//field[@name='target_move']" position="after">
                 <field name="result_selection"/>
                 <field name="partner_id"  widget="many2many_tags" invisible="0"/>
-                <field name="currency_id"/>
+                <field name="currency_id" invisible="1"/>
                 <newline/>
                 <field name="amount_currency" groups="base.group_multi_currency"/>
                 <newline/>

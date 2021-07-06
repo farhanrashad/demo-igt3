@@ -24,7 +24,8 @@ class ReportPartnerLedger(models.AbstractModel):
 
         query = """
             SELECT "account_move_line".id,rp.name as partner_name, proj.name as project_name, emp.name as employee_name ,
-            dept.name as department_name, "account_move_line".date, to_char("account_move_line".date, 'MM-YYYY') as account_period, j.code, acc.code as a_code, acc.name as a_name, "account_move_line".ref, m.name as move_name, "account_move_line".name, "account_move_line".debit, "account_move_line".credit, "account_move_line".amount_currency,"account_move_line".currency_id, c.symbol AS currency_code
+            dept.name as department_name, "account_move_line".date, to_char("account_move_line".date, 'MM-YYYY') as account_period, j.code, acc.code as a_code, acc.name as a_name, "account_move_line".ref, m.name as move_name, 
+            "account_move_line".name, "account_move_line".debit, "account_move_line".credit, "account_move_line".amount_currency,"account_move_line".currency_id, c.symbol AS currency_code, c.name AS currency_name
             FROM """ + query_get_data[0] + """
             LEFT JOIN account_journal j ON ("account_move_line".journal_id = j.id)
             LEFT JOIN res_partner rp ON ("account_move_line".partner_id = rp.id)
@@ -47,9 +48,9 @@ class ReportPartnerLedger(models.AbstractModel):
                 if default_currency.id != currency_obj.id:
                     currency = self.env['res.currency'].search(
                         [('active', '=', True), ('id', '=', currency_obj.id)])
-                    if currency:
-                        rec['debit'] = round(rec['debit'] * currency.rate, 2)
-                        rec['credit'] = round(rec['credit'] * currency.rate, 2)
+#                     if currency:
+#                         rec['debit'] = round(rec['debit'], 2)
+#                         rec['credit'] = round(rec['credit'], 2)
         sum = 0.0
         lang_code = self.env.context.get('lang') or 'en_US'
         lang = self.env['res.lang']
@@ -95,8 +96,8 @@ class ReportPartnerLedger(models.AbstractModel):
         # if r['currency_id'].id != currency_obj.id:
         currency = self.env['res.currency'].search(
             [('active', '=', True), ('id', '=', currency_obj.id)])
-        if default_currency.id != currency.id:
-            result = round(result * currency.rate, 2)
+#         if default_currency.id != currency.id:
+#             result = round(result * currency.rate, 2)
         return result
 
     @api.model
