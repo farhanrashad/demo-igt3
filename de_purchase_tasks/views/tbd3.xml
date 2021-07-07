@@ -1,0 +1,39 @@
+<odoo>
+    <data>
+        <record id="purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_ref']" position="after">
+                    <field name="project_id"/>
+                    <field name="task_ids" widget="many2many_tags"/>
+                </xpath>
+                <div class="oe_button_box" name="button_box">
+                    <button name="get_Project"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-list-alt"
+                            attrs="{'invisible': [('project_count','=', 0)]}">
+                        <field name="project_count" widget="statinfo" nolabel="1"/>
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Project</span>
+                        </div>
+                    </button>
+
+                    <button name="get_Task"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-list-alt"
+                            attrs="{'invisible': [('task_count','=', 0)]}">
+                        <field name="task_count" widget="statinfo" nolabel="1"/>
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_text">Tasks</span>
+                        </div>
+                    </button>
+
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

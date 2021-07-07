@@ -55,6 +55,7 @@ class PurchaseOrder(models.Model):
                     'purchase_project_id': project.id,
                     'purchase_id': self.id,
                     'name': project.name + ' - ' + template.name,
+                    'partner_id': self.partner_id.id,
                     'user_id': template.user_id.id,
                     'date_deadline': fields.Date.to_string(self.date_approve + timedelta(template.completion_days)),
                     'allow_picking': template.allow_picking,
