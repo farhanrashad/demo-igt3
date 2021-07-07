@@ -216,7 +216,7 @@
                                         <tr>
                                             <td><span t-esc="entry_line.f_fleet_id.name"/></td>
                                             <td><span t-esc="entry_line.f_driver_id.name"/></td>
-                                            <td><span t-esc="entry_line.f_job_scope.name"/></td>
+                                            <td><span t-esc="entry_line.f_job_scope"/></td>
                                             <td><span t-esc="entry_line.f_rent_days"/></td>
                                             <td><span t-esc="entry_line.f_amount"/></td>
                                            
