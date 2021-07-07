@@ -134,7 +134,7 @@ class ProjectTask(models.Model):
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
                         'currency_id': self.env.company.currency_id.id,
-                        'company_id': self.env.company, 
+                        'company_id': self.env.company.id, 
                         'user_id': user,
                         'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,
