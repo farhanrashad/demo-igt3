@@ -119,7 +119,7 @@
                     <div class="container">
                       <div class="card">
                            <div class="col-md-1" style="margin-top:5px;">
-                               <t t-if="custom.is_custom_entry_import == True">
+                               <t t-if="entry.is_custom_entry_import == True">
                                 <a t-attf-href="/entry/type/update/#{entry.id}?"><i  class="btn btn-primary">Edit</i></a>
                                </t> 
                             </div>                  
