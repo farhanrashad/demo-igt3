@@ -58,7 +58,7 @@ class SalaryAdvancePayment(models.Model):
     payment_date = fields.Date(string='Payment Date', compute='_compute_payment_date')
 
     payment_amount = fields.Monetary(string='Payment Amount', compute='_compute_payment_amount')
-    account_id = fields.Many2one('account.account',string="Account")
+    #account_id = fields.Many2one('account.account',string="Account")
     payment_method_id = fields.Many2one('account.payment.method', string='Payment Method Type')
     bill_count = fields.Integer(string='Advances Bill', compute='get_bill_count')
     payment_count = fields.Integer(string='Payment Count', compute='get_payment_count')
@@ -276,24 +276,24 @@ class SalaryAdvancePayment(models.Model):
     
     def action_payment(self):
         invoice = False
-        if self.account_id:
-            account_id = self.account_id.id
-        else:
-            account_id = False
+        #if self.account_id:
+            #account_id = self.account_id.id
+        #else:
+            #account_id = False
             
         if self.journal_id.type == 'purchase':
             invoice = self.env['account.move']
             lines_data = []
             for line in self.cash_line_ids:
-                if self.account_id:
-                    account_id = self.account_id
-                else:
-                    account_id = False
+                #if self.account_id:
+                    #account_id = self.account_id
+                #else:
+                    #account_id = False
                 lines_data.append([0,0,{
                     'product_id': line.product_id.id,
                     'name': line.description,
                     'price_unit': line.approved_amount,
-                    'account_id': account_id,
+                    #'account_id': account_id,
                     'quantity': 1,
                 }])
             invoice.create({

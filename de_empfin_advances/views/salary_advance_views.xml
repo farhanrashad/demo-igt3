@@ -112,7 +112,6 @@
                                         <field name="payment_date"  />
 
                                         <field name="payment_method_id"  attrs="{'invisible':[('journal_type','=','purchase')],'required':[('journal_type','in',['cash','bank'])]}" />
-                                        <field name="account_id"   attrs="{'invisible':[('journal_type','!=','purchase')]}" />
                                         <field name="payment_amount" />
                                     </group>
                                     <group string="Expense">
