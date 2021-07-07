@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<odoo>   
+     <record id="hr_expense_form_view_portal" model="ir.ui.view">
+			<field name="name">hr.expense.form.view.portal</field>
+			<field name="model">hr.expense</field>
+			<field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//button[@name='action_submit_expenses']" position="after">
+                  <button name="action_draft" string="Reset To Draft" type="object" class="oe_highlight" 
+                          states="refused"/>
+				</xpath>				
+			</field>
+		</record> 
+  
+
+</odoo>
+
+

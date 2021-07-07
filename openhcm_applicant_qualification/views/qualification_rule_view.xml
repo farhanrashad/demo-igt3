@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="view_qualification_rule_form" model="ir.ui.view">
+		<field name="name">hr.applicant.qualification.rule.form</field>
+		<field name="model">hr.applicant.qualification.rule</field>
+		<field name="arch" type="xml">
+
+			<form string="Applicant Qualification Rule">
+				<sheet>
+					<h1>Applicant Qualification Rule</h1>
+					<group>
+						<field name="name" />
+						<field name="qualification_type_line_id" domain="[('qualification_type_id','=',name)]"/>
+						<field name="score" />
+					</group>
+				</sheet>
+			</form>
+
+		</field>
+	</record>
+
+
+	<record id="view_qualification_rule_tree" model="ir.ui.view">
+		<field name="name">hr.applicant.qualification.rule.tree</field>
+		<field name="model">hr.applicant.qualification.rule</field>
+		<field name="arch" type="xml">
+			<tree string="Applicant Qualification Rule">
+				<field name="name" />
+				<field name="qualification_type_line_id" />
+				<field name="score" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="action_qualification_rule_view" model="ir.actions.act_window">
+		<field name="name">Qualification Rule</field>
+		<field name="res_model">hr.applicant.qualification.rule</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[]</field>
+		<field name="context">{}</field>
+		<field name="view_id" ref="view_qualification_rule_tree" />
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">
+				Add Records...
+			</p>
+		</field>
+	</record>
+</odoo>
+
+

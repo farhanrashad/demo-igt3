@@ -1,0 +1,136 @@
+<odoo>
+  <data>  
+            <record model="ir.ui.view" id="hr_employee_overtime_type_tree_view">
+            <field name="name">hr.employee.overtime.type.tree</field>
+            <field name="model">hr.employee.overtime.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+      
+      
+      
+      <record model="ir.ui.view" id="hr_employee_overtime_type_form_view">
+            <field name="name">hr.employee.overtime.type.form</field>
+            <field name="model">hr.employee.overtime.type</field>
+            <field name="arch" type="xml">
+                <form>
+
+                    <sheet>
+                        
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Name..."/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="type" />
+                            </group>
+                            <group>
+                            
+                            </group>
+                        
+                        </group>
+                       
+                        
+                    </sheet>
+                </form>
+            </field>
+        </record>
+      
+
+      <record model="ir.ui.view" id="hr_employee_overtime_rule_tree_view">
+            <field name="name">hr.employee.overtime.rule.tree</field>
+            <field name="model">hr.employee.overtime.rule</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="overtime_hours"/>
+
+                </tree>
+            </field>
+        </record>
+      
+      <record model="ir.ui.view" id="hr_employee_overtime_rule_form_view">
+            <field name="name">hr.employee.overtime.rule.form</field>
+            <field name="model">hr.employee.overtime.rule</field>
+            <field name="arch" type="xml">
+                <form>
+
+                    <sheet>
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="overtime_type_id" placeholder="Overtime Type..."/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_from" />
+                                <field name="overtime_limit" widget="float_time" />
+                                <field name="tolerace_limit" widget="float_time" />
+                            </group>
+                            <group>
+                                <field name="date_to"/>
+                                <field name="overtime_hours" widget="float_time" />
+                                <field name="overtime_amount"/>
+
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Employees">
+                                <field name="employee_ids">
+                                    <tree>
+                                     <field name="name"/>
+<!--                                      <field name="id"invisible="1"/> -->
+                                     <field name="department_id"/>
+                                    </tree>
+                                
+                                </field>
+                            </page>
+                            
+                        </notebook>
+                        
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+      
+   <record id="overtime_rule_menu_action" model="ir.actions.act_window">
+        <field name="name">Overtime Rule</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.employee.overtime.rule</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a New Overtime Rule 
+            </p>
+        </field>
+    </record>
+      
+       <record id="overtime_type_menu_action" model="ir.actions.act_window">
+        <field name="name">Overtime</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.employee.overtime.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a New Overtime Type 
+            </p>
+        </field>
+    </record>  
+      
+    <menuitem name="Overtime" id="overtime_config_main_menu" parent="hr_attendance.menu_hr_attendance_settings" sequence="3"/>
+    <menuitem name="Overtime Rule" id="overtime_rule_sub_menu" parent="overtime_config_main_menu" action="overtime_rule_menu_action" sequence="1"/>
+    <menuitem name="Overtime Type" id="overtime__type_sub_menu" parent="overtime_config_main_menu" action="overtime_type_menu_action" sequence="2"/>
+  </data>
+</odoo>

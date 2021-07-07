@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="0">
+		<menuitem id="qualicfication_type_menu" name="Qualification Type" parent="hr_recruitment.menu_hr_recruitment_configuration"
+			action="openhcm_applicant_qualification.action_qualification_type_view"
+			sequence="19" />
+	</data>
+</odoo>
+

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="view_qualification_type_form" model="ir.ui.view">
+		<field name="name">hr.applicant.qualification.type.form</field>
+		<field name="model">hr.applicant.qualification.type</field>
+		<field name="arch" type="xml">
+
+			<form string="Applicant Qualification Type">
+				<sheet>
+					<div class="oe_title">
+						<h1>
+							<field name="name" placeholder="Type..."/>
+						</h1>
+					</div>
+					<notebook>
+						<page string="Qualification Type Line">
+							<field name="qualification_type_line">
+								<tree editable="bottom">
+									<field name="name"/>
+									<field name="score"/>
+								</tree>
+							</field>
+						</page>
+					</notebook>
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+
+	<record id="view_qualification_type_tree" model="ir.ui.view">
+		<field name="name">hr.applicant.qualification.type.tree</field>
+		<field name="model">hr.applicant.qualification.type</field>
+		<field name="arch" type="xml">
+			<tree string="Applicant Qualification Type">
+				<field name="name" />
+				<field name="qualification_type_line">
+					<!--					<field name="name"/>-->
+					<!--					<field name="score"/>-->
+				</field>
+			</tree>
+		</field>
+	</record>
+
+	<record id="action_qualification_type_view" model="ir.actions.act_window">
+		<field name="name">Qualification Type</field>
+		<field name="res_model">hr.applicant.qualification.type</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">tree,form</field>
+		<field name="domain">[]</field>
+		<field name="context">{}</field>
+		<field name="view_id" ref="view_qualification_type_tree" />
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">
+				Add Records...
+			</p>
+		</field>
+	</record>
+
+	<menuitem id="qualicfication_type_menu" name="Qualification Type" parent="hr_recruitment.menu_hr_recruitment_configuration"
+			action="openhcm_applicant_qualification.action_qualification_type_view"
+			sequence="19" />
+
+</odoo>
+
+

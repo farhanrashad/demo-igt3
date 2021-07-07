@@ -1,0 +1,85 @@
+<odoo>
+    
+    <record id="view_hr_appraisal_objective_form" model="ir.ui.view">
+		<field name="name">hr.appraisal.objective.form</field>
+		<field name="model">hr.appraisal.objective</field>
+		<field name="arch" type="xml">
+			<form>
+                <header>
+                    <button name='action_sent_review' string="Send for Review" type="object" states='draft'
+						class='oe_highlight' />
+                    <button name='action_submit' string="Submit" type="object" states='waiting'
+						class='oe_highlight' />
+                    <field name="state" widget="statusbar"/>
+                  </header>
+				<sheet>
+					<group col="4">
+						<field name="employee_id"  required = "True" attrs="{'readonly': [('readonly_status','=','make_readonly')]}"/>
+                        <field name="objective_year" required = "True" attrs="{'readonly': [('readonly_status','=','make_readonly')]}" />
+						<field name="description" attrs="{'readonly': [('readonly_status','=','make_readonly')]}"/>
+                        <field name= "readonly_status" invisible = "1"/>
+					</group>
+                    
+                    <field name='objective_lines'  attrs="{'readonly': [('readonly_status','=','make_readonly')]}">
+                        <tree editable="bottom">
+                            <field name="objective" required = "True"/>
+                            <field name="weightage" required = "True" sum = "Total Weightage"/>
+                            <field name="priority" required = "True"/>
+                        </tree>
+                    </field>
+                    <group col="4">
+                        <field name="total_weightage" invisible = "1"/>
+                    </group>
+                    
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+      <record id="view_hr_appraisal_objective_tree" model="ir.ui.view">
+		<field name="name">hr.appraisal.objective.tree</field>
+		<field name="model">hr.appraisal.objective</field>
+		<field name="arch" type="xml">
+			<tree>
+                <field name="employee_id" />
+                <field name="description" />
+                <field name="objective_year"/>
+                <field name="state"/>
+                
+			</tree>
+		</field>
+	</record>   
+    
+<!--    <record model="ir.ui.view" id="view_hr_employee_inh">
+        <field name="name">hr.appraisal.form.inherit</field>
+        <field name="model">hr.appraisal</field>
+        <field name="inherit_id" ref="hr_appraisal.view_hr_appraisal_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']/button[@name='action_open_goals']" position="before">
+                <button name="%(de_appraisal_enhancement.action_hr_appraisal_objective_tree)d" class="oe_stat_button" type="action">
+                    <field name="employee_objectives" widget="statinfo"/> 
+                </button>
+            </xpath>
+        </field>
+    </record>  -->
+
+  <record id="action_hr_appraisal_objective_tree" model="ir.actions.act_window">
+            <field name="name">Appraisal Objective</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.appraisal.objective</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="de_appraisal_enhancement.view_hr_appraisal_objective_tree"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Not Found. Let's Create One!
+              </p>
+            </field>
+    </record>
+    
+    <menuitem name="Appraisal Objectives"
+        id="menu_hr_appraisal_objective"
+        parent="hr_appraisal.menu_hr_appraisal_root"
+        action="action_hr_appraisal_objective_tree"
+        sequence="2"/>
+
+</odoo>
