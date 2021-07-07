@@ -79,7 +79,7 @@ class EmployeeTrainingSessions(models.Model):
         ('cancelled', 'Cancelled'),
     ], string='Status', readonly=True, copy=False, index=True, tracking=3, default='draft')
     trainer_lines = fields.One2many('hr.employee.training.session.trainers', 'session_id', string='Trainer Lines', readonly=True, states={'draft': [('readonly', False)]}, copy=True, auto_join=True)
-    participants_lines = fields.One2many('hr.employee.training.session.participants', 'session_id', string='Trainer Lines', readonly=True, states={'draft': [('readonly', False)]}, copy=True, auto_join=True)
+    participants_lines = fields.One2many('hr.employee.training.session.participants', 'session_id', string='Participants Lines', readonly=True, states={'draft': [('readonly', False)]}, copy=True, auto_join=True)
 
 
 
