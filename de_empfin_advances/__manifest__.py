@@ -2,7 +2,7 @@
 
 {
     'name': 'EMPFIN Employee Advances',
-    'version': '14.0.0.8',
+    'version': '14.0.0.9',
     'summary': 'Employee Advance Request',
     'description': """
         Helps you to manage Advance Salary Request of your company's staff.
