@@ -20,7 +20,7 @@ class HrExpenseSheet(models.Model):
     
     hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', string='Expense Type')
     
-    total_currency_amount = fields.Monetary('Total curr.Amount', compute='_compute_curr_amount', store=True, tracking=True)
+    total_currency_amount = fields.Float(string='Total curr.Amount', compute='_compute_curr_amount', store=True, tracking=True)
     
     @api.depends('expense_line_ids.total_amount')
     def _compute_curr_amount(self):
