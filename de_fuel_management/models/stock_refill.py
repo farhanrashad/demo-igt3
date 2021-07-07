@@ -17,7 +17,7 @@ class StockRefill(models.Model):
 
     location_src_id = fields.Many2one('stock.location', string="Src. Location", required=True, domain="[('usage','=','internal')]")
     location_dest_id = fields.Many2one('stock.location', string="Dest. Location", required=True, domain=[('usage','=','inventory')])
-    owner_id = fields.Many2one('res.partner', string="Owner", readonly=True, states={'draft': [('readonly', False)]},)
+    owner_id = fields.Many2one('res.partner', string="Owner", readonly=True, domain="[('is_fuel_supplier', '=', True)]", states={'draft': [('readonly', False)]})
     state = fields.Selection(selection=[
             ('draft', 'Draft'),
             ('inprocess', 'In-Filling'),
@@ -177,7 +177,13 @@ class StockRefill(models.Model):
         
         
         
-        
+class Contact(models.Model):
+    _inherit = 'res.partner'
+    _description = 'Refill Contacts'
+    
+    
+    is_fuel_supplier = fields.Boolean(string = "Is Fuel Supplier?")
+    is_fuel_station = fields.Boolean(string = "Is Fuel Station?")
     
     
     
