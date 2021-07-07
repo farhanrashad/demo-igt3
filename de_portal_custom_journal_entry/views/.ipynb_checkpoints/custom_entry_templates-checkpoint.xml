@@ -118,6 +118,12 @@
                     <div id="optional_placeholder"></div>
                     <div class="container">
                       <div class="card">
+                           <div class="col-md-1" style="margin-top:5px;">
+                                <a t-attf-href="/entry/type/update/#{entry.id}?"><i  class="btn btn-primary">Edit</i></a>
+                            </div>                  
+                            <div class="col-md-1" style="margin-top:20px;">
+                           </div>
+
                         <div class="card-header">
                                 <div class="row">
                                     <div class="col-lg-11">
@@ -453,7 +459,7 @@
                             </t>
                         </div> 
                     </div>
-
+                   
                 </t> 
             </t>
             <div class="mt32">
