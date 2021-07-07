@@ -25,7 +25,7 @@ class HrExpenseSheet(models.Model):
     @api.depends('expense_line_ids.total_amount')
     def _compute_curr_amount(self):
         for sheet in self:
-            sheet.total_amount = sum(sheet.expense_line_ids.mapped('total_amount'))
+            sheet.total_currency_amount = sum(sheet.expense_line_ids.mapped('total_amount'))
 
 
     
