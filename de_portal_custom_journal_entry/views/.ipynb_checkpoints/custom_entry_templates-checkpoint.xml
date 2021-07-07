@@ -53,8 +53,7 @@
                                 <tr>
 
                                      <td>
-<!--                                         <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}"><span t-field="custom.name"/></a>  -->
-                                       <span t-esc="custom.name" />  
+                                        <a t-attf-href="/entry/order/#{custom.id}?{{ keep_query() }}"><span t-field="custom.name"/></a> 
                                          
                                     </td>
                                      <td class="text-left">
@@ -70,9 +69,7 @@
                                     
                                     <td class="text-left">
                                         <t t-if="custom.is_custom_entry_import == True">
-                                        <marquee style="color:red;">Please Upload  <t t-esc="custom.custom_entry_type_id.name" />
-                                       
-                                        </marquee>  
+                                        <span t-esc="custom.correction_reason" />
                                          </t>     
                                     </td>
                                     
@@ -107,7 +104,7 @@
     </template>
     
     
-    <template id="portal_my_entry" name="custom">
+    <template id="portal_custom_entry" name="custom">
         <t t-call="portal.portal_layout">
              <t t-set="o_portal_fullwidth_alert" >
                 <t t-call="portal.portal_back_in_edit_mode">
@@ -172,19 +169,22 @@
                          <div class="col-12 col-md-12 pb-2">
                             <div class="row">
                                 <div class="col-md-5"> <strong>Reference : </strong>
-<!--                                     <t t-if="entry.ref_fleet">
-                                        <span t-esc="entry.ref_fleet"/>
-                                    </t> -->
+
                                 </div>
                                 <div class="col-md-5"> <strong>Date: </strong>
                                     <t t-if="entry.date_entry">
                                         <span t-esc="entry.date_entry"/>
                                     </t>
                                 </div>
+                                 <div class="col-md-5"> <strong>Entry Type: </strong>
+                                    <t t-if="entry.custom_entry_type_id">
+                                        <span t-esc="entry.custom_entry_type_id.name"/>
+                                    </t>
+                                </div>
                                
                             </div>
 
-                             <t t-if="entry.has_fleet_fields != 'no'">
+                             <t t-if="entry.has_rent_vechile != 'no'">
                              <div class="row" >
                                 <table class="table-striped table">
                                 <thead style="font-size:12px;">
@@ -193,11 +193,10 @@
                                             <b>
                                         <th class="text-left">Car Detail</th>
                                         <th class="text-left">Driver</th>
-                                        <th class="text-left">User</th>
                                         <th class="text-left">Job Scope</th>
                                         <th class="text-left">Days</th>
                                         <th class="text-left">amount</th>
-                                        <th class="text-left">Remarks</th>
+                                        
                                             </b>
                                         </h4>
                                     </tr>
@@ -207,13 +206,12 @@
 
 
                                         <tr>
-                                            <td><span t-esc="entry_line.car_details.name"/></td>
-                                            <td><span t-esc="entry_line.driver.name"/></td>
-                                            <td><span t-esc="entry_line.user.name"/></td>
-                                            <td><span t-esc="entry_line.job_scope"/></td>
-                                            <td><span t-esc="entry_line.days"/></td>
-                                            <td><span t-esc="entry_line.amount"/></td>
-                                            <td><span t-esc="entry_line.remark"/></td>
+                                            <td><span t-esc="entry_line.f_fleet_id.name"/></td>
+                                            <td><span t-esc="entry_line.f_driver_id.name"/></td>
+                                            <td><span t-esc="entry_line.f_job_scope.name"/></td>
+                                            <td><span t-esc="entry_line.f_rent_days"/></td>
+                                            <td><span t-esc="entry_line.f_amount"/></td>
+                                           
                                         </tr>
 
                                     </t>
@@ -224,10 +222,215 @@
                             </div>
                              </t>
                              
+                             <t t-if="entry.has_electricity != 'no'">
+                             <div class="row" >
+                                <table class="table-striped table">
+                                <thead style="font-size:12px;">
+                                    <tr>
+                                        <h4>
+                                            <b>
+                                        <th class="text-left">Forcast</th>
+                                        <th class="text-left">Date From</th>
+                                        <th class="text-left">Date To</th>
+                                        <th class="text-left">Total Units</th>
+                                        <th class="text-left">Actual KHW Charges</th>
+                                        <th class="text-left">Total</th>
+                                            </b>
+                                        </h4>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="entry.custom_entry_line" t-as="entry_line">
+
+
+                                        <tr>
+                                            <td><span t-esc="entry_line.amount_advanced"/></td>
+                                            <td><span t-esc="entry_line.date_bill_from"/></td>
+                                            <td><span t-esc="entry_line.date_bill_to"/></td>
+                                            <td><span t-esc="entry_line.total_unit"/></td>
+                                            <td><span t-esc="entry_line.actual_KHW_charges"/></td>
+                                            <td><span t-esc="entry_line.amount_total_electricity"/></td>
+                                        </tr>
+
+                                    </t>
+                                </tbody>
+                            </table>   
+                                 
+                                
+                            </div>
+                             </t>
+                             
+                             <t t-if="entry.has_travel != 'no'">
+                             <div class="row" >
+                                <table class="table-striped table">
+                                <thead style="font-size:12px;">
+                                    <tr>
+                                        <h4>
+                                            <b>
+                                        <th class="text-left">Category</th>
+                                        <th class="text-left"> From</th>
+                                        <th class="text-left"> To</th>
+                                        <th class="text-left">Departure Date</th>
+                                        <th class="text-left">Arrival Date</th>
+                                         <th class="text-left">Number Of Days</th>          
+                                        <th class="text-left">Total</th>
+                                            </b>
+                                        </h4>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="entry.custom_entry_line" t-as="entry_line">
+
+
+                                        <tr>
+                                            <td><span t-esc="entry_line.t_travel_category"/></td>
+                                            <td><span t-esc="entry_line.travel_from"/></td>
+                                            <td><span t-esc="entry_line.travel_to"/></td>
+                                            <td><span t-esc="entry_line.date_departure"/></td>
+                                            <td><span t-esc="entry_line.date_arrival"/></td>
+                                            <td><span t-esc="entry_line.number_of_days"/></td>
+                                            <td><span t-esc="entry_line.t_amount_travel"/></td>
+                                        </tr>
+
+                                    </t>
+                                </tbody>
+                            </table>   
+                                 
+                                
+                            </div>
+                             </t>
+                             
+                            <t t-if="entry.has_hotel != 'no'">
+                             <div class="row" >
+                                <table class="table-striped table">
+                                <thead style="font-size:12px;">
+                                    <tr>
+                                        <h4>
+                                            <b>
+                                        <th class="text-left">Category</th>
+                                        <th class="text-left"> Hotel Detail</th>
+                                        <th class="text-left"> Check In</th>
+                                        <th class="text-left">Check Out</th>
+                                        <th class="text-left">Travel Request</th>
+                                         <th class="text-left">Number Of Days</th>          
+                                        <th class="text-left">Total Amount</th>
+                                            </b>
+                                        </h4>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="entry.custom_entry_line" t-as="entry_line">
+
+
+                                        <tr>
+                                            <td><span t-esc="entry_line.h_category"/></td>
+                                            <td><span t-esc="entry_line.hotel_detail"/></td>
+                                            <td><span t-esc="entry_line.h_check_in"/></td>
+                                            <td><span t-esc="entry_line.h_check_out"/></td>
+                                            <td><span t-esc="entry_line.h_travel_id.name"/></td>
+                                            <td><span t-esc="entry_line.number_of_nights"/></td>
+                                            <td><span t-esc="entry_line.h_amount"/></td>
+                                        </tr>
+
+                                    </t>
+                                </tbody>
+                            </table>   
+                                 
+                                
+                            </div>
+                             </t>
+                             
+                             
+                               <t t-if="entry.has_fuel_drawn != 'no'">
+                             <div class="row" >
+                                <table class="table-striped table">
+                                <thead style="font-size:12px;">
+                                    <tr>
+                                        <h4>
+                                            <b>
+                                        <th class="text-left">Date</th>
+                                        <th class="text-left"> Purchase From</th>
+                                        <th class="text-left"> Fuel Qty</th>
+                                        <th class="text-left">Unit Price</th>
+                                        <th class="text-left">Subtotal</th>
+                                         <th class="text-left">Booklet No</th>          
+                                        <th class="text-left">Receipt No</th>
+                                            </b>
+                                        </h4>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="entry.custom_entry_line" t-as="entry_line">
+
+
+                                        <tr>
+                                            <td><span t-esc="entry_line.d_date"/></td>
+                                            <td><span t-esc="entry_line.d_partner_id.name"/></td>
+                                            <td><span t-esc="entry_line.d_product_qty"/></td>
+                                            <td><span t-esc="entry_line.d_price_unit"/></td>
+                                            <td><span t-esc="entry_line.d_price_subtotal"/></td>
+                                            <td><span t-esc="entry_line.d_booklet_no"/></td>
+                                            <td><span t-esc="entry_line.d_receipt_no"/></td>
+                                        </tr>
+
+                                    </t>
+                                </tbody>
+                            </table>   
+                                 
+                                
+                            </div>
+                             </t> 
+                             
+                                                    
+                               <t t-if="entry.has_fuel_filling != 'no'">
+                             <div class="row" >
+                                <table class="table-striped table">
+                                <thead style="font-size:12px;">
+                                    <tr>
+                                        <h4>
+                                            <b>
+                                        <th class="text-left">Date</th>
+                                        <th class="text-left"> Purchase From</th>
+                                        <th class="text-left"> Generator Name</th>
+                                        <th class="text-left"> Generator Capacity</th>
+                                        <th class="text-left"> Fuel Qty</th>
+                                        <th class="text-left"> Unit Price</th>        
+                                        <th class="text-left">Subtotal</th>
+                                         <th class="text-left">Booklet No</th>          
+                                        <th class="text-left">Receipt No</th>
+                                            </b>
+                                        </h4>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="entry.custom_entry_line" t-as="entry_line">
+
+
+                                        <tr>
+                                            <td><span t-esc="entry_line.f_date"/></td>
+                                            <td><span t-esc="entry_line.f_partner_id.name"/></td>
+                                             <td><span t-esc="entry_line.f_gen_name"/></td>
+                                            <td><span t-esc="entry_line.f_gen_capacity"/></td>
+                                            <td><span t-esc="entry_line.f_product_qty"/></td>
+                                            <td><span t-esc="entry_line.f_price_unit"/></td>
+                                            <td><span t-esc="entry_line.f_price_subtotal"/></td>
+                                            <td><span t-esc="entry_line.f_booklet_no"/></td>
+                                            <td><span t-esc="entry_line.f_receipt_no"/></td>
+                                        </tr>
+
+                                    </t>
+                                </tbody>
+                            </table>   
+                                 
+                                
+                            </div>
+                             </t> 
+                             
+                             
                              <div class="row">
-                                 <t t-if="entry.text"> 
+                                 <t t-if="entry.description"> 
                                 <div class="col-md-5"> <strong>Comments : </strong>                                   
-                                        <span t-esc="entry.text"/>
+                                        <span t-esc="entry.description"/>
                                 </div>
                                 </t> 
                                

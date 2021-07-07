@@ -28,7 +28,9 @@
 
     # always loaded
     'data': [
+        'wizard/correction_reason_views.xml',
         'security/ir.model.access.csv',
+        'views/custom_entry_views.xml',
         'views/custom_entry_templates.xml',
     ],
     # only loaded in demonstration mode

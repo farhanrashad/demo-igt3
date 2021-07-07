@@ -181,7 +181,7 @@ class CustomerPortal(CustomerPortal):
             pre_id = 0
 
         values = self._entry_get_page_view_values(entry_sudo,next_id, pre_id, entry_user_flag,access_token, **kw)
-        return request.render("de_portal_custom_journal_entry.portal_my_entry", values)
+        return request.render("de_portal_custom_journal_entry.portal_custom_entry", values)
 
     @http.route(['/entry/order/next/<int:move_id>'], type='http', auth="user", website=True)
     def portal_my_next_entry(self, move_id, access_token=None, **kw):
@@ -247,7 +247,7 @@ class CustomerPortal(CustomerPortal):
 
 
         values = self._entry_get_page_view_values(entry_sudo,next_id, pre_id, access_token, **kw)
-        return request.render("de_portal_custom_journal_entry.portal_my_entry", values)
+        return request.render("de_portal_custom_journal_entry.portal_custom_entry", values)
 
   
     @http.route(['/entry/order/pre/<int:move_id>'], type='http', auth="user", website=True)
@@ -315,6 +315,6 @@ class CustomerPortal(CustomerPortal):
 
 
         values = self._entry_get_page_view_values(entry_sudo, next_id,pre_id, access_token, **kw)
-        return request.render("de_portal_custom_journal_entry.portal_my_entry", values)
+        return request.render("de_portal_custom_journal_entry.portal_custom_entry", values)
 
     
