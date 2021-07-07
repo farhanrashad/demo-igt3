@@ -36,7 +36,7 @@ class CustomerPortal(CustomerPortal):
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
         if 'entry_count' in counters:
-            values['entry_count'] = request.env['account.custom.entry'].search_count([])
+            values['entry_count'] = request.env['account.custom.entry'].search_count([('user_id', '=', http.request.env.context.get('uid'))])
         return values
   
     def _entry_get_page_view_values(self,entry, next_id = 0,pre_id= 0, entry_user_flag = 0, access_token = None, **kwargs):
@@ -70,7 +70,7 @@ class CustomerPortal(CustomerPortal):
            
         searchbar_inputs = {
             'id': {'input': 'id', 'label': _('Search in No#')},
-            'partner_id.partner_id.name': {'input': 'partner_id.partner_id.name', 'label': _('Search in Partner')},
+            'user_id.name': {'input': 'user_id.name', 'label': _('Search in Requested Owner')},
             'name': {'input': 'name', 'label': _('Search in Reference')},
 
         }
@@ -79,7 +79,7 @@ class CustomerPortal(CustomerPortal):
             'none': {'input': 'none', 'label': _('None')},
         }
 
-        project_groups = request.env['account.custom.entry'].search([])
+        project_groups = request.env['account.custom.entry'].search([('user_id','=', http.request.env.context.get('uid'))])
 
         # default sort by value
         if not sortby:
@@ -181,7 +181,7 @@ class CustomerPortal(CustomerPortal):
             pre_id = 0
 
         values = self._entry_get_page_view_values(entry_sudo,next_id, pre_id, entry_user_flag,access_token, **kw)
-        return request.render("de_portal_custom_journal_entry.portal_my_entry", values)
+        return request.render("de_portal_custom_journal_entry.portal_custom_entry", values)
 
     @http.route(['/entry/order/next/<int:move_id>'], type='http', auth="user", website=True)
     def portal_my_next_entry(self, move_id, access_token=None, **kw):
@@ -247,7 +247,7 @@ class CustomerPortal(CustomerPortal):
 
 
         values = self._entry_get_page_view_values(entry_sudo,next_id, pre_id, access_token, **kw)
-        return request.render("de_portal_custom_journal_entry.portal_my_entry", values)
+        return request.render("de_portal_custom_journal_entry.portal_custom_entry", values)
 
   
     @http.route(['/entry/order/pre/<int:move_id>'], type='http', auth="user", website=True)
@@ -315,6 +315,6 @@ class CustomerPortal(CustomerPortal):
 
 
         values = self._entry_get_page_view_values(entry_sudo, next_id,pre_id, access_token, **kw)
-        return request.render("de_portal_custom_journal_entry.portal_my_entry", values)
+        return request.render("de_portal_custom_journal_entry.portal_custom_entry", values)
 
     

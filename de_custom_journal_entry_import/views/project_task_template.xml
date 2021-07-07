@@ -447,7 +447,7 @@
             <div class="alert alert-warning" data-oe-model="ir.ui.view" data-oe-id="2176" data-oe-field="arch" data-oe-xpath="/data/xpath/t[2]/div[1]">
                       <a
                             role="button"
-                            t-attf-href="/web/content/#{entry_types.attachment_id.id}?download=true"
+                            t-attf-href="/web/content/#{entry_types.update_attachment_id.id}?download=true"
                             class="btn-primary"
                             style="margin: 0 10px; font-size: 12px; line-height: 1.5; border-radius: 3px; padding: 8px 10px; color: #ffffff;"
                         >

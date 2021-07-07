@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='sequence_code']" position="after">
                     <field name="attachment_id"  widget="many2many_binary"></field>
+                    <field name="update_attachment_id"  widget="many2many_binary"></field>
                     <field name="is_publish"   />
                 </xpath>
               
