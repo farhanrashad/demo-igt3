@@ -21,7 +21,7 @@ class CustumEntry(models.Model):
             'view_id': False,
             'type': 'ir.actions.act_window',
             'target': 'new',
-            'context': {'default_custom_entry_id': selected_records.id},
+            'context': {'default_custom_entry_id': self.id},
         }
     
     
