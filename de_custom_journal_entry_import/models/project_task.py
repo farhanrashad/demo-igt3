@@ -125,9 +125,16 @@ class ProjectTask(models.Model):
                             for group in entry.group_id.users:
                                 if group.id == self.env.uid:
                                     entry_id = entry.id
+
+                    name_seq = self.custom_entry_type_id.name 
+                    if self.custom_entry_type_id.automated_sequence == True:
+                        name_seq = self.custom_entry_type_id.sequence_id.next_by_id()         
                     custom_vals = {
+                        'name':  name_seq, 
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
+                        'currency_id': self.env.company.currency_id.id,
+                        'company_id': self.env.company.id, 
                         'user_id': user,
                         'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,
