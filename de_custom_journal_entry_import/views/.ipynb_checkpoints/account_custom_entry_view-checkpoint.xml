@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="de_custom_journal_entry.account_custom_entry_form_view" />
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='custom_entry_type_id']" position="after">
-                    <field name="is_custom_entry_import"   />
+                    <field name="is_custom_entry_import"   invisible="1"/>
                 </xpath>
               
            </field>
