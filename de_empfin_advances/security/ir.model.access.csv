@@ -5,9 +5,9 @@ access_hr_advance_type_user,access.hr.advance.type.user,model_hr_advance_type,hr
 access_hr_salary_advance_user,access.hr.salary.advance.user,model_hr_salary_advance,hr.group_hr_user,1,1,1,1
 access_hr_salary_advance_line,access.hr.salary.advance.line,model_hr_salary_advance_line,hr.group_hr_user,1,1,1,1
 access_hr_expense_sheet_type_manager,access.hr.expense.sheet.type.manager,model_hr_expense_sheet_type,hr_expense.group_hr_expense_manager,1,1,1,1
-access_hr_expense_sheet_type_user,access.hr.expense.sheet.type.user,model_hr_expense_sheet_type,hr_expense.group_hr_expense_manager,1,0,0,0
+access_hr_expense_sheet_type_user,access.hr.expense.sheet.type.user,model_hr_expense_sheet_type,hr_expense.group_hr_expense_user,1,0,0,0
 access_hr_expense_type_manager,access.hr.expense.type.manager,model_hr_expense_type,hr_expense.group_hr_expense_manager,1,1,1,1
-access_hr_expense_type_user,access.hr.expense.type.user,model_hr_expense_type,hr_expense.group_hr_expense_manager,1,0,0,0
+access_hr_expense_type_user,access.hr.expense.type.user,model_hr_expense_type,hr_expense.group_hr_expense_user,1,0,0,0
 
 
 
