@@ -39,7 +39,7 @@ class ProjectTask(models.Model):
     delivery_assigned = fields.Boolean(string='Delivery Assigned', readonly=True)
     task_sequence = fields.Integer(string='Task Sequence', readonly=True)
     date_estimated = fields.Datetime(string='Estimated Completion Date', compute="_compute_date_completion")
-    days_to_close = fields.Datetime(string='Delay', compute="_compute_days_to_close")
+    days_to_close = fields.Integer(string='Delay', compute="_compute_days_to_close")
     picking_id = fields.Many2one('stock.picking', string='Picking', compute="_compute_picking")
     
     date_doc_submission = fields.Date(string='Docs Submit On', compute="_compute_all_submission_date", store=True)
