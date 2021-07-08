@@ -69,7 +69,9 @@ class SalaryAdvancePayment(models.Model):
     #expense details
     hr_expense_sheet_id = fields.Many2one('hr.expense.sheet', string='Expense Sheet', compute='_compute_expense_id')
     hr_expense_id = fields.Many2one('hr.expense', string='Expense', compute='_compute_expense_id')
+    date_due_expense = fields.Datetime(string='Due On', compute='_compute_expense_deadline', )
     expense_deadline = fields.Datetime(string='Expense Deadline', compute='_compute_expense_deadline', )
+    
     remittance_outstanding_days = fields.Integer(string='Remittance Outstanding day(s)', compute='_compute_remittance_days')
     remittance_overdue_days = fields.Integer(string='Remittance Overdue day(s)', compute='_compute_remittance_days')
 
@@ -127,6 +129,7 @@ class SalaryAdvancePayment(models.Model):
             days = 30
             dt = fields.Date.to_string(request.date + timedelta(days))
             request.expense_deadline = dt
+            request.date_due_expense = dt
 
     
     def _compute_expense_id(self):

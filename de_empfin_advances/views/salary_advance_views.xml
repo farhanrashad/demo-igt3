@@ -118,7 +118,8 @@
                                     <group string="Expense">
                                         <field name="hr_expense_id" invisible="1"/>
                                         <field name="hr_expense_sheet_id" invisible="0"/>
-                                        <field name="expense_deadline" widget="remaining_days" string="Remittance Date"/>
+                                        <field name="date_due_expense" widget="date" string='Due Date'/>
+                                        <field name="expense_deadline" widget="remaining_days" string="Remittance Days"/>
                                         <field name="remittance_outstanding_days" invisible="1"/>
                                         <field name="remittance_overdue_days" invisible="1"/>
                                     </group>
