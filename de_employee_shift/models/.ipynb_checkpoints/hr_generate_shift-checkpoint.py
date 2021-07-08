@@ -40,9 +40,10 @@ class HrGenerateShift(models.Model):
                     shift_two = 0
                     rest_day = False
                     if date_after_month.weekday() == 0:
-                        day_week = 1
+                        day_week = self.env['shift.week.days'].search([('name','=','Monday')], limit=1)
                         for day in self.week_day_ids:
                             if day.name == 'Monday':
+                                
                                 rest_day = True
 
                         count1 = 0       
@@ -71,7 +72,7 @@ class HrGenerateShift(models.Model):
                                 count1 = count1 + 1
 
                     elif date_after_month.weekday() == 1:
-                        day_week = 2
+                        day_week = self.env['shift.week.days'].search([('name','=','Tuesday')], limit=1)
                         for day in self.week_day_ids:
                             if day.name == 'Tuesday':
                                 rest_day = True 
@@ -101,7 +102,7 @@ class HrGenerateShift(models.Model):
                                 count1 = count1 + 1        
 
                     elif date_after_month.weekday() == 2:
-                        day_week = 3
+                        day_week = self.env['shift.week.days'].search([('name','=','Wednesday')], limit=1)
                         for day in self.week_day_ids:
                             if day.name == 'Wednesday':
                                 rest_day = True 
@@ -133,7 +134,7 @@ class HrGenerateShift(models.Model):
                                 count1 = count1 + 1        
 
                     elif date_after_month.weekday() == 3:
-                        day_week = 4
+                        day_week = self.env['shift.week.days'].search([('name','=','Thursday')], limit=1)
                         for day in self.week_day_ids:
                             if day.name == 'Thursday':
                                 rest_day = True 
@@ -164,7 +165,7 @@ class HrGenerateShift(models.Model):
                                 count1 = count1 + 1        
 
                     elif date_after_month.weekday() == 4:
-                        day_week = 5
+                        day_week = self.env['shift.week.days'].search([('name','=','Friday')], limit=1)
                         for day in self.week_day_ids:
                             if day.name == 'Friday':
                                 rest_day = True 
@@ -194,7 +195,7 @@ class HrGenerateShift(models.Model):
                                 count1 = count1 + 1        
 
                     elif date_after_month.weekday() == 5:
-                        day_week = 6
+                        day_week = self.env['shift.week.days'].search([('name','=','Saturday')], limit=1)
                         for day in self.week_day_ids:
                             if day.name == 'Saturday':
                                 rest_day = True 
@@ -223,7 +224,7 @@ class HrGenerateShift(models.Model):
                                 count1 = count1 + 1        
 
                     elif date_after_month.weekday() == 6:
-                        day_week = 7
+                        day_week = self.env['shift.week.days'].search([('name','=','Sunday')], limit=1)
                         for day in self.week_day_ids:
                             if day.name == 'Sunday':
                                 rest_day = True 
@@ -256,7 +257,7 @@ class HrGenerateShift(models.Model):
                         vals = {
                             'wizard_generate_id': self.id,
                             'date': date_after_month,
-                            'day': day_week,
+                            'day': day_week.id,
                             'first_shift_id':False,
                             'second_shift_id': False,
                             'rest_day': rest_day
@@ -266,7 +267,7 @@ class HrGenerateShift(models.Model):
                         vals = {
                             'wizard_generate_id': self.id,
                             'date': date_after_month,
-                            'day': day_week,
+                            'day': day_week.id,
                             'first_shift_id':shift_one,
                             'second_shift_id': shift_two,
                             'rest_day': rest_day

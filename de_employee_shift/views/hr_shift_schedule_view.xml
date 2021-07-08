@@ -195,7 +195,10 @@
               id="menu__employee_shift_schedule"
               parent="menu_shift_schedule_generate_id_menu"
               action="action_shift_schedule"
-               sequence="8"/>
+               sequence="8"
+                  
+                  
+                  />
         
     </data>
 </odoo>

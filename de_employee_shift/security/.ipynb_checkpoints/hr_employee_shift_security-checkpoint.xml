@@ -17,7 +17,11 @@
         <field name="category_id" ref="module_category_human_resources_shift"/>
     </record>
 
-    
+     <record id="resource_calander" model="ir.rule">
+        <field name="name">Resource Calander</field>
+        <field name="model_id" ref="model_resource_calendar"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+    </record>
      
      <record id="hr_shift_schedule_comp_rule" model="ir.rule">
         <field name="name">Shift Schedule</field>

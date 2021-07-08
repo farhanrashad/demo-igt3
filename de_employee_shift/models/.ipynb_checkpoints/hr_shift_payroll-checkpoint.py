@@ -7,6 +7,118 @@ import math
 from pytz import utc
 from odoo.tools.float_utils import float_round
 from collections import namedtuple
+from collections import defaultdict
+import math
+from datetime import datetime, time, timedelta
+from dateutil.relativedelta import relativedelta
+from dateutil.rrule import rrule, DAILY, WEEKLY
+from functools import partial
+from itertools import chain
+from pytz import timezone, utc
+
+from odoo import api, fields, models, _
+from odoo.addons.base.models.res_partner import _tz_get
+from odoo.exceptions import ValidationError
+from odoo.osv import expression
+from odoo.tools.float_utils import float_round
+
+from odoo.tools import date_utils, float_utils
+
+# Default hour per day value. The one should
+# only be used when the one from the calendar
+# is not available.
+HOURS_PER_DAY = 8
+# This will generate 16th of days
+ROUNDING_FACTOR = 16
+
+
+def _boundaries(intervals, opening, closing):
+    """ Iterate on the boundaries of intervals. """
+    for start, stop, recs in intervals:
+        if start < stop:
+            yield (start, opening, recs)
+            yield (stop, closing, recs)
+
+
+class Intervals(object):
+    """ Collection of ordered disjoint intervals with some associated records.
+        Each interval is a triple ``(start, stop, records)``, where ``records``
+        is a recordset.
+    """
+    def __init__(self, intervals=()):
+        self._items = []
+        if intervals:
+            # normalize the representation of intervals
+            append = self._items.append
+            starts = []
+            recses = []
+            for value, flag, recs in sorted(_boundaries(intervals, 'start', 'stop')):
+                if flag == 'start':
+                    starts.append(value)
+                    recses.append(recs)
+                else:
+                    start = starts.pop()
+                    if not starts:
+                        append((start, value, recses[0].union(*recses)))
+                        recses.clear()
+
+    def __bool__(self):
+        return bool(self._items)
+
+    def __len__(self):
+        return len(self._items)
+
+    def __iter__(self):
+        return iter(self._items)
+
+    def __reversed__(self):
+        return reversed(self._items)
+
+    def __or__(self, other):
+        """ Return the union of two sets of intervals. """
+        return Intervals(chain(self._items, other._items))
+
+    def __and__(self, other):
+        """ Return the intersection of two sets of intervals. """
+        return self._merge(other, False)
+
+    def __sub__(self, other):
+        """ Return the difference of two sets of intervals. """
+        return self._merge(other, True)
+
+    def _merge(self, other, difference):
+        """ Return the difference or intersection of two sets of intervals. """
+        result = Intervals()
+        append = result._items.append
+
+        # using 'self' and 'other' below forces normalization
+        bounds1 = _boundaries(self, 'start', 'stop')
+        bounds2 = _boundaries(other, 'switch', 'switch')
+
+        start = None                    # set by start/stop
+        recs1 = None                    # set by start
+        enabled = difference            # changed by switch
+        for value, flag, recs in sorted(chain(bounds1, bounds2)):
+            if flag == 'start':
+                start = value
+                recs1 = recs
+            elif flag == 'stop':
+                if enabled and start < value:
+                    append((start, value, recs1))
+                start = None
+            else:
+                if not enabled and start is not None:
+                    start = value
+                if enabled and start is not None and start < value:
+                    append((start, value, recs1))
+                enabled = not enabled
+
+        return result
+
+
+
+
+
 
 
 class HrPayroll(models.Model):
@@ -95,11 +207,48 @@ class Calendar(models.Model):
     _interval_obj = namedtuple('Interval', ('start_datetime', 'end_datetime', 'data'))
     
     shift_type = fields.Selection([
+        ('general', 'General'),
         ('morning', 'Morning'),
         ('evening', 'Evening'),
         ('night', 'Night'),
         
     ], string='Shift Type',copy=False, required=True)
+    
+    
+    def _check_overlap(self, attendance_ids):
+        """ attendance_ids correspond to attendance of a week,
+            will check for each day of week that there are no superimpose. """
+        result = []
+        for attendance in attendance_ids.filtered(lambda att: not att.date_from and not att.date_to):
+            # 0.000001 is added to each start hour to avoid to detect two contiguous intervals as superimposing.
+            # Indeed Intervals function will join 2 intervals with the start and stop hour corresponding.
+            result.append((int(attendance.dayofweek) * 24 + attendance.hour_from + 0.000001, int(attendance.dayofweek) * 24 + attendance.hour_to, attendance))
+
+        if len(Intervals(result)) != len(result):
+            if self.shift_type != 'night':
+                raise ValidationError(_("Attendances can't overlap."))
+                
+                
+    def _compute_hours_per_day(self, attendances):
+        if not attendances:
+            return 0
+
+        hour_count = 0.0
+        for attendance in attendances:
+            if self.shift_type != 'night':
+                hour_count += attendance.hour_to - attendance.hour_from
+            elif self.shift_type == 'night':
+                hour_count +=  (24 - attendance.hour_from)   + attendance.hour_to   
+
+        if self.two_weeks_calendar:
+            number_of_days = len(set(attendances.filtered(lambda cal: cal.week_type == '1').mapped('dayofweek')))
+            number_of_days += len(set(attendances.filtered(lambda cal: cal.week_type == '0').mapped('dayofweek')))
+        else:
+            number_of_days = len(set(attendances.mapped('dayofweek')))
+
+        return float_round(hour_count / float(number_of_days), precision_digits=2)
+        
+    
 
     def string_to_datetime(self, value):
         """ Convert the given string value to a datetime in UTC. """

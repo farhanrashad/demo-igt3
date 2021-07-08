@@ -59,13 +59,19 @@ class CreateAttendance(http.Controller):
             checkin_date_out = datetime(*date_processing_in)
             attendance_data_in = datetime(*date_processing_in) - relativedelta(hours =+ 5)  
             
+            if attendance_data_in.date() > date.today():
+                return request.render("de_portal_attendance.cannot_submit_future_days_commitment_msg", attendance_page_content())
+            
         checkout_date_in = kw.get('check_out') 
         if checkout_date_in:
             date_processing_out = checkout_date_in.replace('T', '-').replace(':', '-').split('-')
             date_processing_out = [int(v) for v in date_processing_out]
             checkout_date_out = datetime(*date_processing_out)
             attendance_data_out = datetime(*date_processing_out) - relativedelta(hours =+ 5)
-
+            
+            if attendance_data_out.date() > date.today():
+                return request.render("de_portal_attendance.cannot_submit_future_days_commitment_msg", attendance_page_content())
+            
         if kw.get('id'):
             exist_attendance1 = request.env['hr.attendance'].search([('id','=',int(kw.get('id')))])
             if not kw.get('check_out'):

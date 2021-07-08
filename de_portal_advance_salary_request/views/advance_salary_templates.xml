@@ -20,7 +20,7 @@
     
     <template id="portal_my_home" name="Show advance salary / fifty" customize_show="True" inherit_id="portal.portal_my_home" priority="25">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-call="portal.portal_docs_entry"  >
+            <t t-call="portal.portal_docs_entry"  groups="de_portal_advance_salary_request.group_advance_salary">
                 <t t-set="title">Advance Salary</t>
                 <t t-set="url" t-value="'/advance/salary'"/>
                 <t t-set="placeholder_count" t-value="'advance_count'"/>

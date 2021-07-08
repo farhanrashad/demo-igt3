@@ -15,7 +15,7 @@
 
     <template id="portal_my_home" name="Show Approvals / fifty" customize_show="True" inherit_id="portal.portal_my_home" priority="25">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-call="portal.portal_docs_entry">
+            <t t-call="portal.portal_docs_entry" groups='de_portal_approvals.group_approval_access'>
                 <t t-set="title">Approvals</t>
                 <t t-set="url" t-value="'/my/approvals'"/>
                 <t t-set="placeholder_count" t-value="'approval_count'"/>

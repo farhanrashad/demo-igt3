@@ -134,6 +134,7 @@
     <!--loan menu-->
     <menuitem name="Loans &amp; Advances"
         id="menu_parent_hr_loans_and_advances" 
+        groups="de_employee_loan.group_hr_loan_manager"      
          web_icon="de_employee_loan,static/description/loan.png"/>
     
     <menuitem name="Loans"
@@ -166,7 +167,9 @@
     <menuitem name="Loan"
         id="menu_base_hr_loan_request"
         parent = "menu_hr_loan"
-        sequence="9"/>
+        sequence="9"
+              
+              />
 
     <menuitem name="Loan Request"
         parent="menu_base_hr_loan_request"

@@ -10,7 +10,7 @@
     "author": "Dynexcel",
     "website": "http://www.dynexcel.co",
     'version': '14.0.0.1',
-    'depends': ['base','sale_expense'],
+    'depends': ['base','hr_expense'],
     'data': [
         'security/ir.model.access.csv',
         'views/product_enhancement_view.xml',

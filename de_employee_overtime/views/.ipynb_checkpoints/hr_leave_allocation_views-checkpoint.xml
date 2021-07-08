@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <data>
+       <record id="hr_leave_allocation_form_view_ovt" model="ir.ui.view">
+			<field name="name">hr.leave.allocation.form.view</field>
+			<field name="model">hr.leave.allocation</field>
+			<field name="inherit_id" ref="hr_holidays.hr_leave_allocation_view_form_manager"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='number_of_hours_display']" position="after">
+					<field name="number_of_hours_calc" invisible="0"/>
+				</xpath>
+                <xpath expr="//field[@name='number_of_hours_display']" position="attributes">
+                    <attribute name="invisible" >1</attribute>
+				</xpath>
+				
+			</field>
+		</record>
+        
+       
+
+
+
+    </data>
+</odoo>

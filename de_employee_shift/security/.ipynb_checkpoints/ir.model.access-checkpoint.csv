@@ -9,3 +9,6 @@ access_hr_shift_schedule_manager,access.hr.shift.schedule,model_hr_shift_schedul
 access_hr_shift_generate_manager,access.hr.shift.generate,model_hr_shift_generate,de_employee_shift.group_hr_shift_manager,1,1,1,1
 access_hr_shift_schedule_generate_line_manager,access.hr.shift.schedule.generate.line,model_hr_shift_schedule_generate_line,de_employee_shift.group_hr_shift_manager,1,1,1,1
 access_hr_shift_schedule_line_manager,hr.shift.schedule.line,model_hr_shift_schedule_line,de_employee_shift.group_hr_shift_manager,1,1,1,1
+
+access_resource_calendar_manager,access.resource.calendar,model_resource_calendar,de_employee_shift.group_hr_shift_manager,1,1,1,1
+access_resource_calendar_user,access.resource.calendar,model_resource_calendar,de_employee_shift.group_hr_shift_user,1,0,0,0

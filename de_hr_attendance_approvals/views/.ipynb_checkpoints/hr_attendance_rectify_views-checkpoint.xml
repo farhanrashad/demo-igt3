@@ -131,7 +131,7 @@
 		  id="Attendance_rectification_main_menu"
 		  name="Rectify Attendance"
 		  parent="hr_attendance.menu_hr_attendance_root"
-		  sequence="2"
+		  sequence="20"
 	/>
        
        

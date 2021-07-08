@@ -207,6 +207,7 @@ class Calendar(models.Model):
     _interval_obj = namedtuple('Interval', ('start_datetime', 'end_datetime', 'data'))
     
     shift_type = fields.Selection([
+        ('general', 'General'),
         ('morning', 'Morning'),
         ('evening', 'Evening'),
         ('night', 'Night'),

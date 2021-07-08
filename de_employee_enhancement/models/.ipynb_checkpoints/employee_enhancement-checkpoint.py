@@ -235,17 +235,17 @@ class CostCenterInformations(models.Model):
     @api.model
     def create(self,vals):
         res = super(CostCenterInformations, self).create(vals)
-        if self.cost_center_information_line.cost_center_id:
-            if res.total_percentage != 100:
-                raise UserError('Total Percentage must be equal 100')
-            return res
+        if self.cost_center_information_line.cost_center:
+        	if res.total_percentage != 100:
+        		raise UserError('Total Percentage must be equal 100')
+        return res
     
     def write(self, vals):
         res = super(CostCenterInformations, self).write(vals)
-        if self.cost_center_information_line.cost_center_id:
-            if self.total_percentage != 100:
-                raise UserError('Total Percentage must be equal 100')
-            return res
+        if self.cost_center_information_line.cost_center:
+        	if self.total_percentage != 100:
+        		raise UserError('Total Percentage must be equal 100')
+        return res
 
 
 class CostCenterInformation(models.Model):
@@ -253,19 +253,8 @@ class CostCenterInformation(models.Model):
 
     contract_id = fields.Many2one('hr.contract')
     employee_id = fields.Many2one('hr.employee')
-    cost_center_id = fields.Many2one('account.analytic.account')
+    cost_center = fields.Many2one('account.analytic.account')
     percentage_charged = fields.Float('Percentage Charged')
-
-
-#     @api.onchange('cost_center')
-#     def _onchange_exp(self):
-#         ids = []
-#         rule_ids = self.env['hr.salary.rule'].search(
-#             [('is_cost_center', '=', True),('struct_id.type_id','=',self.contract_id.structure_type_id.id)])
-#         if rule_ids:
-#             for rule in rule_ids:
-#                 ids.append(rule.id)
-#         return {'domain': {'cost_center': [('id', '=', ids)]}}
 
     @api.onchange('percentage_charged')
     def limit_percentage_charged(self):
@@ -273,10 +262,3 @@ class CostCenterInformation(models.Model):
             for rec in self:
                 if rec.percentage_charged > 100 or rec.percentage_charged <1:
                     raise UserError('Percentage Charged Cannot be greater than 100 or less than 1')
-
-
-
-class HrSalaryRule(models.Model):
-	_inherit='hr.salary.rule'
-	
-	is_cost_center = fields.Boolean('Is a Cost Center')

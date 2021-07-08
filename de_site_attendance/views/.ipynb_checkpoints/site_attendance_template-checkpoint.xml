@@ -15,7 +15,7 @@
 
     <template id="portal_site_attendance_home" name="Show site attendance" customize_show="True" inherit_id="portal.portal_my_home" priority="25">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-call="portal.portal_docs_entry">
+            <t t-call="portal.portal_docs_entry"  groups="de_site_attendance.group_site_attendance_portal">
                 <t t-set="title">Site Attendance</t>
                 <t t-set="url" t-value="'/hr/site/attendances'"/>
                 <t t-set="placeholder_count" t-value="'site_attendance_count'"/>
@@ -51,7 +51,7 @@
                         <tbody>
                             
                             <t t-foreach="attendances" t-as="attendance"> 
-                               
+                               <t t-if="attendance.incharge_id.user_id.id == uid">
                                 <tr>
                                     <td class="text-left">
                                           <a t-attf-href="/hr/site/attendance/#{attendance.id}?{{ keep_query() }}">#<span t-field="attendance.id"/></a>
@@ -85,6 +85,7 @@
                                    
                                  
                                 </tr>
+                            </t>
                             </t>
                             
                              <tr>
@@ -171,7 +172,7 @@
                             
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
                                 <th class="text-left">Employee</th>
-                                <th class="text-left">Days</th>
+                                <th class="text-left">Payable Days</th>
                                 <th class="text-left">Normal Overtime</th>
                                 <th class="text-left">Gazetted Overtime</th>
                                 <th class="text-left">Action</th>

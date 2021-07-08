@@ -15,7 +15,7 @@
 
     <template id="portal_site_attendance_home" name="Show site attendance" customize_show="True" inherit_id="portal.portal_my_home" priority="25">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-call="portal.portal_docs_entry">
+            <t t-call="portal.portal_docs_entry"  groups="de_site_attendance.group_site_attendance_portal">
                 <t t-set="title">Site Attendance</t>
                 <t t-set="url" t-value="'/hr/site/attendances'"/>
                 <t t-set="placeholder_count" t-value="'site_attendance_count'"/>

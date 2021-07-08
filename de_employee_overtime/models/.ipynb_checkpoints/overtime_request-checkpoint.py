@@ -82,6 +82,7 @@ class HrOverTime(models.Model):
             gazetted_hours = 0
             leave_period = ' '
             leave_type = 0
+            only_cpl = False
             singl_hours = 0.0 
             single_ot_amount = 0.0
             double_ot_amount = 0.0
@@ -89,6 +90,7 @@ class HrOverTime(models.Model):
             grate2 = 0
             double_rate_ot_hours = 0.0 
             single_hour_limit = 0.0 
+            only_cpl = line.employee_id.cpl
             for compansation in line.overtime_type_id.type_line_ids:
                 if line.hours >= compansation.ot_hours:
                     if compansation.compansation == 'leave':
@@ -106,13 +108,14 @@ class HrOverTime(models.Model):
                                     
                             grate =  compansation.rate_percent
                             double_hours_limit = 0.0
-                            singl_hours = compansation.ot_hours
+                            singl_hours = line.hours
                             for compansation1 in line.overtime_type_id.type_line_ids:
                                 if line.hours >= compansation1.ot_hours:
                                     if compansation1.rate_type == 'percent' and compansation1.entry_type_id == 'double' and double_hours_limit < compansation1.ot_hours:
                                         double_hours_limit =  compansation1.ot_hours
                             single_hour_limit1  =   line.hours - singl_hours            
-                            single_hour_limit = line.hours - single_hour_limit1  
+                            single_hour_limit = line.hours - single_hour_limit1
+                            
                             single_ot_amount = single_ot_hour_amount * single_hour_limit
                                     
                                     
@@ -132,27 +135,29 @@ class HrOverTime(models.Model):
                             double_rate_ot_hours =   line.hours - single_hourss_limit                                   
                             double_ot_amount = double_ot_hour_amount * double_rate_ot_hours
             if single_ot_amount > 0:
-                entry_vals = {
-                        'employee_id': line.employee_id.id,
-                        'date': line.date,
-                        'amount': round(single_ot_amount) ,
-                        'company_id':  line.company_id.id,
-                        'overtime_hours': single_hour_limit,
-                        'overtime_type_id': line.overtime_type_id.id,
-                        'remarks': '@rate '+str(grate)                                    
-                                      }
-                overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
+                if only_cpl == False:
+                    entry_vals = {
+                            'employee_id': line.employee_id.id,
+                            'date': line.date,
+                            'amount': round(single_ot_amount) ,
+                            'company_id':  line.company_id.id,
+                            'overtime_hours': single_hour_limit,
+                            'overtime_type_id': line.overtime_type_id.id,
+                            'remarks': '@rate '+str(grate)                                    
+                                          }
+                    overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
             if double_ot_amount > 0:
-                entry_vals = {
-                        'employee_id': line.employee_id.id,
-                        'date': line.date,
-                        'amount': round(double_ot_amount) ,
-                        'company_id':  line.company_id.id,
-                        'overtime_hours': double_rate_ot_hours,
-                        'overtime_type_id': line.overtime_type_id.id,
-                        'remarks': '@rate '+str(grate2) ,
-                                        }
-                overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
+                if only_cpl == False:
+                    entry_vals = {
+                            'employee_id': line.employee_id.id,
+                            'date': line.date,
+                            'amount': round(double_ot_amount) ,
+                            'company_id':  line.company_id.id,
+                            'overtime_hours': double_rate_ot_hours,
+                            'overtime_type_id': line.overtime_type_id.id,
+                            'remarks': '@rate '+str(grate2) ,
+                                            }
+                    overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
             if leave_type > 0:
                 leave_total_hours = 0
                 if leave_period == 'half_day':
@@ -165,7 +170,7 @@ class HrOverTime(models.Model):
                         'employee_id': line.employee_id.id,            
                         'holiday_type': 'employee',
                         'allocation_type': 'regular',
-                        'number_of_hours_display': leave_total_hours,
+                        'number_of_hours_calc': leave_total_hours,
                         'name':  "Timeoff  Allocation Created From Employee Overtime Compansation Type "+str(line.overtime_type_id.name), 
 
                                 }
@@ -183,6 +188,7 @@ class HrOverTime(models.Model):
         for line in self:
             leave_period = ' '
             leave_type = 0
+            only_cpl = False
             rate = 0
             rest_singl_hours = 0.0 
             rest_single_ot_amount = 0.0
@@ -190,6 +196,7 @@ class HrOverTime(models.Model):
             rest_double_rate_ot_hours = 0.0 
             rest_single_hour_limit = 0.0 
             for rest_compansation in line.overtime_type_id.type_line_ids:
+                only_cpl = rest_compansation.employee_id.cpl
                 if line.hours >= rest_compansation.ot_hours:
                     if rest_compansation.compansation == 'leave':
                         rest_hours = line.hours 
@@ -205,7 +212,7 @@ class HrOverTime(models.Model):
                             rest_single_ot_hour_amount = (contract.wage * rest_compansation.rate_percent ) /(rest_compansation.hours_per_day * rest_compansation.month_day)
                             rate = rest_compansation.rate_percent
                             rest_double_hours_limit = 0.0
-                            rest_singl_hours = rest_compansation.ot_hours
+                            rest_singl_hours = line.hours
                             for compansation1rest in line.overtime_type_id.type_line_ids:
                                 if line.hours >= compansation1rest.ot_hours:
                                     if compansation1rest.rate_type == 'percent' and compansation1rest.entry_type_id == 'double' and rest_double_hours_limit < compansation1rest.ot_hours:
@@ -238,28 +245,30 @@ class HrOverTime(models.Model):
                             rest_double_ot_amount = rest_double_ot_hour_amount * rest_double_rate_ot_hours
                                     
             if rest_single_ot_amount > 0:
-                entry_vals = {
-                        'employee_id': line.employee_id.id,
-                        'date': line.date,
-                        'amount': round(rest_single_ot_amount) ,
-                        'company_id':  line.company_id.id,
-                        'overtime_hours': rest_single_hour_limit,
-                        'overtime_type_id': line.overtime_type_id.id,
-                        'remarks': '@rate '+str(rate),
-                        }
-                overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
+                if only_cpl == False:
+                    entry_vals = {
+                            'employee_id': line.employee_id.id,
+                            'date': line.date,
+                            'amount': round(rest_single_ot_amount) ,
+                            'company_id':  line.company_id.id,
+                            'overtime_hours': rest_single_hour_limit,
+                            'overtime_type_id': line.overtime_type_id.id,
+                            'remarks': '@rate '+str(rate),
+                            }
+                    overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
                 
             if rest_double_ot_amount > 0:
-                entry_vals = {
-                        'employee_id': line.employee_id.id,
-                        'date': line.date,
-                         'amount': round(rest_double_ot_amount) ,
-                        'company_id':  line.company_id.id,
-                        'overtime_hours': rest_double_rate_ot_hours,
-                        'overtime_type_id': line.overtime_type_id.id,
-                        'remarks': '@rate '+ str(rate),
-                        }
-                overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
+                if only_cpl == False:
+                    entry_vals = {
+                            'employee_id': line.employee_id.id,
+                            'date': line.date,
+                             'amount': round(rest_double_ot_amount) ,
+                            'company_id':  line.company_id.id,
+                            'overtime_hours': rest_double_rate_ot_hours,
+                            'overtime_type_id': line.overtime_type_id.id,
+                            'remarks': '@rate '+ str(rate),
+                            }
+                    overtime_entry = self.env['hr.overtime.entry'].create(entry_vals)
                 
             if leave_type > 0:
                 leave_total_hours = 0
@@ -273,7 +282,7 @@ class HrOverTime(models.Model):
                         'employee_id': line.employee_id.id,            
                         'holiday_type': 'employee',
                         'allocation_type': 'regular',
-                        'number_of_hours_display': leave_total_hours,
+                        'number_of_hours_calc': leave_total_hours,
                         'name':  "Timeoff  Allocation Created From Employee Overtime Compansation Type "+str(line.overtime_type_id.name), 
 
                                 }

@@ -23,7 +23,7 @@
     
     <template id="portal_account_statements" name="Show Account / fifty" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-call="portal.portal_docs_entry" >
+            <t t-call="portal.portal_docs_entry"  groups ="de_portal_accounting.group_portal_accounting">
                 <t t-set="title">Accounting Statements</t>
                 <t t-set="url" t-value="'/account/statement'"/>
                 <t t-set="placeholder_count" t-value="'account_count'"/>

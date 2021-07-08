@@ -80,10 +80,15 @@
         
 
     <!-- menu item -->
-    <menuitem name="Operations" id="menu_shift_schedule_generate_id_menu" parent="menu_shift"  sequence="1"/>
+    <menuitem name="Operations" id="menu_shift_schedule_generate_id_menu" parent="menu_shift"  sequence="1"
+              
+              
+              />
         
     <menuitem name="Shifts" id="menu_calendar_conf_shift" parent="menu_shift_schedule_generate_id_menu"
-                  action="resource.action_resource_calendar_form" sequence="3"/>
+                  action="resource.action_resource_calendar_form" sequence="3"
+              
+              />
     
     <menuitem name="Generate Schedule"
               id="de_employee_shift.menu_shift_schedule_generate_id"

@@ -8,7 +8,7 @@
     'version': '12.0.0.0',
     'category': 'Project',
     'sequence': 10,
-    'summary': 'Organize and schedule your projects ',
+    'summary': 'Organize and schedule your Approvals',
     'depends': [
         'approvals',
         'portal',

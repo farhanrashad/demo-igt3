@@ -108,7 +108,7 @@
       
 
         <menuitem name="Shifts" id="menu_shift"
-                  groups="hr.group_hr_manager"
+                  groups="de_employee_shift.group_hr_shift_manager"
                   web_icon="de_employee_shift,static/description/shift_icon.jpg"/>
         
         <menuitem name="Configuration" id="shift_configuration" parent="menu_shift" sequence="100"/>

@@ -20,7 +20,7 @@
     
     <template id="portal_loan_request_home" name="Show Loan Request" customize_show="True" inherit_id="portal.portal_my_home" priority="25">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-call="portal.portal_docs_entry"  >
+            <t t-call="portal.portal_docs_entry"  groups="de_portal_loan_request.group_loan_request">
                 <t t-set="title">Loan Request</t>
                 <t t-set="url" t-value="'/loan/request'"/>
                 <t t-set="placeholder_count" t-value="'loan_count'"/>

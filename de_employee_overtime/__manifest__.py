@@ -32,6 +32,7 @@
         'views/hr_payslip_views.xml',
         'views/hr_overtime_entry_views.xml',
         'views/hr_work_location_views.xml',
+        'views/hr_leave_allocation_views.xml',
     ],
     'demo': [
         'data/hr_overtime_demo.xml',

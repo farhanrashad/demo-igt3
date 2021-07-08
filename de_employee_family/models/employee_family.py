@@ -32,12 +32,13 @@ class HrEmployeeFamily(models.Model):
     
     @api.onchange('mobile')
     def onchange_mobile(self):
-        if not self.mobile.isdigit():
-            raise UserError(("Only Digits are allowed in Mobile Field"))
-        elif len(self.mobile) > 11:
-            raise UserError(("Only 11 Digit Mobile Numbers in format 03XX-XXXXXXX are allowed"))
-        elif len(self.mobile) < 11:
-            raise UserError(("Only 11 Digit Mobile Numbers in format 03XX-XXXXXXX are allowed"))
+        if self.mobile:
+            if not self.mobile.isdigit():
+                raise UserError(("Only Digits are allowed in Mobile Field"))
+            elif len(self.mobile) > 11:
+                raise UserError(("Only 11 Digit Mobile Numbers in format 03XX-XXXXXXX are allowed"))
+            elif len(self.mobile) < 11:
+                raise UserError(("Only 11 Digit Mobile Numbers in format 03XX-XXXXXXX are allowed"))
 
 
 
