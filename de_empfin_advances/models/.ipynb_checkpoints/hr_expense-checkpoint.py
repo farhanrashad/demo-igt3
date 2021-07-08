@@ -58,11 +58,12 @@ class HrExpenseSheet(models.Model):
         (self - to_post).write({'state': 'done'})
         self.activity_update()
         # change status of advances
+        #expense.hr_salary_advance_id.hr_expense_sheet_id = self.id
         for expense in expense_line_ids:
             #expense.hr_salary_advance_id.state = 'close'
             expense.advance_line_id.state = 'close'
-            expense.hr_salary_advance_id.hr_expense_id = expense.id
-            
+            #expense.hr_salary_advance_id.hr_expense_id = expense.id
+            #expense.hr_salary_advance_id.hr_expense_id = expense.id
         return res
     
 class HrExpenseType(models.Model):
