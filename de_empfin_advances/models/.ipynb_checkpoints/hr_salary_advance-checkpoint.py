@@ -46,7 +46,7 @@ class SalaryAdvancePayment(models.Model):
                               ('paid', 'Open'),
                               ('close', 'Close'),
                               ('cancel', 'Cancelled'),
-                              ('reject', 'Rejected')], string='Status', default='draft')
+                              ('reject', 'Rejected')], string='Status', default='draft', compute='_compute_state', store=True)
     employee_contract_id = fields.Many2one('hr.contract', string='Contract', default=_default_get_contract, domain="[('employee_id','=',employee_id),('state','=','open')]")
         
     deductable = fields.Boolean(string='Deductable', default=False)
@@ -78,7 +78,32 @@ class SalaryAdvancePayment(models.Model):
         if not self.env.context.get('default_employee_id'):
             for adv in self:
                 adv.employee_id = self.env.user.with_company(adv.company_id).employee_id
-                
+    
+    @api.depends('cash_line_ids.state')
+    def _compute_state(self):
+        status = ''
+        for adv in self:
+            #state = adv.mapped('cash_line_ids.state')
+            #if state:
+            if adv.cash_line_ids:
+                for line in adv.cash_line_ids:
+                    if line.state == 'close':
+                        status = 'close'
+                    else:
+                        status = adv.state
+                        break
+            else:
+                status = 'draft'
+                #if state.count('close'):
+                 #   status = 'close'
+                #elif state.count('draft'):
+                 #   status = 'draft'
+                #else:
+                 #   status = adv.state
+            #else:
+                #status = adv.state
+            adv.state = status
+            
     def _compute_remittance_days(self):
         date = expense_date = self.date
         for request in self:
@@ -291,7 +316,7 @@ class SalaryAdvancePayment(models.Model):
                     #account_id = False
                 lines_data.append([0,0,{
                     'product_id': line.product_id.id,
-                    'name': line.description,
+                    'name': line.desc,
                     'price_unit': line.approved_amount,
                     #'account_id': account_id,
                     'hr_salary_advance_line_id': line.id,
@@ -327,6 +352,10 @@ class SalaryAdvancePayment(models.Model):
         self.update({
             'state': 'paid'
         })
+        for cash_line in self.cash_line_ids:
+            cash_line.update({
+                'state': 'paid'
+            })
         return invoice
     
     
@@ -347,12 +376,13 @@ class AdvancePayment(models.Model):
     _name = "hr.salary.advance.line"
     _description = 'Salary Advance Line'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name='description'
+    _rec_name='name'
     
+    name = fields.Char(string='Name', compute='_compute_name')
     type_id = fields.Many2one('hr.advance.type', string='Type')
     #product_id = fields.Many2one('product.product', string='Product', domain="[('can_be_expensed','=', True)]", required=True, change_default=True)
     product_id = fields.Many2one('product.product', string='Product', domain=[('type', '=', 'service')], change_default=True)
-    description = fields.Char(string='Description')
+    desc = fields.Char(string='Description', oldname='description')
     quantity = fields.Float(string='Qunatity', required=1, default=1.0)
     unit_price = fields.Float(string='Unit Price', required=True, default=1.0)
     total_amount = fields.Monetary(compute='_compute_amount', string='Subtotal')
@@ -371,7 +401,7 @@ class AdvancePayment(models.Model):
                               ('finance_approval', 'Waiting Finance Approval'),
                               ('accepted', 'Waiting Account Entries'),
                               ('approved', 'Waiting Payment'),
-                              ('paid', 'Paid'),
+                              ('paid', 'Open'),
                               ('close', 'Close'),
                               ('cancel', 'Cancelled'),
                               ('reject', 'Rejected')], string='Status', default='draft')
@@ -382,11 +412,15 @@ class AdvancePayment(models.Model):
             #if line.approved_amount > line.total_amount:
                 #raise UserError(_('The amount is exceeded than requested amount'))
     
+    def _compute_name(self):
+        for line in self:
+            line.name = line.advance_id.name + ' - ' + line.product_id.name
+            
     @api.onchange('type_id')
     def _onchange_type(self):
         for line in self:
             line.product_id = line.type_id.product_id.id
-            line.description = line.product_id.name
+            #line.description = line.product_id.name
         
     @api.onchange('total_amount')
     def onchange_amount(self):
