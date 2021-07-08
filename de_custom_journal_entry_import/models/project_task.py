@@ -110,7 +110,8 @@ class ProjectTask(models.Model):
                     custom_entry_id_vals = self.custom_entry_id.id
                     entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
                     for entry_line in entry.custom_entry_line:
-                        entry_line.unlink()    
+                        entry_line.unlink()
+                    self.custom_entry_id.is_custom_entry_import = False    
                             
                 else:    
                     partner = custom.entry_partner_id.id
