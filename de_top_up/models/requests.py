@@ -57,7 +57,7 @@ class TopUpRequest(models.Model):
 
     def action_approved(self):
         if self.is_level == True:
-            self.state = 'approved'
+            self.state = 'approved_admin'
         elif self.additional_req == True:
             self.state = 'approved_hr'
         else:
