@@ -43,7 +43,6 @@
 
         <menuitem id="menu_hr_expense_sheet_type" action="action_hr_expense_sheet_type" parent="hr_expense.menu_hr_expense_configuration" name="Expense Type" sequence="2" />
         
-        
          <!-- HR Expense -->
         <record model="ir.ui.view" id="hr_expense_from_view_line">
             <field name="name">hr.expense.form.advance</field>

@@ -197,5 +197,23 @@
         
         <menuitem id="menu_salary_advance" action="action_my_salary_advance_request_approved" parent="employee_salary_advance_menu" name="Approved Request" sequence="3" groups="hr.group_hr_manager,hr.group_hr_user,account.group_account_manager"/>
 
+        <!-- Advance Invoices -->
+        <record id="action_move_in_invoice_type_advance" model="ir.actions.act_window">
+            <field name="name">Advance Invoices</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_id" ref="account.view_in_invoice_tree"/>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="domain">[('move_type', '=', 'in_invoice'),('hr_salary_advance_id', '!=', False)]</field>
+            <field name="context">{'default_move_type': 'in_invoice', 'create':False}</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create an Advance invoice
+              </p>
+            </field>
+        </record>
+        
+        <menuitem id="menu_advance_invoice" action="action_move_in_invoice_type_advance" parent="employee_salary_advance_menu" name="Advance Invoice" sequence="4" groups="account.group_account_manager"/>
+        
     </data>
 </odoo>
