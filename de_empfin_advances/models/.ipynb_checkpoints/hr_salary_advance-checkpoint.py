@@ -294,6 +294,7 @@ class SalaryAdvancePayment(models.Model):
                     'name': line.description,
                     'price_unit': line.approved_amount,
                     #'account_id': account_id,
+                    'hr_salary_advance_line_id': line.id,
                     'quantity': 1,
                 }])
             invoice.create({
