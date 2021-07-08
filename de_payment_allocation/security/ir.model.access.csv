@@ -4,3 +4,4 @@ access_payment_allocation_wizard_line,access.payment.allocation.wizard.line,mode
 access_invoice_allocation_wizard_line,access.invoice.allocation.wizard.line,model_invoice_allocation_wizard_line,account.group_account_manager,1,1,1,1
 access_invoice_allocation_wizard_line_credit,access.invoice.allocation.wizard.line.credit,model_invoice_allocation_wizard_line_credit,account.group_account_manager,1,1,1,1
 access_decimal_precision,access.decimal.precision,model_decimal_precision,,1,1,1,1
+access_invoice_allocation_wizard_line_entry,access.invoice.allocation.wizard.line.entry,model_invoice_allocation_wizard_line_entry,,1,1,1,1

@@ -14,9 +14,10 @@ class AccountPayment(models.Model):
         for payment in self:
             reconcile_amount = 0.0
             for move_line in payment.move_id.line_ids:
-                if move_line.credit == 0.0:
-                    for credit_line in move_line.matched_credit_ids:
-                        reconcile_amount = reconcile_amount + credit_line.amount
+                for credit_line in move_line.matched_credit_ids:
+                    reconcile_amount = reconcile_amount + credit_line.amount
+                for debit_line in move_line.matched_debit_ids:
+                    reconcile_amount = reconcile_amount + debit_line.amount        
             payment.update({
                 'reconcile_amount' : reconcile_amount
             })
@@ -24,11 +25,7 @@ class AccountPayment(models.Model):
                 payment.update({
                 'is_reconciled' : True
                 })
-                
-                          
-    
-    
-    
+                   
     
     def action_payment_allocation(self):
         currency_accuracy = self.env['decimal.precision'].search([('name','=','Currency Conversion')], limit=1)
@@ -40,16 +37,14 @@ class AccountPayment(models.Model):
             accuracy = self.env['decimal.precision'].create(decimal_vals)
         payment_list = []
         invoice_list = []
+        entry_move_lines = []
         refund_invoice_list = []
         partner = []
         for rec in self:
             selected_ids = rec.env.context.get('active_ids', [])
             selected_records = rec.env['account.payment'].browse(selected_ids)
-            
-            
+                        
         for  payment in  selected_records:
-#             if payment.state == 'draft':
-#                 raise UserError(_('Only Posted Payment are allow to Reconcile!'))
             if payment.is_reconciled == True:
                 raise UserError(_('This Payment Already Reconciled'))
             else:                
@@ -70,10 +65,10 @@ class AccountPayment(models.Model):
         for ppartner in uniq_partner:
             invoices = self.env['account.move'].search([('state','=','posted'),('partner_id','=',ppartner)])  
             if self.payment_type == 'outbound':
-                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', 'in', ('in_invoice','entry')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
+                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', 'in', ('in_invoice')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
                 
             elif self.payment_type == 'inbound':
-                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', 'in', ('out_invoice','entry')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
+                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', 'in', ('out_invoice')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
                 
                 
             for  inv in invoices:
@@ -124,7 +119,48 @@ class AccountPayment(models.Model):
                     'allocate_amount': amount,
                     'currency_id': currency,
                     'original_currency_id': refund_inv.currency_id.id, 
-                }))      
+                }))  
+                
+            entry_invoices = self.env['account.move'].search([('state','=','posted'),('partner_id','=',ppartner),('move_type','=','entry')], limit=0)  
+            if self.payment_type == 'outbound':
+                entry_invoices = self.env['account.move'].search([('state','=','posted'),('move_type','=','entry'),('partner_id','=',ppartner)]) 
+            elif self.payment_type == 'inbound':
+                entry_invoices = self.env['account.move'].search([('state','=','posted'),('move_type','=','entry'),('partner_id','=',ppartner)])     
+                
+                
+            for  entry_inv in entry_invoices:
+                jv_amount = 0.0
+                currency = 0
+                for jv_line in refund_inv.line_ids:
+                    for debit_line_jv in jv_line.matched_debit_ids:
+                        jv_amount = debit_line_jv.amount
+#                         if jv_line.credit == 0.0:
+#                             jv_amount += debit_line_jv.amount   
+#                     for credit_line_jv in jv_line.matched_credit_ids:
+#                         if jv_line.debit == 0.0:
+#                             jv_amount += credit_line_jv.amount
+#                         if jv_line.credit == 0.0:
+#                             jv_amount += credit_line_jv.amount   
+                            
+                if entry_inv.currency_id.id == self.currency_id.id:
+                    
+                    currency = entry_inv.currency_id.id 
+                else:
+                    jv_amount = entry_inv.currency_id._convert(jv_amount, self.currency_id, self.company_id, self.date)
+                    currency = self.currency_id.id 
+
+                entry_move_lines.append((0,0,{
+                    'move_id': entry_inv.id,
+                    'payment_date': entry_inv.invoice_date,
+                    'due_date': entry_inv.invoice_date_due,
+                    'invoice_amount': entry_inv.amount_total,
+                    'unallocate_amount': jv_amount,
+                    'allocate': False,
+                    'allocate_amount': jv_amount,
+                    'currency_id': currency,
+                    'original_currency_id': entry_inv.currency_id.id, 
+                }))  
+                
         return {
             'name': ('Payment Allocation'),
             'view_type': 'form',
@@ -135,7 +171,8 @@ class AccountPayment(models.Model):
             'target': 'new',
             'context': {'default_payment_line_ids': payment_list, 
                         'default_invoice_move_ids': invoice_list, 
-                        'default_invoice_refund_ids': refund_invoice_list, 
+                        'default_invoice_refund_ids': refund_invoice_list,
+                        'default_journal_entries_ids': entry_move_lines, 
                         'default_company_id': self.env.company.id,
                         'default_partner_id': self.partner_id.id,
                         'default_is_payment': True,
