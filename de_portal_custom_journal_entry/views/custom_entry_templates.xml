@@ -69,7 +69,7 @@
                                     
                                     <td class="text-left">
                                         <t t-if="custom.is_custom_entry_import == True">
-                                        <span t-esc="custom.correction_reason" />
+                                        <p style='color:red;'><strong>Need Correction</strong></p>
                                          </t>     
                                     </td>
                                     

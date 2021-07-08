@@ -6,7 +6,7 @@ from odoo import models, fields, api, _
 class CustumEntry(models.Model):
     _inherit = 'account.custom.entry'    
     
-    correction_reason = fields.Char(string='Correction Reason')
+    correction_reason = fields.Char(string='Correction Reason', tracking=True)
     
     
     def action_correction_entry(self):
