@@ -116,8 +116,8 @@
                                         <field name="payment_amount" />
                                     </group>
                                     <group string="Expense">
-                                        <field name="hr_expense_id" />
-                                        <field name="hr_expense_sheet_id" invisible="1"/>
+                                        <field name="hr_expense_id" invisible="1"/>
+                                        <field name="hr_expense_sheet_id" invisible="0"/>
                                         <field name="expense_deadline" widget="remaining_days" string="Remittance Date"/>
                                         <field name="remittance_outstanding_days" invisible="1"/>
                                         <field name="remittance_overdue_days" invisible="1"/>
