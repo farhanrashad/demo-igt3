@@ -205,6 +205,8 @@
                                     <field name="date_arrival" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>             
                                     <field name="number_of_days" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="travel_reference" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+                                    <field name="t_travel_description" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
+                                    <field name="t_travel_type" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="t_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="t_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="t_amount_travel" string="Total" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
@@ -224,6 +226,8 @@
                                     <field name="h_check_out" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_number_of_nights" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_travel_id" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
+                                    <field name="h_travel_description" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
+                                    <field name="h_travel_type" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_amount" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>

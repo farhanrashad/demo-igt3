@@ -593,7 +593,7 @@ class CustomEntryLine(models.Model):
     _description = 'Custom Entry Line'
     
     custom_entry_id = fields.Many2one('account.custom.entry', string='Custom Entry', required=True, ondelete='cascade', index=True, copy=False)
-    note = fields.Char(string='Description')
+    note = fields.Char(string='Remarks')
     stage_category = fields.Selection(related='custom_entry_id.stage_category', readonly=True)
     company_id = fields.Many2one(
         string='Company', related='custom_entry_id.company_id',
@@ -659,6 +659,8 @@ class CustomEntryLine(models.Model):
     date_arrival = fields.Date(string='Arrival Date', )    
     number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
     travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
+    t_travel_description = fields.Char(related='travel_reference.description_main', string = 'Travel Description')
+    t_travel_type = fields.Selection(related='travel_reference.travel_type', string = 'Travel For')
     t_unit_price = fields.Float(string="Travel Unit Price")
     t_extra_charges = fields.Float(string="Travel Extra Charges")
     t_amount_travel = fields.Float(string="Travel Total Amount", compute='_compute_all_amount_travel')
@@ -715,6 +717,8 @@ class CustomEntryLine(models.Model):
     h_check_out = fields.Date(string="Check-Out")
     h_number_of_nights = fields.Float(string="Number of Nights", compute='_number_of_nights')
     h_travel_id = fields.Many2one('travel.request' , string="Travel Request")
+    h_travel_description = fields.Char(related='h_travel_id.description_main', string = 'Travel Description')
+    h_travel_type = fields.Selection(related='h_travel_id.travel_type', string = 'Travel For')
     h_unit_price = fields.Float(string="Hotel Unit Price")
     h_extra_charges = fields.Float(string="Hote Extra Charges")
     h_amount = fields.Float(string="Total Amount", compute='_compute_all_amount_hotel')
