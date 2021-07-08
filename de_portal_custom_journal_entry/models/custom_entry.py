@@ -35,3 +35,6 @@ class CustumEntryline(models.Model):
 
 class CustumEntrystage(models.Model):
     _inherit = 'account.custom.entry.stage'    
+
+class MailMessage(models.Model):
+    _inherit = 'mail.message'    
