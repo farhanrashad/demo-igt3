@@ -24,6 +24,10 @@ class CustomEntry(models.Model):
             return False
         return self.stage_find(custom_entry_type_id, [('fold', '=', False)])
     
+    def _get_default_currency_id(self):
+        default_currency_id = self.env.context.get('default_currency_id')
+        return [default_currency_id] if default_currency_id else None
+    
     name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     date_entry = fields.Datetime(string='Entry Date', required=True, index=True, copy=False, default=fields.Datetime.now,)
     date_entry_month = fields.Selection(MONTH_LIST, string='Month')
@@ -34,7 +38,7 @@ class CustomEntry(models.Model):
 
     user_id = fields.Many2one('res.users', string="Request Owner",check_company=True, domain="[('company_ids', 'in', company_id)]", default=lambda self: self.env.user, required=True,readonly=True, )
     company_id = fields.Many2one('res.company', 'Company', copy=False, required=True, index=True, default=lambda s: s.env.company)
-    currency_id = fields.Many2one('res.currency', 'Currency', required=True,                                 default=lambda self: self.env.company.currency_id.id)
+    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=_get_default_currency_id)
     
     stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]", copy=False)
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
@@ -44,6 +48,11 @@ class CustomEntry(models.Model):
     amount_balance = fields.Float('Balance', compute='_amount_all')
  
     custom_entry_line = fields.One2many('account.custom.entry.line', 'custom_entry_id', string='Entry Line', copy=True, auto_join=True,)
+    
+    @api.onchange('custom_entry_type_id')
+    def _onchange_entry_type(self):
+        for entry in self:
+            entry.currency_id = entry.custom_entry_type_id.currency_id.id
     
     #account related fields
     stage_category = fields.Selection(related='stage_id.stage_category')
@@ -82,6 +91,7 @@ class CustomEntry(models.Model):
     has_analytic = fields.Selection(related="custom_entry_type_id.has_analytic")
     has_product = fields.Selection(related="custom_entry_type_id.has_product")
     has_employee = fields.Selection(related="custom_entry_type_id.has_employee")
+    has_supplier = fields.Selection(related="custom_entry_type_id.has_supplier")
     has_advanced = fields.Selection(related="custom_entry_type_id.has_advanced")
     
     #application optional fields
@@ -108,7 +118,9 @@ class CustomEntry(models.Model):
         string='Travel By', default='ticket')
     
     invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
-    invoice_count = fields.Integer(compute="_compute_invoice", string='Bill Count', copy=False, default=0, store=True)
+    invoice_count = fields.Integer(compute="_compute_all_moves", string='Bill Count', copy=False, default=0,)
+    move_count = fields.Integer(compute="_compute_all_moves", string='Move Count', copy=False, default=0)
+
 
     def _compute_entry_year(self):
         for entry in self:
@@ -175,7 +187,15 @@ class CustomEntry(models.Model):
         for entry in self:
             invoices = entry.mapped('custom_entry_line.invoice_lines.move_id')
             entry.invoice_ids = invoices
-            entry.invoice_count = len(invoices)
+            #entry.invoice_count = len(invoices)
+    
+    @api.depends('custom_entry_line.invoice_lines.move_id')
+    def _compute_all_moves(self):
+        Move = self.env['account.move']
+        can_read = Move.check_access_rights('read', raise_exception=False)
+        for move in self:
+            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'in_invoice')]) or 0
+            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry')]) or 0
 
    
     def _amount_all(self):
@@ -326,30 +346,45 @@ class CustomEntry(models.Model):
         })
     def _create_account_move(self):
         move = self.env['account.move']
+        company = self.company_id
         lines_data = []
-        debit = credit = 0
-        counter_debit = counter_credit = 0
+        debit = credit = amount = balance = 0
+        counter_debit = counter_credit = counter_amount = counter_balance = 0
         for line in self.custom_entry_line:
-            if self.custom_entry_id.custom_entry_type_id.counterpart_mode == 'debit':
-                credit = line.price_subtotal
+            if self.custom_entry_type_id.counterpart_mode == 'debit':
+                #credit = line.price_subtotal
+                amount = line.price_subtotal * -1
             else:
-                debit = line.price_subtotal
+                #debit = line.price_subtotal
+                amount = line.price_subtotal
+            balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+            debit = balance if balance > 0.0 else 0.0
+            credit = -balance if balance < 0.0 else 0.0
+                
                 
             lines_data.append([0,0,{
                 'name': str(self.name) + ' ' + str(line.product_id.name),
                 'custom_entry_line_id': line.id,
                 'account_id': self.custom_entry_type_id.account_id.id,
+                'amount_currency': amount,
+                'currency_id': self.currency_id.id,
                 'debit': debit,
                 'credit': credit,
-                'partner_id': line.partner_id.id,
+                'partner_id': line.supplier_id.id,
                 'analytic_account_id': line.analytic_account_id.id,
                 'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                 'project_id': line.project_id.id,
             }])
         if self.custom_entry_type_id.counterpart_mode == 'debit':
-            counter_debit = self.amount_total
+            #counter_debit = self.amount_total
+            counter_amount = self.amount_total
         else:
-            counter_credit = self.amount_total
+            #counter_credit = self.amount_total
+            counter_amount = self.amount_total * -1
+            
+        counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+        counter_debit = counter_balance if counter_balance > 0.0 else 0.0
+        counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
             
         lines_data.append([0,0,{
             'name': str(self.name),
@@ -357,23 +392,19 @@ class CustomEntry(models.Model):
             'account_id': self.custom_entry_type_id.counterpart_account_id.id,
             'debit': counter_debit,
             'credit': counter_credit,
+            'amount_currency': counter_amount,
+            'currency_id': self.currency_id.id,
             'partner_id': self.partner_id.id,
         }])
         move.create({
-            'move_type': 'in_invoice',
+            'move_type': 'entry',
             'custom_entry_id': self.id,
-            'invoice_date': fields.Datetime.now(),
-            'partner_id': self.partner_id.id,
-            #'partner_shipping_id': self.partner_id.id,
+            'ref':  str(self.name), 
+            'date': fields.Datetime.now(),
             'currency_id': self.currency_id.id,
             'journal_id': self.custom_entry_type_id.journal_id.id,
-            'invoice_origin': self.name,
-            #'fiscal_position_id': fpos.id,
-            'invoice_payment_term_id': self.partner_id.property_supplier_payment_term_id.id,
             'narration': self.name,
-            'invoice_user_id': self.user_id.id,
-            #'partner_bank_id': company.partner_id.bank_ids.filtered(lambda b: not b.company_id or b.company_id == company)[:1].id,
-            'invoice_line_ids':lines_data,
+            'line_ids':lines_data,
         })
         return move
     
@@ -562,7 +593,7 @@ class CustomEntryLine(models.Model):
     _description = 'Custom Entry Line'
     
     custom_entry_id = fields.Many2one('account.custom.entry', string='Custom Entry', required=True, ondelete='cascade', index=True, copy=False)
-    note = fields.Char(string='Remark')
+    note = fields.Char(string='Description')
     stage_category = fields.Selection(related='custom_entry_id.stage_category', readonly=True)
     company_id = fields.Many2one(
         string='Company', related='custom_entry_id.company_id',
@@ -579,6 +610,7 @@ class CustomEntryLine(models.Model):
     
     #employee
     employee_id = fields.Many2one('hr.employee',string="Employee")
+    supplier_id = fields.Many2one('res.partner',string="Supplier")
     
     #Product
     product_id = fields.Many2one('product.product', string="Products", check_company=True)
@@ -627,8 +659,6 @@ class CustomEntryLine(models.Model):
     date_arrival = fields.Date(string='Arrival Date', )    
     number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
     travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
-    t_travel_description = fields.Char(related='travel_reference.description_main', string = 'Travel Description')
-    t_travel_type = fields.Selection(related='travel_reference.travel_type', string = 'Travel For')
     t_unit_price = fields.Float(string="Travel Unit Price")
     t_extra_charges = fields.Float(string="Travel Extra Charges")
     t_amount_travel = fields.Float(string="Travel Total Amount", compute='_compute_all_amount_travel')
@@ -685,8 +715,6 @@ class CustomEntryLine(models.Model):
     h_check_out = fields.Date(string="Check-Out")
     h_number_of_nights = fields.Float(string="Number of Nights", compute='_number_of_nights')
     h_travel_id = fields.Many2one('travel.request' , string="Travel Request")
-    h_travel_description = fields.Char(related='h_travel_id.description_main', string = 'Travel Description')
-    h_travel_type = fields.Selection(related='h_travel_id.travel_type', string = 'Travel For')
     h_unit_price = fields.Float(string="Hotel Unit Price")
     h_extra_charges = fields.Float(string="Hote Extra Charges")
     h_amount = fields.Float(string="Total Amount", compute='_compute_all_amount_hotel')
@@ -740,7 +768,7 @@ class CustomEntryLine(models.Model):
     d_partner_id = fields.Many2one('res.partner',string='Drawn Purchase From', ondelete='cascade')
     d_product_qty = fields.Float(string='Drawn Qty', default=1.0, digits='Product Unit of Measure', )
     d_price_unit = fields.Float(string='Drawn Unit Price', default=1.0, digits='Product Price')
-    d_price_subtotal = fields.Monetary(compute='_compute_fuel_drawn_total', string='Drawn Subtotal', store=True)
+    d_price_subtotal = fields.Monetary(compute='_compute_fuel_drawn_total', string='Drawn Subtotal')
     d_booklet_no = fields.Char(string='Booklet')
     d_receipt_no = fields.Char(string='Receipt No.')
     
@@ -750,10 +778,8 @@ class CustomEntryLine(models.Model):
         tot = 0
         for line in self:
             if line.custom_entry_id.has_fuel_drawn:
-                line.d_product_qty * line.d_price_unit
-        self.update({
-            'd_price_subtotal': tot
-        })
+                tot = line.d_product_qty * line.d_price_unit
+        self.d_price_subtotal = tot
         
     #Fuel Filling
     f_date = fields.Date(string='Filling Date')

@@ -44,6 +44,7 @@ class CustomEntryType(models.Model):
         string='Counterpart Mode', default='debit')
     counterpart_account_id = fields.Many2one('account.account', string="Counterpart Account", company_dependent=True, check_company=True)
     payment_journal_id = fields.Many2one('account.journal', string="Payment Journal", required=True, company_dependent=True, check_company=True,  domain="[('type', 'in', ['bank', 'cash'])]")
+    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=lambda self: self.env.company.currency_id.id)
 
     group_id = fields.Many2one('res.groups', string='Security Group')
 
@@ -66,6 +67,7 @@ class CustomEntryType(models.Model):
     has_advanced = fields.Selection(CATEGORY_SELECTION, string="Has Advanced Amount", default="no", required=True,)
     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Has Analytic", default="no", required=True,)
     has_employee = fields.Selection(CATEGORY_SELECTION, string="Has Employee", default="no", required=True,)
+    has_supplier = fields.Selection(CATEGORY_SELECTION, string="Has Supplier", default="no", required=True,)
     #feature options fields
     has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
     has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)

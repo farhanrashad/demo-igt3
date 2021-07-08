@@ -59,7 +59,7 @@
         
                         <!--<button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>-->
                                                 
-                        <button string="Journal Entry" name="create_journal_entry" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','bill')]}"/>
+                        <button string="Journal Entry" name="create_journal_entry" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','entry')]}"/>
 
                         <button string="Create Payment" name="create_payment" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','payment')]}" invisible="0"/>
 
@@ -73,13 +73,18 @@
                         
                         
                         <div class="oe_button_box" name="button_box">
-                        <button type="object"  name="action_view_invoice"
+                        <button type="object"  name="action_view_invoice" attrs="{'invisible': [('invoice_count', '=', 0)]}" 
                             class="oe_stat_button"
                             icon="fa-pencil-square-o">
                             <field name="invoice_count" widget="statinfo" string="Bill"/>
                             <field name='invoice_ids' invisible="1"/>
                         </button>
-                          <button name="action_view_payment" type="object" class="oe_stat_button"  icon="fa-usd"  string="Payment" attrs="{'invisible': [('payment_count', '=', 0)]}">
+                        <button type="object"  name="action_view_invoice" attrs="{'invisible': [('move_count', '=', 0)]}" 
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o">
+                            <field name="move_count" widget="statinfo" string="Journal Entry"/>
+                        </button>
+                        <button name="action_view_payment" type="object" class="oe_stat_button"  icon="fa-usd"  string="Payment" attrs="{'invisible': [('payment_count', '=', 0)]}">
                         </button>  
                     </div>
                         <field name="payment_count" invisible="1"/>
@@ -98,6 +103,7 @@
                         <field name="has_analytic" invisible="1"/>
                         <field name="has_product" invisible="1"/>
                         <field name="has_employee" invisible="1"/>
+                        <field name="has_supplier" invisible="1"/>
                         <field name="has_advanced" invisible="1"/>
                         
                         <field name="has_rent_vechile" invisible="1"/>
@@ -199,8 +205,6 @@
                                     <field name="date_arrival" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>             
                                     <field name="number_of_days" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="travel_reference" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_travel_description" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_travel_type" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="t_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="t_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
                                     <field name="t_amount_travel" string="Total" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
@@ -220,8 +224,6 @@
                                     <field name="h_check_out" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_number_of_nights" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_travel_id" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_travel_description" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_travel_type" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_amount" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
@@ -268,6 +270,8 @@
                                     <field name="f_receipt_no" string="Receipt No." attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
 
                                     <field name="employee_id" attrs="{'column_invisible':[('parent.has_employee','==','no')], 'required': [('parent.has_employee','==','required')]}"/>
+                                    <field name="supplier_id" attrs="{'column_invisible':[('parent.has_supplier','==','no')], 'required': [('parent.has_supplier','==','required')]}"/>
+
 
                                     <field name='note' optional="show"/>
 

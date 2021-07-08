@@ -16,7 +16,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Accounting',
-    'version': '14.0.5.4',
+    'version': '14.0.5.6',
     
     'depends': ['base','de_purchase_subscription','account', 'analytic', 'fleet', 'de_project_planning','project','stock','purchase_requisition','purchase','de_travel_request'],
 
