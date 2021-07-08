@@ -82,29 +82,57 @@ class TopUpRequest(models.Model):
         oredoo = 0
         mpt = 0
         mytel = 0
-        for request_line in  self.topup_request_lines:
-            telenor += request_line.telenor
-            oredoo += request_line.ooredoo
-            mpt += request_line.mpt  
-            mytel += request_line.mytel
-            
-        for balance_line in balance.topup_balance_lines:
-            if  balance_line.operator == 'telenor':       
-                balance_line.update({
-                    'distributed_qty': balance_line.distributed_qty + telenor
-                })
-            if  balance_line.operator == 'ooredoo':       
-                balance_line.update({
-                    'distributed_qty': balance_line.distributed_qty + oredoo
-                })
-            if  balance_line.operator == 'mpt':       
-                balance_line.update({
-                    'distributed_qty': balance_line.distributed_qty + mpt
-                })
-            if  balance_line.operator == 'mytel':       
-                balance_line.update({
-                    'distributed_qty': balance_line.distributed_qty + mytel
-                })    
+        if self.type == 'employee benfit':
+            for request_line in  self.topup_request_lines:
+                telenor += request_line.telenor
+                oredoo += request_line.ooredoo
+                mpt += request_line.mpt  
+                mytel += request_line.mytel
+
+            for balance_line in balance.topup_balance_lines:
+                if  balance_line.operator == 'telenor':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + telenor
+                    })
+                if  balance_line.operator == 'ooredoo':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + oredoo
+                    })
+                if  balance_line.operator == 'mpt':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + mpt
+                    })
+                if  balance_line.operator == 'mytel':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + mytel
+                    })
+                    
+        elif self.type == 'category use':
+            for category_line in  self.topup_request_lines_category:
+                telenor += category_line.telenor
+                oredoo += category_line.ooredoo
+                mpt += category_line.mpt  
+                mytel += category_line.mytel
+
+            for balance_line in balance.topup_balance_lines:
+                if  balance_line.operator == 'telenor':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + telenor
+                    })
+                if  balance_line.operator == 'ooredoo':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + oredoo
+                    })
+                if  balance_line.operator == 'mpt':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + mpt
+                    })
+                if  balance_line.operator == 'mytel':       
+                    balance_line.update({
+                        'distributed_qty': balance_line.distributed_qty + mytel
+                    })    
+
+                    
 
     current_date = date.today()
     end_date = current_date + timedelta(days=30)
