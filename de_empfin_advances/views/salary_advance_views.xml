@@ -77,9 +77,10 @@
                                <field name="cash_line_ids" attrs="{'readonly':[('state','in',('paid','cancel','close','reject'))]}" >
                                 <tree editable="bottom">
                                     <field name="currency_id" invisible="1" />
-                                  <field name="type_id" attrs="{'readonly':[('state','!=','draft')]}" />
-                                 <field name="product_id" attrs="{'readonly':[('state','!=','draft')]}" optional="hide"/>
-                                 <field name="description" attrs="{'readonly':[('state','!=','draft')]}" />
+                                <field name="name" invisible="1"/>
+                                  <field name="type_id" options="{'no_create':True}" attrs="{'readonly':[('state','!=','draft')]}" />
+                                 <field name="product_id" options="{'no_create':True}" attrs="{'readonly':[('state','!=','draft')]}" />
+                                 <field name="desc" attrs="{'readonly':[('state','!=','draft')]}" />
                                  <field name="quantity" attrs="{'readonly':[('state','!=','draft')]}" />
                                  <field name="unit_price" attrs="{'readonly':[('state','!=','draft')]}" />
                                  <field name="total_amount" sum="Total"/>  
