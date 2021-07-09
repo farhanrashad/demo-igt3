@@ -1,5 +1,13 @@
-from odoo import models, fields, api, _
+import base64
 
+from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
+
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_round, date_utils
+from odoo.tools.misc import format_date
+from odoo.tools.safe_eval import safe_eval
 
 class HrPayslipRun(models.Model):
     _name = 'hr.payslip.run'
