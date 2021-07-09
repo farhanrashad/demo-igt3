@@ -74,7 +74,7 @@
                                     </td>
                                     
                                     <td class="text-left">
-                                         <a t-attf-href="/web/content/#{custom.custom_entry_type_id.attachment_id.id}?download=true" title="Dowload"><i class="fa fa-download"></i></a>
+                                         <a t-attf-href="/web/content/#{custom.entry_attachment_id.id}?download=true" title="Dowload"><i class="fa fa-download"></i></a>
                                     </td>
                                     <td class="text-left">
                                         <t t-if="custom.is_custom_entry_import == True">
@@ -336,7 +336,7 @@
                                             <td><span t-esc="entry_line.h_check_in"/></td>
                                             <td><span t-esc="entry_line.h_check_out"/></td>
                                             <td><span t-esc="entry_line.h_travel_id.name"/></td>
-                                            <td><span t-esc="entry_line.number_of_nights"/></td>
+                                            <td></td> 
                                             <td><span t-esc="entry_line.h_amount"/></td>
                                         </tr>
 
@@ -436,9 +436,9 @@
                              
                              
                              <div class="row">
-                                 <t t-if="entry.description"> 
+                                 <t t-if="entry.correction_reason"> 
                                 <div class="col-md-5"> <strong>Comments : </strong>                                   
-                                        <span t-esc="entry.description"/>
+                                      <p style='color:red;'>  <span t-esc="entry.correction_reason"/> </p>
                                 </div>
                                 </t> 
                                

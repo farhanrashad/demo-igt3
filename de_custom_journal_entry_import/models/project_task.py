@@ -105,14 +105,24 @@ class ProjectTask(models.Model):
                 rowvals = []
                 vals = []
                 line_vals = {}
+                attachment_vals = {
+                     'name': custom.entry_attachment_id.name,
+                     'type': 'binary',
+                     'datas':  custom.entry_attachment_id.datas, 
+                }
+                attachment = self.env['ir.attachment'].create(attachment_vals)
                 custom_entry_id_vals = self.custom_entry_id.id
                 if self.custom_entry_id:
                     custom_entry_id_vals = self.custom_entry_id.id
                     entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
                     for entry_line in entry.custom_entry_line:
                         entry_line.unlink()
-                    self.custom_entry_id.is_custom_entry_import = False    
-                            
+                    custom.custom_entry_id.is_custom_entry_import = False
+                    custom.custom_entry_id.correction_reason = ' ' 
+                    custom.custom_entry_id.entry_attachment_id  = [[6, 0, attachment.ids]], 
+                    
+                    
+                                              
                 else:    
                     partner = custom.entry_partner_id.id
                     user = custom.user_id.id
@@ -135,7 +145,8 @@ class ProjectTask(models.Model):
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
                         'currency_id': self.env.company.currency_id.id,
-                        'company_id': self.env.company.id, 
+                        'company_id': self.env.company.id,
+                        'entry_attachment_id': [[6, 0, attachment.ids]], 
                         'user_id': user,
                         'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,

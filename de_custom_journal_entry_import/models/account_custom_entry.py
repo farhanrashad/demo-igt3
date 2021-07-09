@@ -19,6 +19,10 @@ class AccountCustomEntry(models.Model):
     _inherit = 'account.custom.entry'
     
     is_custom_entry_import = fields.Boolean(string='Update Entry')
+    entry_attachment_id = fields.Many2many('ir.attachment', relation="files_rel_account_custom_entry",
+                                            column1="doc_id",
+                                            column2="entry_attachment_id",
+                                            string="Entry Attachment")
     
     
     
