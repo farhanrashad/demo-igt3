@@ -212,7 +212,7 @@ class Calendar(models.Model):
         ('evening', 'Evening'),
         ('night', 'Night'),
         
-    ], string='Shift Type',copy=False, required=True)
+    ], string='Shift Type',copy=True, required=True)
     
     
     def _check_overlap(self, attendance_ids):
