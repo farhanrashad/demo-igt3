@@ -53,7 +53,7 @@ class ProjectTask(models.Model):
 
     entry_attachment_id = fields.Many2many('ir.attachment', relation="files_rel_project_task_entry",
                                             column1="doc_id",
-                                            column2="entry_attachment_id",
+                                            column2="attachment_id",
                                             string="Entry Attachment")
 
 
