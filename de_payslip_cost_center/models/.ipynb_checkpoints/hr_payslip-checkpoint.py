@@ -16,17 +16,16 @@ class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
     
 
-
     def compute_sheet(self):
+        res = super(HrPayslip, self).compute_sheet()
         for payslip in self:
-            res = super(HrPayslip, payslip).compute_sheet()
             for rule in payslip.line_ids:
     #                 rule_code = 'COST1'
                 cost_amount = 0
                 contract = self.env['hr.contract'].search([('employee_id','=',payslip.employee_id.id),('state','=','open')],limit=1)
                 for cost_line in contract.cost_center_information_line:
                     if cost_line.cost_center_id.id == rule.salary_rule_id.analytic_account_id.id:
-    #                     rule_code =  cost_line.cost_center_id.code 
+    #                     rule_code =  cost_line.cost_center.code 
     #                     for inner_rule in self.line_ids:
                         if rule.category_id.name in ['Basic','Allowance','Contribution Exp']:
                             cost_amount = (cost_line.percentage_charged / 100) * rule.amount
@@ -71,7 +70,7 @@ class HrPayslip(models.Model):
                         'amount': total_basic + total_allowance + total_compensation + total_deduction
                     })
 
-            return res
+        return res
 
 
 
