@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <odoo>
+
     <record id="view_custom_entry_type_correction_reason" model="ir.ui.view">
             <field name="name">account.custom.entry.corrction.reason</field>
             <field name="model">account.custom.entry</field>
