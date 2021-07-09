@@ -16,6 +16,7 @@ class PaymentAllocation(models.TransientModel):
     is_invoice = fields.Boolean(string='Is Invoice')
     account_id = fields.Many2one('account.account', string='Account', required=False)
     amount = fields.Float(string='Amount')
+    journal_entries_ids = fields.One2many('invoice.allocation.wizard.line.entry', 'allocation_id', string='Journal Entries')
     payment_line_ids = fields.One2many('payment.allocation.wizard.line', 'allocation_id', string='Payment Lines')
     invoice_move_ids = fields.One2many('invoice.allocation.wizard.line', 'allocation_id', string='Invoice Lines')
     invoice_refund_ids = fields.One2many('invoice.allocation.wizard.line.credit', 'allocation_id', string='Invoice Refund Lines')
@@ -34,7 +35,7 @@ class PaymentAllocation(models.TransientModel):
         "SEPA Credit Transfer: Pay bill from a SEPA Credit Transfer file you submit to your bank. To enable sepa credit transfer, module account_sepa must be installed ")
     
     
-    @api.depends('invoice_move_ids.allocate_amount', 'payment_line_ids.allocate_amount')
+    @api.depends('invoice_move_ids.allocate_amount', 'payment_line_ids.allocate_amount', 'invoice_refund_ids.allocate_amount', 'journal_entries_ids.allocate_amount')
     def _amount_all(self):
         for order in self:
             amount_untaxed = 0.0
@@ -42,6 +43,12 @@ class PaymentAllocation(models.TransientModel):
                 for line in order.invoice_move_ids:
                     if line.allocate == True:
                         amount_untaxed += line.allocate_amount
+                for refund_line in order.invoice_refund_ids:
+                    if refund_line.allocate == True:
+                        amount_untaxed += refund_line.allocate_amount 
+                for entry_line in order.journal_entries_ids:
+                    if entry_line.allocate == True:
+                        amount_untaxed += entry_line.allocate_amount         
             else:
                 for payment_line in order.payment_line_ids:
                     if payment_line.allocate == True:
@@ -49,6 +56,8 @@ class PaymentAllocation(models.TransientModel):
             order.update({
                 'allocated_amount': amount_untaxed 
             })
+            if order.payment_id.amount < order.allocated_amount:
+                raise UserError(_('Allocated Amount can not be greater than Payment Amount! '+str(order.payment_id.amount)))
             
     
     @api.depends('journal_id')
@@ -130,15 +139,15 @@ class PaymentAllocation(models.TransientModel):
                 
                 refund_debit_line = 0
                 refund_credit_line = 0
-                move_debit_line = 0
+                pmove_debit_line = 0
                 for line in refund.move_id.line_ids:
-                    if line.credit != 0.0:
-                        refund_credit_line = line.id 
                     if line.credit == 0.0:
-                        refund_debit_line = line.id  
+                        refund_credit_line = line.id 
+
                         
-                for inv_line in self.payment_id.move_id.line_ids:                    
-                    move_debit_line = inv_line.id
+                for inv_line in self.payment_id.move_id.line_ids:
+                    if inv_line.debit == 0.0:
+                        pmove_debit_line = inv_line.id
                     
                     
                 refund_recocile_vals = {
@@ -153,8 +162,8 @@ class PaymentAllocation(models.TransientModel):
                 vals = {
                     'full_reconcile_id': refund_reconcile_id.id,
                     'amount':  refund.allocate_amount,
-                    'credit_move_id':  refund_credit_line,
-                    'debit_move_id': move_debit_line,
+                    'credit_move_id':  pmove_debit_line ,
+                    'debit_move_id': refund_credit_line,
                     'credit_amount_currency': refund_amount_reconcile,
                     'debit_amount_currency': refund_amount_reconcile,
                 }
@@ -176,7 +185,13 @@ class PaymentAllocation(models.TransientModel):
         tot_payment_amount = 0.0    
         for invoice in self.invoice_move_ids:
             if invoice.allocate == True:
-                tot_invoice_amount = tot_invoice_amount + invoice.allocate_amount  
+                tot_invoice_amount = tot_invoice_amount + invoice.allocate_amount 
+        for refund_mv in self.invoice_refund_ids:
+            if refund_mv.allocate == True:
+                tot_invoice_amount = tot_invoice_amount + refund_mv.allocate_amount 
+        for jv_mv in self.journal_entries_ids:
+            if jv_mv.allocate == True:
+                tot_invoice_amount = tot_invoice_amount + jv_mv.allocate_amount         
 
         for payment_line in self.payment_line_ids:                    
             tot_payment_amount = tot_payment_amount + payment_line.allocate_amount
@@ -247,19 +262,83 @@ class PaymentAllocation(models.TransientModel):
                         }
                     inv_payment = self.env['account.partial.reconcile'].create(ext_vals)
                     
+        for journal_move in self.journal_entries_ids:
+            if journal_move.allocate == True:
+                jv_debit_line = 0
+                jv_credit_line = 0
+                jv_payment_debit_line = 0
+                for jv_line in journal_move.move_id.line_ids:
+                    if jv_line.credit != 0.0:
+                        jv_credit_line = jv_line.id 
+                    if jv_line.credit == 0.0:
+                        jv_debit_line = jv_line.id    
+                for jv_payment_line in self.payment_id.move_id.line_ids:                    
+                    jv_payment_debit_line = jv_payment_line.id
+                
+                jv_reconcile_amount = 0.0
+                if journal_move.move_id.currency_id.id != self.payment_id.currency_id.id:
+                    jv_reconcile_amount = journal_move.currency_id._convert(journal_move.allocate_amount, self.payment_id.currency_id, self.payment_id.company_id, self.payment_id.date)    
+                jv_recocile_vals = {
+                    'exchange_move_id': journal_move.move_id.id,
+                }
+                jv_reconcile_id = self.env['account.full.reconcile'].create(jv_recocile_vals)
+                 
+                
+                jv_amount_reconcile = 0.0
+                if journal_move.move_id.currency_id.id == self.payment_id.currency_id.id:
+                    jv_amount_reconcile = journal_move.allocate_amount
+                else:
+                    jv_amount_reconcile = self.payment_id.currency_id._convert(journal_move.allocate_amount, journal_move.move_id.currency_id, journal_move.move_id.company_id, journal_move.move_id.date) 
+                jv_vals = {
+                    'full_reconcile_id': jv_reconcile_id.id,
+                    'amount':  journal_move.allocate_amount,
+                    'credit_move_id':  jv_credit_line,
+                    'debit_move_id': jv_payment_debit_line,
+                    'credit_amount_currency': jv_amount_reconcile,
+                    'debit_amount_currency': jv_amount_reconcile,
+                }
+                jv_payment = self.env['account.partial.reconcile'].create(jv_vals)
+                
+                if jv_reconcile_amount == journal_move.allocate_amount:
+                    
+                    jv_exchange_amount = journal_move.move_id.amount_residual 
+                    
+                    jv_exchange_moves = self.action_exchange_rate(journal_move.currency_id.id, jv_exchange_amount)
+                    jv_ext_payment_debit_line = 0
+                    for jv_ext_line in jv_exchange_moves.line_ids:
+                        jv_ext_payment_debit_line = jv_ext_line.id
+                        break
+                    for jv_ext_line in jv_exchange_moves.line_ids:
+                        if jv_ext_line.account_id.id == self.payment_id.destination_account_id.id:
+                            jv_ext_payment_debit_line = jv_ext_line.id
+                    jv_ext_recocile_vals = {
+                        'exchange_move_id': journal_move.move_id.id,
+                        }
+                        
+                    jv_ex_reconcile_id = self.env['account.full.reconcile'].create(jv_ext_recocile_vals)                       
+                    jv_ext_vals = {
+                        'full_reconcile_id': jv_ex_reconcile_id.id,
+                        'amount':  journal_move.allocate_amount,
+                        'credit_move_id':  jv_credit_line,
+                        'debit_move_id': jv_ext_payment_debit_line,
+                        'credit_amount_currency': jv_exchange_amount,
+                        'debit_amount_currency': jv_exchange_amount,
+                        }
+                    jv_inv_payment = self.env['account.partial.reconcile'].create(jv_ext_vals)
+                                
+                    
         for refund in self.invoice_refund_ids:
             if refund.allocate == True:
                 refund_debit_line = 0
                 refund_credit_line = 0
                 refund_payment_debit_line = 0
                 for line in refund.move_id.line_ids:
-                    if line.credit != 0.0:
-                        refund_credit_line = line.id 
                     if line.credit == 0.0:
-                        refund_debit_line = line.id    
-                refund.move_id.id
-                for refund_payment_line in self.payment_id.move_id.line_ids:                    
-                    refund_payment_debit_line = refund_payment_line.id
+                        refund_credit_line = line.id 
+                     
+                for refund_payment_line in self.payment_id.move_id.line_ids:
+                    if line.debit == 0.0:
+                        refund_payment_debit_line = refund_payment_line.id
                 
                 refund_reconcile_amount = 0.0
                 if refund.move_id.currency_id.id != self.payment_id.currency_id.id:
@@ -278,8 +357,8 @@ class PaymentAllocation(models.TransientModel):
                 vals = {
                     'full_reconcile_id': refund_reconcile_id.id,
                     'amount':  refund.allocate_amount,
-                    'credit_move_id':  refund_credit_line,
-                    'debit_move_id': refund_payment_debit_line,
+                    'credit_move_id':  refund_payment_debit_line,
+                    'debit_move_id': refund_credit_line ,
                     'credit_amount_currency': refund_amount_reconcile,
                     'debit_amount_currency': refund_amount_reconcile,
                 }
@@ -463,23 +542,24 @@ class InvoiceAllocationLineCreditmemo(models.TransientModel):
         string='Invoice Currency')
     
     
-#     @api.onchange('allocate')
-#     def onchange_allocate(self):
-#         payment_amount = 0.0
-#         inv_amount = 0.0
-#         amount = 0.0
-#         for payment in self.allocation_id.payment_line_ids:
-#             payment_amount = payment.allocate_amount     
-#         for inv in self:
-#             if inv.allocate == True:
-#                 if inv.move_id.currency_id.id == inv.allocation_id.payment_id.currency_id.id:                
-#                     inv_amount = inv_amount + inv.allocate_amount
-#                 else:
-#                     inv_amount = inv_amount + inv.move_id.currency_id._convert(inv.allocate_amount, inv.allocation_id.payment_id.currency_id, inv.allocation_id.payment_id.company_id, inv.allocation_id.payment_id.date)
-
-
-#         if  payment_amount <  inv_amount:
-#             amount = inv_amount - payment_amount
-#             raise UserError(_('Allocate Amount cannot be greater than '+str(payment_amount)))
+class InvoiceAllocationLineEntry(models.TransientModel):
+    _name = 'invoice.allocation.wizard.line.entry'
+    _description = 'Invoice Allocation Wizard Line Entry'
+    
+    
+    move_id = fields.Many2one('account.move', string='Invoice', store=True)
+    allocation_id = fields.Many2one('payment.allocation.wizard', string='Allocation', store=True)
+    payment_date = fields.Date(string='Invoice Date', store=True)
+    due_date = fields.Date(string='Due Date', store=True)
+    invoice_amount = fields.Float(string='Invoice Amount', store=True)
+    unallocate_amount = fields.Float(string='Unallocated Amount', store=True)
+    allocate = fields.Boolean(string='Allocate', store=True)
+    allocate_amount = fields.Float(string='allocate Amount', store=True)
+    currency_id = fields.Many2one('res.currency', store=True, readonly=True, tracking=True, required=False,
+        string='Currency')
+    original_currency_id = fields.Many2one('res.currency', store=True, readonly=True, tracking=True, required=False,
+        string='Invoice Currency')    
+    
+    
 
                         
