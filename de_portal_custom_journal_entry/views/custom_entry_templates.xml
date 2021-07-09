@@ -74,7 +74,7 @@
                                     </td>
                                     
                                     <td class="text-left">
-                                         <a t-attf-href="/web/content/#{custom.custom_entry_type_id.attachment_id.id}?download=true" title="Dowload"><i class="fa fa-download"></i></a>
+                                         <a t-attf-href="/web/content/#{custom.entry_attachment_id.id}?download=true" title="Dowload"><i class="fa fa-download"></i></a>
                                     </td>
                                     <td class="text-left">
                                         <t t-if="custom.is_custom_entry_import == True">

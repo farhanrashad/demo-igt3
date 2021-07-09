@@ -53,7 +53,7 @@ class ProjectTask(models.Model):
 
     entry_attachment_id = fields.Many2many('ir.attachment', relation="files_rel_project_task_entry",
                                             column1="doc_id",
-                                            column2="attachment_id",
+                                            column2="entry_attachment_id",
                                             string="Entry Attachment")
 
 
@@ -111,8 +111,9 @@ class ProjectTask(models.Model):
                     entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
                     for entry_line in entry.custom_entry_line:
                         entry_line.unlink()
-                    self.custom_entry_id.is_custom_entry_import = False
-                    self.correction_reason = ' '  
+                    custom.custom_entry_id.is_custom_entry_import = False
+                    custom.custom_entry_id.correction_reason = ' ' 
+                    custom.custom_entry_id.entry_attachment_id  = [[6, 0, custom.entry_attachment_id.ids]], 
                             
                 else:    
                     partner = custom.entry_partner_id.id
@@ -136,7 +137,8 @@ class ProjectTask(models.Model):
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
                         'currency_id': self.env.company.currency_id.id,
-                        'company_id': self.env.company.id, 
+                        'company_id': self.env.company.id,
+                        'entry_attachment_id': [[6, 0, custom.entry_attachment_id.ids]], 
                         'user_id': user,
                         'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,
