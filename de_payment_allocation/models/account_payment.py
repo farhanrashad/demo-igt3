@@ -65,10 +65,10 @@ class AccountPayment(models.Model):
         for ppartner in uniq_partner:
             invoices = self.env['account.move'].search([('state','=','posted'),('partner_id','=',ppartner)])  
             if self.payment_type == 'outbound':
-                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', 'in', ('in_invoice')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
+                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', '=', 'in_invoice'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))]) 
                 
             elif self.payment_type == 'inbound':
-                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', 'in', ('out_invoice')),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
+                invoices = self.env['account.move'].search([('state','=','posted'),('move_type', '=', 'out_invoice'),('partner_id','=',ppartner),('payment_state','in', ('not_paid','partial'))])     
                 
                 
             for  inv in invoices:
@@ -131,16 +131,7 @@ class AccountPayment(models.Model):
             for  entry_inv in entry_invoices:
                 jv_amount = 0.0
                 currency = 0
-                for jv_line in refund_inv.line_ids:
-                    for debit_line_jv in jv_line.matched_debit_ids:
-                        jv_amount = debit_line_jv.amount
-#                         if jv_line.credit == 0.0:
-#                             jv_amount += debit_line_jv.amount   
-#                     for credit_line_jv in jv_line.matched_credit_ids:
-#                         if jv_line.debit == 0.0:
-#                             jv_amount += credit_line_jv.amount
-#                         if jv_line.credit == 0.0:
-#                             jv_amount += credit_line_jv.amount   
+                jv_amount = entry_inv.amount_total - entry_inv.reconcile_amount 
                             
                 if entry_inv.currency_id.id == self.currency_id.id:
                     
@@ -148,18 +139,19 @@ class AccountPayment(models.Model):
                 else:
                     jv_amount = entry_inv.currency_id._convert(jv_amount, self.currency_id, self.company_id, self.date)
                     currency = self.currency_id.id 
-
-                entry_move_lines.append((0,0,{
-                    'move_id': entry_inv.id,
-                    'payment_date': entry_inv.invoice_date,
-                    'due_date': entry_inv.invoice_date_due,
-                    'invoice_amount': entry_inv.amount_total,
-                    'unallocate_amount': jv_amount,
-                    'allocate': False,
-                    'allocate_amount': jv_amount,
-                    'currency_id': currency,
-                    'original_currency_id': entry_inv.currency_id.id, 
-                }))  
+                if jv_amount > 0.0:
+                    if not entry_inv.payment_id:
+                        entry_move_lines.append((0,0,{
+                            'move_id': entry_inv.id,
+                            'payment_date': entry_inv.invoice_date,
+                            'due_date': entry_inv.invoice_date_due,
+                            'invoice_amount': entry_inv.amount_total,
+                            'unallocate_amount': jv_amount,
+                            'allocate': False,
+                            'allocate_amount': jv_amount,
+                            'currency_id': currency,
+                            'original_currency_id': entry_inv.currency_id.id, 
+                        }))  
                 
         return {
             'name': ('Payment Allocation'),

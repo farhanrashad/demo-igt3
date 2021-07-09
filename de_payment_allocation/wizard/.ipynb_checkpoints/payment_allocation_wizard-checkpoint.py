@@ -35,7 +35,7 @@ class PaymentAllocation(models.TransientModel):
         "SEPA Credit Transfer: Pay bill from a SEPA Credit Transfer file you submit to your bank. To enable sepa credit transfer, module account_sepa must be installed ")
     
     
-    @api.depends('invoice_move_ids.allocate_amount', 'payment_line_ids.allocate_amount', 'invoice_refund_ids.allocate_amount')
+    @api.depends('invoice_move_ids.allocate_amount', 'payment_line_ids.allocate_amount', 'invoice_refund_ids.allocate_amount', 'journal_entries_ids.allocate_amount')
     def _amount_all(self):
         for order in self:
             amount_untaxed = 0.0
@@ -56,6 +56,8 @@ class PaymentAllocation(models.TransientModel):
             order.update({
                 'allocated_amount': amount_untaxed 
             })
+            if order.payment_id.amount < order.allocated_amount:
+                raise UserError(_('Allocated Amount can not be greater than Payment Amount! '+str(order.payment_id.amount)))
             
     
     @api.depends('journal_id')
@@ -141,8 +143,7 @@ class PaymentAllocation(models.TransientModel):
                 for line in refund.move_id.line_ids:
                     if line.credit == 0.0:
                         refund_credit_line = line.id 
-#                     if line.credit == 0.0:
-#                         refund_debit_line = line.id  
+
                         
                 for inv_line in self.payment_id.move_id.line_ids:
                     if inv_line.debit == 0.0:
@@ -560,23 +561,5 @@ class InvoiceAllocationLineEntry(models.TransientModel):
         string='Invoice Currency')    
     
     
-#     @api.onchange('allocate')
-#     def onchange_allocate(self):
-#         payment_amount = 0.0
-#         inv_amount = 0.0
-#         amount = 0.0
-#         for payment in self.allocation_id.payment_line_ids:
-#             payment_amount = payment.allocate_amount     
-#         for inv in self:
-#             if inv.allocate == True:
-#                 if inv.move_id.currency_id.id == inv.allocation_id.payment_id.currency_id.id:                
-#                     inv_amount = inv_amount + inv.allocate_amount
-#                 else:
-#                     inv_amount = inv_amount + inv.move_id.currency_id._convert(inv.allocate_amount, inv.allocation_id.payment_id.currency_id, inv.allocation_id.payment_id.company_id, inv.allocation_id.payment_id.date)
-
-
-#         if  payment_amount <  inv_amount:
-#             amount = inv_amount - payment_amount
-#             raise UserError(_('Allocate Amount cannot be greater than '+str(payment_amount)))
 
                         

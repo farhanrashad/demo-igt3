@@ -30,6 +30,7 @@
         'wizard/payment_allocation_wizard_views.xml',
         'security/ir.model.access.csv',
         'views/account_payment_views.xml',
+        'views/account_move_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
