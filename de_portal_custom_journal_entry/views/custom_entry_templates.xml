@@ -336,7 +336,7 @@
                                             <td><span t-esc="entry_line.h_check_in"/></td>
                                             <td><span t-esc="entry_line.h_check_out"/></td>
                                             <td><span t-esc="entry_line.h_travel_id.name"/></td>
-                                            <td><span t-esc="entry_line.number_of_nights"/></td>
+                                            <td></td> 
                                             <td><span t-esc="entry_line.h_amount"/></td>
                                         </tr>
 
