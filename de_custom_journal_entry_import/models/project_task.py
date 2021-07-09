@@ -119,7 +119,9 @@ class ProjectTask(models.Model):
                         entry_line.unlink()
                     custom.custom_entry_id.is_custom_entry_import = False
                     custom.custom_entry_id.correction_reason = ' ' 
-                    custom.custom_entry_id.entry_attachment_id  = [[6, 0, attachment.ids]], 
+                    custom.custom_entry_id.update({
+                           'entry_attachment_id'  : [[6, 0, attachment.ids]], 
+                           })
                     
                     
                                               
