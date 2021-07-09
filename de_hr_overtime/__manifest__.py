@@ -2,7 +2,7 @@
 ###################################################################################
 {
     'name': 'Employee Overtime',
-    'version': '14.0.0.5',
+    'version': '14.0.0.6',
     'summary': 'Manage Employee Overtime',
     'description': """
         Helps you to manage Employee Overtime.
