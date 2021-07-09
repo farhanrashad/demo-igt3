@@ -9,7 +9,7 @@ class HrPayslip(models.Model):
     type = fields.Selection([
         ('expat', 'Expat'),
         ('local', 'Local'),
-    ], default=False,  string='Type', help="Technical field for UX purpose.")
+    ], string='Type')
     
     
    

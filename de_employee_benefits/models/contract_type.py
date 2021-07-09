@@ -9,8 +9,7 @@ class ContractType(models.Model):
     
     name = fields.Char(string='Reference')
     sequence_code = fields.Char(string="Code")
-    sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
-        copy=False, check_company=True)
+    sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence', copy=False, check_company=True)
     company_id = fields.Many2one(
         'res.company', 'Company', copy=False,
         required=True, index=True, default=lambda s: s.env.company)
