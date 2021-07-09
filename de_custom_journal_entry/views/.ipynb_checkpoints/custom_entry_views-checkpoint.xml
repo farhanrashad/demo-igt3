@@ -59,7 +59,7 @@
         
                         <!--<button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>-->
                                                 
-                        <button string="Journal Entry" name="create_journal_entry" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','entry')]}"/>
+                        <button string="Journal Entry" name="create_journal_entry" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','entry')]}"/>
 
                         <button string="Create Payment" name="create_payment" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','payment')]}" invisible="0"/>
 
@@ -99,6 +99,7 @@
                         <field name="has_picking" invisible="1"/>
                         <field name="has_invoice" invisible="1"/>
                         
+                        <field name="has_line_period" invisible="1"/>
                         <field name="has_project" invisible="1"/>
                         <field name="has_analytic" invisible="1"/>
                         <field name="has_product" invisible="1"/>
@@ -181,7 +182,9 @@
                                     <field name="currency_id" invisible="1" />
                                     <field name="product_uom_category_id" invisible="1" />
                                     
-                                    <!-- Project -->
+                                    <!-- Line Item -->
+                                    <field name="date_entry_period" attrs="{'column_invisible':[('parent.has_line_period','==','no')], 'required': [('parent.has_line_period','==','required')]}"/>
+                                   <!-- Project --> 
                                     <field name="project_id" attrs="{'column_invisible':[('parent.has_project','==','no')], 'required': [('parent.has_project','==','required')]}" options="{'no_create':True}" />
                                     <field name="state_id" attrs="{'column_invisible':[('parent.has_project','==','no')]}" optional="hide" />
 
@@ -248,7 +251,9 @@
                                     
                                     <!-- Fuel drawn-->
                                     <field name="d_date" string="Date" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_partner_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
+                                    <field name="d_partner_id" string="Purchase Partner" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
+                                    <field name="d_contact_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
+
                                     <field name="d_product_qty" string="Fuel Qty" sum="Drawn Product Qty" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
                                     <field name="d_price_unit" string="Unit Price" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
                                     <field name="d_price_subtotal" string="Subtotal" sum="Drawn Total" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
@@ -257,7 +262,9 @@
                                     
                                     <!-- Fuel Filled-->
                                     <field name="f_date" string="Date" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_partner_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
+                                    <field name="f_partner_id" string="Purchase Contact" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
+                                    <field name="f_contact_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
+
                                     <field name="f_gen_name" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
                                     <field name="f_gen_capacity" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
                                     <field name="f_curr_drgh" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>

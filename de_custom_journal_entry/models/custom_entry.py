@@ -31,7 +31,7 @@ class CustomEntry(models.Model):
     name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     date_entry = fields.Datetime(string='Entry Date', required=True, index=True, copy=False, default=fields.Datetime.now,)
     date_entry_month = fields.Selection(MONTH_LIST, string='Month')
-    date_entry_year = fields.Char(string='Year', compute='_compute_entry_year')
+    date_entry_year = fields.Char(string='Year', compute='_compute_entry_year', store=True)
 
     date_submit = fields.Datetime('Submission Date', readonly=False)
     date_approved = fields.Datetime('Approved Date', readonly=False)
@@ -87,6 +87,7 @@ class CustomEntry(models.Model):
     
     
     #optional line items fields
+    has_line_period = fields.Selection(related="custom_entry_type_id.has_line_period")
     has_project = fields.Selection(related="custom_entry_type_id.has_project")
     has_analytic = fields.Selection(related="custom_entry_type_id.has_analytic")
     has_product = fields.Selection(related="custom_entry_type_id.has_product")
@@ -121,7 +122,8 @@ class CustomEntry(models.Model):
     invoice_count = fields.Integer(compute="_compute_all_moves", string='Bill Count', copy=False, default=0,)
     move_count = fields.Integer(compute="_compute_all_moves", string='Move Count', copy=False, default=0)
 
-
+    
+    @api.depends('date_entry')
     def _compute_entry_year(self):
         for entry in self:
             entry_year = entry.date_entry
@@ -194,8 +196,8 @@ class CustomEntry(models.Model):
         Move = self.env['account.move']
         can_read = Move.check_access_rights('read', raise_exception=False)
         for move in self:
-            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'in_invoice')]) or 0
-            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry')]) or 0
+            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'in_invoice'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
 
    
     def _amount_all(self):
@@ -593,8 +595,11 @@ class CustomEntryLine(models.Model):
     _description = 'Custom Entry Line'
     
     custom_entry_id = fields.Many2one('account.custom.entry', string='Custom Entry', required=True, ondelete='cascade', index=True, copy=False)
-    note = fields.Char(string='Remarks')
+    note = fields.Char(string='Description')
     stage_category = fields.Selection(related='custom_entry_id.stage_category', readonly=True)
+    date_entry = fields.Datetime(related='custom_entry_id.date_entry')
+    date_entry_period = fields.Char(string='Month')
+    
     company_id = fields.Many2one(
         string='Company', related='custom_entry_id.company_id',
         store=True, readonly=True, index=True)
@@ -659,8 +664,6 @@ class CustomEntryLine(models.Model):
     date_arrival = fields.Date(string='Arrival Date', )    
     number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
     travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
-    t_travel_description = fields.Char(related='travel_reference.description_main', string = 'Travel Description')
-    t_travel_type = fields.Selection(related='travel_reference.travel_type', string = 'Travel For')
     t_unit_price = fields.Float(string="Travel Unit Price")
     t_extra_charges = fields.Float(string="Travel Extra Charges")
     t_amount_travel = fields.Float(string="Travel Total Amount", compute='_compute_all_amount_travel')
@@ -717,8 +720,6 @@ class CustomEntryLine(models.Model):
     h_check_out = fields.Date(string="Check-Out")
     h_number_of_nights = fields.Float(string="Number of Nights", compute='_number_of_nights')
     h_travel_id = fields.Many2one('travel.request' , string="Travel Request")
-    h_travel_description = fields.Char(related='h_travel_id.description_main', string = 'Travel Description')
-    h_travel_type = fields.Selection(related='h_travel_id.travel_type', string = 'Travel For')
     h_unit_price = fields.Float(string="Hotel Unit Price")
     h_extra_charges = fields.Float(string="Hote Extra Charges")
     h_amount = fields.Float(string="Total Amount", compute='_compute_all_amount_hotel')
@@ -751,7 +752,7 @@ class CustomEntryLine(models.Model):
     e_paid_to = fields.Selection([
         ('govt', 'Government'),
         ('private', 'Private')],
-        string='Paid To', default='govt')
+        string='Paid To')
     date_bill_from = fields.Date(string='Date From', )
     date_bill_to = fields.Date(string='Date To', )
     amount_advanced = fields.Float(string='Forecast', help='Advanced Amount')
@@ -770,6 +771,7 @@ class CustomEntryLine(models.Model):
     #has fuel Drawn
     d_date = fields.Date(string='Drawn Date')
     d_partner_id = fields.Many2one('res.partner',string='Drawn Purchase From', ondelete='cascade')
+    d_contact_id = fields.Many2one('res.partner',string='Drawn Contact From', ondelete='cascade')
     d_product_qty = fields.Float(string='Drawn Qty', default=1.0, digits='Product Unit of Measure', )
     d_price_unit = fields.Float(string='Drawn Unit Price', default=1.0, digits='Product Price')
     d_price_subtotal = fields.Monetary(compute='_compute_fuel_drawn_total', string='Drawn Subtotal')
@@ -788,6 +790,7 @@ class CustomEntryLine(models.Model):
     #Fuel Filling
     f_date = fields.Date(string='Filling Date')
     f_partner_id = fields.Many2one('res.partner',string='Filling Purchase From', ondelete='cascade')
+    f_contact_id = fields.Many2one('res.partner',string='Filling Contact From', ondelete='cascade')
     f_gen_name = fields.Char(string='Generator Name')
     f_gen_capacity = fields.Integer(string='Generator Capacity')
     f_curr_drgh = fields.Float(string='Current DRGH')
