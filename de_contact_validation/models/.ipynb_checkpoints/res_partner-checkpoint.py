@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, fields, api
 import base64
 import collections
 import datetime
@@ -8,40 +8,113 @@ import hashlib
 import pytz
 import threading
 import re
+
 import requests
 from lxml import etree
 from random import randint
 from werkzeug import urls
+
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
 from odoo.modules import get_module_resource
 from odoo.osv.expression import get_unaccent_wrapper
 from odoo.exceptions import UserError, ValidationError
 
-
-
-
-
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+    def _get_default_stage_id(self):
+        """ Gives default stage_id """
+        category_id = self.env.context.get('default_category_id')
+        if not category_id:
+            return False
+        return self.stage_find(category_id, [('fold', '=', False)])
+    
     state = fields.Selection([
         ('draft', 'Draft'),
         ('to_approve', 'To Approve'),
         ('approved', 'Approved'),
     ], string='Status', copy=False, index=True, default='draft')
 
-    def action_to_approve(self):
-        self.write({
-            'state' : 'to_approve',
-            # 'active' : False,
-        })
+    stage_id = fields.Many2one('res.partner.stage', string='Stage', readonly=False, ondelete='restrict', tracking=True, index=True, domain="[('category_ids', 'in', category_id)]", copy=False, store=True, compute="_compute_stage_id", default=_get_default_stage_id)
+    stage_category = fields.Selection(related='stage_id.stage_category')
+    date_submit = fields.Datetime('Submission Date', readonly=False)
+    date_approved = fields.Datetime('Approved Date', readonly=False)
 
-    def action_approved(self):
-        self.write({
+    @api.depends('category_id')
+    def _compute_stage_id(self):
+        for partner in self:
+            if partner.category_id:
+                if partner.category_id not in partner.stage_id.category_ids:
+                    partner.stage_id = partner.stage_find(partner.category_id.ids, [
+                        ('fold', '=', False)])
+            else:
+                partner.stage_id = False
+    
+    def stage_find(self, section_id, domain=[], order='sequence'):
+        """ Override of the base.stage method
+            Parameter of the stage search taken from the lead:
+            - section_id: if set, stages must belong to this section or
+              be a default stage; if not set, stages must be default
+              stages
+        """
+        # collect all section_ids
+        section_ids = []
+        if section_id:
+            section_ids.append(section_id)
+        section_ids.extend(self.mapped('category_id').ids)
+        search_domain = []
+        if section_ids:
+            search_domain = [('|')] * (len(section_ids) - 1)
+            for section_id in section_ids:
+                search_domain.append(('category_ids', '=', section_id))
+        search_domain += list(domain)
+        # perform search, return the first found
+        return self.env['res.partner.stage'].search(search_domain, order=order, limit=1).id
+    
+    def button_submit(self):
+        #self.ensure_one()
+        stage_id = False
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to submit '%s'.", order.stage_id.name))
+           
+        self.update({
+            'date_submit' : fields.Datetime.now(),
+            'stage_id' : self.stage_id.next_stage_id.id,
+            'state' : 'to_approve',
+        })
+        
+    def button_confirm(self):
+        stage_id = False
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to approve '%s'.", order.stage_id.name))
+                    
+        if self.stage_id.next_stage_id.id == self.stage_id.next_stage_id.next_stage_id.id:
+            stage_id = self.stage_id.next_stage_id.next_stage_id
+        else:
+            stage_id = self.stage_id.next_stage_id.next_stage_id    
+            
+        self.update({
+            'date_approved' : fields.Datetime.now(),
+            'stage_id' : stage_id.id,
             'state': 'approved',
         })
-    def action_draft(self):
-        self.write({
+    
+    def button_draft(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to resetn to draft '%s'.", order.stage_id.name))
+                    
+        stage_id = self.env['res.partner.stage'].search([('category_ids','in',self.category_id.ids),('stage_category','=','draft')],limit=1)
+        self.update({
+            'stage_id': stage_id.id,
             'state': 'draft',
         })
 
