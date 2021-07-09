@@ -438,7 +438,7 @@
                              <div class="row">
                                  <t t-if="entry.description"> 
                                 <div class="col-md-5"> <strong>Comments : </strong>                                   
-                                        <span t-esc="entry.description"/>
+                                        <span t-esc="entry.correction_reason"/>
                                 </div>
                                 </t> 
                                
