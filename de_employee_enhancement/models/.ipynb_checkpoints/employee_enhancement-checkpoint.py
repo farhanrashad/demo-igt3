@@ -9,7 +9,7 @@ from odoo.exceptions import UserError
 class EmployeeEnhancement(models.Model):
     _inherit = 'hr.employee'
 
-    emp_number = fields.Char('Employee Number')
+    emp_number = fields.Char(string='Employee Number', store=True)
     emp_status = fields.Char('Employee Status')
     emp_type = fields.Selection([
         ('permanent', 'Permanent'),
@@ -224,28 +224,69 @@ class CostCenterInformations(models.Model):
     total_percentage = fields.Float('Total Percentage', compute = 'limit_total_percentage')
 
 
-#     @api.constrains('total_percentage')
+#     FOR MAIN ACCOUNT HEAD
     def limit_total_percentage(self):
         for rec in self:
-            count = 0
-            for line in rec. cost_center_information_line:
-                count = count + line.percentage_charged
-            rec.total_percentage = count
+            account_count = 0
+            total_count = 0
+            account_list = []
+            accounts = ' '
+            for line in rec.cost_center_information_line:
+                if not line.main_account_id.id in account_list: 
+                    accounts = self.env['cost.information.line'].search([('contract_id','=',rec.id),('main_account_id','=',line.main_account_id.id)])
+                    for account in accounts:
+                        account_count = line.percentage_charged
+                    total_count = total_count + account_count
+                    account_list.append(line.main_account_id.id)
+            rec.total_percentage = total_count
+            
+            
+            
 
     @api.model
     def create(self,vals):
         res = super(CostCenterInformations, self).create(vals)
-        if self.cost_center_information_line.cost_center:
-        	if res.total_percentage != 100:
-        		raise UserError('Total Percentage must be equal 100')
-        return res
+        if self.cost_center_information_line.cost_center_id:
+            if res.total_percentage != 100:
+                raise UserError('Total Percentage must be equal 100')
+        if self.cost_center_information_line.main_account_id:
+            for line in self.cost_center_information_line:
+                list = []
+                cost_center_per = 0
+                accounts = self.env['cost.information.line'].search([('contract_id','=',self.id),('main_account_id','=',line.main_account_id.id)])
+                for account in accounts:
+                    if not account.cost_center_id.id in list:
+                        if line.percentage_charged != account.percentage_charged:
+                            raise UserError("Percentage Charged to one Head must be same in all Lines")
+                        cost_center_per = cost_center_per + account.percentage_charged_cost_center
+                        list.append(account.cost_center_id.id)
+                    else:
+                        raise UserError("Same Cost Center can not be selected twice against same account Head")
+                if cost_center_per != 100:
+                    raise UserError("Percentage Charged to all cost centers against one Head must be equal to 100")
+            return res
     
     def write(self, vals):
         res = super(CostCenterInformations, self).write(vals)
-        if self.cost_center_information_line.cost_center:
-        	if self.total_percentage != 100:
-        		raise UserError('Total Percentage must be equal 100')
-        return res
+        if self.cost_center_information_line.cost_center_id:
+            if self.total_percentage != 100:
+                raise UserError('Total Percentage charged to main head must be equal 100')
+        if self.cost_center_information_line.main_account_id:
+            for line in self.cost_center_information_line:
+                list = []
+                cost_center_per = 0
+                accounts = self.env['cost.information.line'].search([('contract_id','=',self.id),('main_account_id','=',line.main_account_id.id)])
+                for account in accounts:
+                    if not account.cost_center_id.id in list:
+                        if line.percentage_charged != account.percentage_charged:
+                            raise UserError("Percentage Charged to one Head must be same in all Lines")
+                        cost_center_per = cost_center_per + account.percentage_charged_cost_center
+                        list.append(account.cost_center_id.id)
+                    else:
+                        raise UserError("Same Cost Center can not be selected twice against same account Head")
+                if cost_center_per != 100:
+                    raise UserError("Percentage Charged to all cost centers against one Head must be equal to 100")
+            return res
 
 
 class CostCenterInformation(models.Model):
@@ -253,8 +294,21 @@ class CostCenterInformation(models.Model):
 
     contract_id = fields.Many2one('hr.contract')
     employee_id = fields.Many2one('hr.employee')
-    cost_center = fields.Many2one('account.analytic.account')
-    percentage_charged = fields.Float('Percentage Charged')
+    main_account_id = fields.Many2one('account.account')
+    percentage_charged = fields.Float('Percentage Charged to Head')
+    cost_center_id = fields.Many2one('account.analytic.account')
+    percentage_charged_cost_center = fields.Float('Percentage Charged to Cost Center')
+
+
+#     @api.onchange('cost_center')
+#     def _onchange_exp(self):
+#         ids = []
+#         rule_ids = self.env['hr.salary.rule'].search(
+#             [('is_cost_center', '=', True),('struct_id.type_id','=',self.contract_id.structure_type_id.id)])
+#         if rule_ids:
+#             for rule in rule_ids:
+#                 ids.append(rule.id)
+#         return {'domain': {'cost_center': [('id', '=', ids)]}}
 
     @api.onchange('percentage_charged')
     def limit_percentage_charged(self):
@@ -262,3 +316,17 @@ class CostCenterInformation(models.Model):
             for rec in self:
                 if rec.percentage_charged > 100 or rec.percentage_charged <1:
                     raise UserError('Percentage Charged Cannot be greater than 100 or less than 1')
+                    
+    @api.onchange('percentage_charged_cost_center')
+    def limit_percentage_charged(self):
+        if self.percentage_charged_cost_center:
+            for rec in self:
+                if rec.percentage_charged_cost_center > 100 or rec.percentage_charged_cost_center <1:
+                    raise UserError('Percentage Charged Cannot be greater than 100 or less than 1')
+
+
+                    
+class HrSalaryRule(models.Model):
+	_inherit='hr.salary.rule'
+	
+	is_cost_center = fields.Boolean('Is a Cost Center')
