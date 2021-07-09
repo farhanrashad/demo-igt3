@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="department_wise_wizard_view" model="ir.ui.view">
+        <field name="name">department.wise.wizard.view</field>
+        <field name="model">department.wise</field>
+        <field name="arch" type="xml">
+            <form string="Department Wise">
+                <group>
+                    <field name="department_ids" widget="many2many_tags"/>
+                    <field name="employee_type_ids"  widget="many2many_tags"/>
+                </group>
+                <group>
+                    <field name="grade_type_ids"  widget="many2many_tags"/>
+                    <field name="location_ids" widget="many2many_tags"/>
+                </group>
+
+                <footer>
+<!--                    <button name="action_gnerate_excel" type="object" string="Create Excel Report"-->
+<!--                            class="oe_highlight"/>-->
+                    <button name="action_generate_pdf" type="object" string="Print PDF" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_department_wise_wizard" model="ir.actions.act_window">
+        <field name="name">Department Wise Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">department.wise</field>
+        <field name="view_id" ref="department_wise_wizard_view"/>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

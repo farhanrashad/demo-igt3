@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="view_contract_report_xlsx"
+                model="contract.expiry.wizard"
+                string="Print to XLSX"
+                report_type="xlsx"
+                name="de_hr_employee_report.contract_xlsx_report"
+                file="Contract Expiry Report"/>
+    </data>
+</odoo>
