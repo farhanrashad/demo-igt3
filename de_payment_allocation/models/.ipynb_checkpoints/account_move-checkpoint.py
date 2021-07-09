@@ -20,6 +20,22 @@ import warnings
 class AccountMove(models.Model):
     _inherit = 'account.move'
     
+    
+    reconcile_amount = fields.Float(string='Reconcile Amount', compute='_compute_reconcile_amount')
+    
+    def _compute_reconcile_amount(self):
+        for entry in self:
+            reconcile_amount = 0.0
+            for move_line in entry.line_ids:
+                for credit_line in move_line.matched_credit_ids:
+                    reconcile_amount = reconcile_amount + credit_line.amount
+                for debit_line in move_line.matched_debit_ids:
+                    reconcile_amount = reconcile_amount + debit_line.amount        
+            entry.update({
+                'reconcile_amount' : reconcile_amount
+            })
+
+    
         
     
     def allocate_invoice_payment(self):
