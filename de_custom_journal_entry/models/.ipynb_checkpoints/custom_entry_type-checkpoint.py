@@ -62,12 +62,14 @@ class CustomEntryType(models.Model):
     has_invoice = fields.Selection(CATEGORY_SELECTION, string="Has Invoice", default="no", required=True,)
 
     #Line Item fields
+    has_line_period = fields.Selection(CATEGORY_SELECTION, string="Has Period", default="no", required=True,)
     has_project = fields.Selection(CATEGORY_SELECTION, string="Has Project", default="no", required=True,)
     has_product = fields.Selection(CATEGORY_SELECTION, string="Has Product", default="no", required=True,)
     has_advanced = fields.Selection(CATEGORY_SELECTION, string="Has Advanced Amount", default="no", required=True,)
     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Has Analytic", default="no", required=True,)
     has_employee = fields.Selection(CATEGORY_SELECTION, string="Has Employee", default="no", required=True,)
     has_supplier = fields.Selection(CATEGORY_SELECTION, string="Has Supplier", default="no", required=True,)
+    
     #feature options fields
     has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
     has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)
