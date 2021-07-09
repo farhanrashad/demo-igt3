@@ -13,7 +13,7 @@ class AccountPartnerLedger(models.TransientModel):
                                           "currency differs from the company currency.")
     reconciled = fields.Boolean('Reconciled Entries')
     partner_id = fields.Many2many('res.partner', string='Partners')
-    currency_id = fields.Many2one('res.currency', string='Currencies', required=False)
+    currency_id = fields.Many2one('res.currency', string='Currencies', required=True)
 
     def _print_report(self, data):
         data = self.pre_print_report(data)

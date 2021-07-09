@@ -43,7 +43,7 @@ class ReportGeneralLedger(models.AbstractModel):
                 init_wheres.append(init_where_clause.strip())
             init_filters = " AND ".join(init_wheres)
             filters = init_filters.replace('account_move_line__move_id', 'm').replace('account_move_line', 'l')
-            sql = ("""SELECT 0 AS lid, l.account_id AS account_id, '' AS ldate, '' AS lcode, 0.0 AS amount_currency, '' AS lref, 'Initial Balance' AS lname, COALESCE(SUM(l.debit),0.0) AS debit, COALESCE(SUM(l.credit),0.0) AS credit, COALESCE(SUM(l.debit),0.0) AS bc_debit, COALESCE(SUM(l.credit),0.0) AS bc_credit, COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit), 0) as balance,
+            sql = ("""SELECT 0 AS lid, l.account_id AS account_id, '' AS ldate, to_char(l.date, 'MM-YYYY') AS account_period, '' AS lcode, 0.0 AS amount_currency, '' AS lref, 'Initial Balance' AS lname, COALESCE(SUM(l.debit),0.0) AS debit, COALESCE(SUM(l.credit),0.0) AS credit, COALESCE(SUM(l.debit),0.0) AS bc_debit, COALESCE(SUM(l.credit),0.0) AS bc_credit, COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit), 0) as balance,
             proj.name as project_name, emp.name as employee_name , dept.name as department_name, analytic.name as analytic_account, 
             COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit), 0) as bc_balance, '' AS lpartner_id,\
                 '' AS move_name, '' AS mmove_id, '' AS currency_code,\
@@ -59,7 +59,7 @@ class ReportGeneralLedger(models.AbstractModel):
                 LEFT JOIN hr_department dept ON (emp.department_id = dept.id)\
                 LEFT JOIN account_analytic_account analytic ON (l.analytic_account_id = analytic.id)\
                 JOIN account_journal j ON (l.journal_id=j.id)\
-                WHERE l.account_id IN %s""" + filters + ' GROUP BY l.account_id')
+                WHERE l.account_id IN %s""" + filters + ' GROUP BY l.account_id, l.date, proj.name, emp.name, dept.name, analytic.name')
             params = (tuple(accounts.ids),) + tuple(init_where_params)
             cr.execute(sql, params)
             for row in cr.dictfetchall():
@@ -80,7 +80,7 @@ class ReportGeneralLedger(models.AbstractModel):
         # Get move lines base on sql query and Calculate the total balance of move lines
         sql = ('''SELECT l.id AS lid, l.account_id AS account_id, l.date AS ldate, to_char(l.date, 'MM-YYYY') AS account_period, j.code AS lcode, proj.name as project_name, emp.name as employee_name , analytic.name as analytic_account,
             dept.name as department_name, l.currency_id, l.amount_currency, l.ref AS lref, l.name AS lname, COALESCE(l.debit,0) AS debit, COALESCE(l.credit,0) AS credit, COALESCE(l.debit,0) AS bc_debit, COALESCE(l.credit,0) AS bc_credit, COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit), 0) AS balance, COALESCE(SUM(l.debit),0) - COALESCE(SUM(l.credit), 0) AS bc_balance,\
-            m.name AS move_name, c.symbol AS currency_code, p.name AS partner_name\
+            m.name AS move_name, c.symbol AS currency_code, c.name AS currency_name, p.name AS partner_name\
             FROM account_move_line l\
             JOIN account_move m ON (l.move_id=m.id)\
             LEFT JOIN res_currency c ON (l.currency_id=c.id)\
