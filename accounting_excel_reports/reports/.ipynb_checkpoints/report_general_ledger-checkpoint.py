@@ -80,10 +80,10 @@ class ReportGeneralLedgerExcel(models.Model):
         sheet.write('K7', "Entry Label", format2)
         sheet.write('L7', "Debit", format3)
         sheet.write('M7', "Credit", format3)
-        sheet.write('N7', "Balance", format3)
+        sheet.write('N7', "Amount In Currency", format3)
         sheet.write('O7', "Currency", format3)
-        sheet.write('P7', "BC Balance", format3)
-        sheet.write('Q7', "BC Currency", format3)
+#         sheet.write('P7', "BC Balance", format3)
+#         sheet.write('Q7', "BC Currency", format3)
         currency_obj = self.env['res.currency'].search([('id','=',data['currency_id'])])
         company_currency = self.env.company.id
         bc_company_obj = self.env['res.company'].search([('id','=',company_currency)])
@@ -95,10 +95,10 @@ class ReportGeneralLedgerExcel(models.Model):
             sheet.merge_range(row, col, row, col + 10, account['code'] + account['name'], format4)
             sheet.write(row, col + 11, (account['debit']), format5)
             sheet.write(row, col + 12, (account['credit']), format5)
-            sheet.write(row, col + 13, (account['balance']), format5)
-            sheet.write(row, col + 14, str(currency_obj.name) + "(" + str(data['currency_symbol']) + ")", format5)
-            sheet.write(row, col + 15, (account['bc_balance']), format5)
-            sheet.write(row, col + 16, str(bc_currency_obj.name) + "(" + str(bc_currency_symbol) + ")", format5)
+#             sheet.write(row, col + 13, (account['balance']), format5)
+#             sheet.write(row, col + 14, str(currency_obj.name) + "(" + str(data['currency_symbol']) + ")", format5)
+#             sheet.write(row, col + 15, (account['bc_balance']), format5)
+#             sheet.write(row, col + 16, str(bc_currency_obj.name) + "(" + str(bc_currency_symbol) + ")", format5)
 
             for line in account['move_lines']:
                 
@@ -117,9 +117,10 @@ class ReportGeneralLedgerExcel(models.Model):
                 sheet.write(row, col + 10, line['lname'], format6)
                 sheet.write(row, col + 11, (line['debit']), format7)
                 sheet.write(row, col + 12, (line['credit']), format7)
-                sheet.write(row, col + 13, (line['balance']), format7)
-                sheet.write(row, col + 14, str(currency_obj.name) + "(" + str(data['currency_symbol']) + ")", format5)
-                sheet.write(row, col + 15, (line['bc_balance']), format6)
-                sheet.write(row, col + 16, str(bc_currency_obj.name) + "(" + str(bc_currency_symbol) + ")", format6)
+                sheet.write(row, col + 13, (line['amount_currency']), format7)
+                sheet.write(row, col + 14, (line['currency_name'] +' ('+line['currency_code']+')'), format7)
+#                 sheet.write(row, col + 14, str(currency_obj.name) + "(" + str(data['currency_code']) + ")", format5)
+#                 sheet.write(row, col + 15, (line['bc_balance']), format6)
+#                 sheet.write(row, col + 16, str(bc_currency_obj.name) + "(" + str(bc_currency_symbol) + ")", format6)
 
             row += 1

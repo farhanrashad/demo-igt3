@@ -17,7 +17,7 @@ class AccountReportGeneralLedger(models.TransientModel):
                               required=True, default='sort_date')
     journal_ids = fields.Many2many('account.journal', 'account_report_general_ledger_journal_rel', 'account_id',
                                    'journal_id', string='Journals', required=True)
-    currency_id = fields.Many2one('res.currency', string='Currency' ,required=True)
+    currency_id = fields.Many2one('res.currency', string='Currency' ,required=False)
 
     def _print_report(self, data):
         data = self.pre_print_report(data)
