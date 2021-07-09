@@ -17,6 +17,7 @@ class CustomEntryRefuse(models.TransientModel):
         self.custom_entry_id.update({
             'correction_reason': self.reason,
             'is_custom_entry_import': True,
-        })    
+        })
+        
     
     

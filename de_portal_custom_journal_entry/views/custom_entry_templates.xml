@@ -69,7 +69,7 @@
                                     
                                     <td class="text-left">
                                         <t t-if="custom.is_custom_entry_import == True">
-                                        <span t-esc="custom.correction_reason" />
+                                        <p style='color:red;'><strong>Need Correction</strong></p>
                                          </t>     
                                     </td>
                                     
@@ -119,7 +119,7 @@
                     <div class="container">
                       <div class="card">
                            <div class="col-md-1" style="margin-top:5px;">
-                               <t t-if="custom.is_custom_entry_import == True">
+                               <t t-if="entry.is_custom_entry_import == True">
                                 <a t-attf-href="/entry/type/update/#{entry.id}?"><i  class="btn btn-primary">Edit</i></a>
                                </t> 
                             </div>                  
@@ -216,7 +216,7 @@
                                         <tr>
                                             <td><span t-esc="entry_line.f_fleet_id.name"/></td>
                                             <td><span t-esc="entry_line.f_driver_id.name"/></td>
-                                            <td><span t-esc="entry_line.f_job_scope.name"/></td>
+                                            <td><span t-esc="entry_line.f_job_scope"/></td>
                                             <td><span t-esc="entry_line.f_rent_days"/></td>
                                             <td><span t-esc="entry_line.f_amount"/></td>
                                            
