@@ -6,16 +6,15 @@ from odoo import models, fields, api, _
 class HrContract(models.Model):
     _inherit = 'hr.contract'
     
-    contract_type_id = fields.Many2one('contract.type', string='Contract Type', help="Technical field for UX purpose.", required=True)
+    contract_type_id = fields.Many2one('contract.type', string='Contract Type', index=True, ondelete="cascade")
     code = fields.Char(related='contract_type_id.sequence_code')
-    sequence_code = fields.Char(String="Sequence Code")
+    sequence_code = fields.Char(string="Sequence Code")
     
     @api.onchange('contract_type_id')
     def _check_code(self):
         self.sequence_code = self.code   
         
-    sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence',
-        copy=False, check_company=True)
+    sequence_id = fields.Many2one('ir.sequence', 'Reference Sequence', copy=False, check_company=True)
     
     
     
