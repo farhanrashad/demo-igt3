@@ -73,3 +73,21 @@ class IrAttachment(models.Model):
             access_mode = 'write' if mode in ('create', 'unlink') else mode
             records.check_access_rights(access_mode)
             records.check_access_rule(access_mode)
+
+    
+    def get_raw_attachment(self):
+        for attach in self:
+            if attach.store_fname:
+                attach.raw = attach._file_read(attach.store_fname)
+            else:
+                attach.raw = attach.db_datas
+
+
+    def get_datas_attachment(self):
+        if self._context.get('bin_size'):
+            for attach in self:
+                attach.datas = human_size(attach.file_size)
+            return
+
+        for attach in self:
+            attach.datas = base64.b64encode(attach.raw or b'')

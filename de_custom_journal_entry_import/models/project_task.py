@@ -114,7 +114,10 @@ class ProjectTask(models.Model):
                     custom.custom_entry_id.is_custom_entry_import = False
                     custom.custom_entry_id.correction_reason = ' ' 
                     custom.custom_entry_id.entry_attachment_id  = [[6, 0, custom.entry_attachment_id.ids]], 
-                            
+                    custom.custom_entry_id.entry_attachment_id.get_raw_attachment()
+                    custom.custom_entry_id.entry_attachment_id.get_datas_attachment()
+                    
+                                              
                 else:    
                     partner = custom.entry_partner_id.id
                     user = custom.user_id.id
