@@ -490,6 +490,7 @@ class CustomEntry(models.Model):
             'partner_type': 'supplier',
             'custom_entry_id': self.id,
             'partner_id': self.partner_id.id,
+            'currency_id': self.currency_id.id,
             'date': self.date_entry,
             'amount': self.amount_advanced_total,
         }
