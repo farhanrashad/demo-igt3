@@ -71,8 +71,8 @@ class ProjectTask(models.Model):
         if self.entry_attachment_id:
             self.is_entry_attachment = True
             self.un_processed_entry = True
-        if self.is_entry_attachment == True:
-            self.action_journal_entry_import()
+        #if self.is_entry_attachment == True:
+        #    self.action_journal_entry_import()
 
 	
     def action_journal_entry_import(self):
