@@ -63,7 +63,10 @@ class ProjectTask(models.Model):
     is_entry_attachment = fields.Boolean(string='Is Entry Attachment')
     is_entry_processed = fields.Boolean(string='Entry Processed')
     un_processed_entry = fields.Boolean(string='Un-Processed Entry')
-
+    reference = fields.Char(string='Reference')
+    supplier_bill_ref = fields.Char(string='Supplier Bill Ref') 
+    date_entry_year = fields.Char(string='Entry Year')
+    date_entry_month = fields.Selection(MONTH_LIST, string='Month')
     
 
     @api.constrains('entry_attachment_id')
@@ -120,7 +123,12 @@ class ProjectTask(models.Model):
                     custom.custom_entry_id.is_custom_entry_import = False
                     custom.custom_entry_id.correction_reason = ' ' 
                     custom.custom_entry_id.update({
-                           'entry_attachment_id'  : [[6, 0, attachment.ids]], 
+                           'entry_attachment_id'  : [[6, 0, attachment.ids]],
+                           'ref': custom.reference,
+                           'supplier_bill_ref': custom.supplier_bill_ref,
+                           'date_entry_year': custom.date_entry_year,
+                           'date_entry_month':  custom.date_entry_month,
+                           'description': custom.description, 
                            })
                     
                     
@@ -148,7 +156,12 @@ class ProjectTask(models.Model):
                         'partner_id': partner,
                         'currency_id': self.env.company.currency_id.id,
                         'company_id': self.env.company.id,
-                        'entry_attachment_id': [[6, 0, attachment.ids]], 
+                        'entry_attachment_id': [[6, 0, attachment.ids]],
+                        'ref': custom.reference,
+                        'supplier_bill_ref': custom.supplier_bill_ref,
+                        'date_entry_year': custom.date_entry_year,
+                        'date_entry_month':  custom.date_entry_month,
+                        'description': custom.description,   
                         'user_id': user,
                         'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,

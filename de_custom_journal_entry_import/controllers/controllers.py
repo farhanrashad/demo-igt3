@@ -51,10 +51,30 @@ def get_custom_entry_final(entry_type):
     custom_types = request.env['account.custom.entry.type'].search([('id', '=', entry_type)], limit=1)
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
     tasks = 'project.task'
+    reference = 0
+    supplier_inv = 0
+    month = 0
+    year = 0
+    description = 0
+    if custom_types.has_ref != 'no':
+        reference = 1  
+    if custom_types.has_supplier_bill != 'no':
+        supplier_inv = 1  
+    if custom_types.has_period != 'no':
+        month = 1 
+        year = 1
+    if custom_types.has_description != 'no':
+        description = 1 
+        
     return {
         'entry_types': custom_types ,
         'partner': company_info.partner_id.id,
         'user': company_info.id,
+        'reference': reference,
+        'supplier_iv_num': supplier_inv,
+        'month': month,
+        'year': year,
+        'description': description,   
         'title': custom_types.name +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
         'company_info': company_info,
         'tasks': tasks,
@@ -68,11 +88,31 @@ def get_custom_entry_final_update(entry_type, entry):
     custom_types = request.env['account.custom.entry.type'].search([('id', '=', entry_type)], limit=1)
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
     tasks = 'project.task'
+    reference = 0
+    supplier_inv = 0
+    month = 0
+    year = 0
+    description = 0
+    if custom_types.has_ref != 'no':
+        reference = 1  
+    if custom_types.has_supplier_bill != 'no':
+        supplier_inv = 1  
+    if custom_types.has_period != 'no':
+        month = 1 
+        year = 1
+    if custom_types.has_description != 'no':
+        description = 1 
+        
     return {
         'entry_types': custom_types ,
         'partner': company_info.partner_id.id,
         'custom_entry': custom_entry.id, 
         'user': company_info.id,
+        'reference': reference,
+        'supplier_iv_num': supplier_inv,
+        'month': month,
+        'year': year,
+        'description': description,    
         'title': custom_types.name +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
         'company_info': company_info,
         'tasks': tasks,
