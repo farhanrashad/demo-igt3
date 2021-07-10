@@ -39,6 +39,19 @@
         </record>
 
 
+      <record id="view_res_currency_custom_entry_import" model="ir.ui.view">
+            <field name="name">res.currency.custom.entry.import</field>
+            <field name="model">res.currency</field>
+            <field name="inherit_id" ref="base.view_currency_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="task_id"  />
+                </xpath>
+              
+           </field>
+        </record>
+
+
          <record id="action_view_un_processed_entry_task" model="ir.actions.act_window">
             <field name="name">Un-Processed Tasks</field>
             <field name="res_model">project.task</field>
