@@ -294,7 +294,7 @@ class CostCenterInformation(models.Model):
 
     contract_id = fields.Many2one('hr.contract')
     employee_id = fields.Many2one('hr.employee')
-    main_account_id = fields.Many2one('account.account')
+    main_account_id = fields.Many2one('account.account', domain="[('contract_wage_account', '=', True)]")
     percentage_charged = fields.Float('Percentage Charged to Head')
     cost_center_id = fields.Many2one('account.analytic.account')
     percentage_charged_cost_center = fields.Float('Percentage Charged to Cost Center')
@@ -330,3 +330,9 @@ class HrSalaryRule(models.Model):
 	_inherit='hr.salary.rule'
 	
 	is_cost_center = fields.Boolean('Is a Cost Center')
+    
+    
+class Account(models.Model):
+    _inherit = 'account.account'
+    
+    contract_wage_account = fields.Boolean(string="Wage account?")
