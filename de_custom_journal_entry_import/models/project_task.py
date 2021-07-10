@@ -17,6 +17,7 @@ from odoo.exceptions import UserError, AccessError, ValidationError, RedirectWar
 from odoo.tools.misc import format_date, get_lang
 from odoo.osv.expression import OR
 
+MONTH_LIST = [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May'), ('6', 'Jun'), ('7', 'Jul'), ('8', 'Aug'), ('9', 'Sep'), ('10', 'Oct'), ('11', 'Nov'),('12', 'Dec')]
 
 import logging
 _logger = logging.getLogger(__name__)
