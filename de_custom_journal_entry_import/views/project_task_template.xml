@@ -242,7 +242,7 @@
                     <span class="s_website_form_label_content">Currency</span>
                   </label>
                   <div class="col-sm">
-                    <select class="form-control  o_website_form_input" name="currency_id" readonly="1">
+                    <select class="form-control  o_website_form_input" name="tcurrency_id" readonly="1">
                                                                     <t t-foreach="currencies" t-as="currency">
                                                                         <option t-att-value="currency.id">
                                                                             <t t-esc="currency.name"    />
@@ -579,7 +579,7 @@
                     <span class="s_website_form_label_content">Currency</span>
                   </label>
                   <div class="col-sm">
-                    <select class="form-control  o_website_form_input" name="currency_id" >
+                    <select class="form-control  o_website_form_input" name="tcurrency_id" >
                                                                     <t t-foreach="currencies" t-as="currency">
                                                                         <option t-att-value="currency.id">
                                                                             <t t-esc="currency.name"    />

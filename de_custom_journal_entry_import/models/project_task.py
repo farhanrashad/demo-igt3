@@ -74,7 +74,7 @@ class ProjectTask(models.Model):
     customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
     date_effective = fields.Date(string='Effective Date')
     date_subscription = fields.Date(string='Date of Subscription')
-    currency_id = fields.Many2one('res.company', string='Currency')
+    tcurrency_id = fields.Many2one('res.company', string='Currency')
     t_travel_by = fields.Selection([
         ('ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
@@ -86,8 +86,8 @@ class ProjectTask(models.Model):
         if self.entry_attachment_id:
             self.is_entry_attachment = True
             self.un_processed_entry = True
-        #if self.is_entry_attachment == True:
-         #   self.action_journal_entry_import()
+        if self.is_entry_attachment == True:
+            self.action_journal_entry_import()
 
 	
     def action_journal_entry_import(self):
@@ -185,6 +185,10 @@ class ProjectTask(models.Model):
                     if   custom.date_subscription :
                         custom.custom_entry_id.update({   
                            'description': custom.date_subscription, 
+                           })
+                    if   custom.tcurrency_id :
+                        custom.custom_entry_id.update({   
+                           'currency_id': custom.tcurrency_id, 
                            })     
                     
                     
@@ -210,7 +214,7 @@ class ProjectTask(models.Model):
                         'name':  name_seq, 
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
-                        'currency_id': custom.currency_id.id,
+                        'currency_id': custom.tcurrency_id.id,
                         'company_id': self.env.company.id,
                         'entry_attachment_id': [[6, 0, attachment.ids]],
                         'ref': custom.reference,
