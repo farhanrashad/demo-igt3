@@ -74,7 +74,7 @@ class ProjectTask(models.Model):
     customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
     date_effective = fields.Date(string='Effective Date')
     date_subscription = fields.Date(string='Date of Subscription')
-    tcurrency_id = fields.Many2one('res.company', string='Currency')
+    tcurrency_id = fields.Many2one('res.currency', string='Currency')
     t_travel_by = fields.Selection([
         ('ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
@@ -314,5 +314,4 @@ class ResGroups(models.Model):
 class ResCurrency(models.Model):
     _inherit = 'res.currency' 
 
-    task_id = fields.Many2one('project.task', string='Task')    
 
