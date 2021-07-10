@@ -300,6 +300,7 @@ class ProjectTask(models.Model):
                 custom.user_id = self.env.user.id
 
 
+
 class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
@@ -311,5 +312,7 @@ class ResGroups(models.Model):
     _inherit = 'res.groups' 
     
 class ResCurrency(models.Model):
-    _inherit = 'res.currency'     
+    _inherit = 'res.currency' 
+
+    task_id = fields.Many2one('project.task', string='Task')    
 
