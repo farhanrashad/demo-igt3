@@ -68,6 +68,17 @@ class ProjectTask(models.Model):
     supplier_bill_ref = fields.Char(string='Supplier Bill Ref') 
     date_entry_year = fields.Char(string='Entry Year')
     date_entry_month = fields.Selection(MONTH_LIST, string='Month')
+
+    f_duration_from = fields.Date(string='Duration From')
+    f_duration_to = fields.Date(string='Duration To')
+    customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
+    date_effective = fields.Date(string='Effective Date')
+    date_subscription = fields.Date(string='Date of Subscription')
+    currency_id = fields.Many2one('res.company', string='Currency')
+    t_travel_by = fields.Selection([
+        ('ticket', 'Flight Ticket'),
+        ('Vehicle', 'Vehicle Rental')],
+        string='Travel By', default='ticket') 
     
 
     @api.constrains('entry_attachment_id')
@@ -150,8 +161,31 @@ class ProjectTask(models.Model):
                     if   custom.description :
                         custom.custom_entry_id.update({   
                            'description': custom.description, 
-                           })   
-                        
+                           })
+                    if   custom.customer_type :
+                        custom.custom_entry_id.update({   
+                           'customer_type': custom.customer_type, 
+                           }) 
+                    if   custom.t_travel_by :
+                        custom.custom_entry_id.update({   
+                           'description': custom.t_travel_by, 
+                           }) 
+                    if   custom.f_duration_from :
+                        custom.custom_entry_id.update({   
+                           'description': custom.f_duration_from, 
+                           }) 
+                    if   custom.f_duration_to :
+                        custom.custom_entry_id.update({   
+                           'description': custom.f_duration_to, 
+                           }) 
+                    if   custom.date_effective :
+                        custom.custom_entry_id.update({   
+                           'description': custom.date_effective, 
+                           })     
+                    if   custom.date_subscription :
+                        custom.custom_entry_id.update({   
+                           'description': custom.date_subscription, 
+                           })     
                     
                     
                                               
@@ -160,7 +194,7 @@ class ProjectTask(models.Model):
                     user = custom.user_id.id
                     entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
                     entry_id = 0
-                    entry_id = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')], limit=1)
+                    entry_id = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')], limit=1).id
                     for entry in entry_stage:
                         if entry.custom_entry_type_ids:
                             if self.custom_entry_type_id.id in entry.custom_entry_type_ids.ids:
@@ -176,14 +210,20 @@ class ProjectTask(models.Model):
                         'name':  name_seq, 
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
-                        'currency_id': self.env.company.currency_id.id,
+                        'currency_id': custom.currency_id.id,
                         'company_id': self.env.company.id,
                         'entry_attachment_id': [[6, 0, attachment.ids]],
                         'ref': custom.reference,
                         'supplier_bill_ref': custom.supplier_bill_ref,
                         'date_entry_year': custom.date_entry_year,
                         'date_entry_month':  custom.date_entry_month,
-                        'description': custom.description,   
+                        'description': custom.description, 
+                        'customer_type': custom.customer_type,
+                        't_travel_by':  custom.t_travel_by,
+                        'f_duration_from': custom.f_duration_from, 
+                        'f_duration_to': custom.f_duration_to,
+                        'date_effective':  custom.date_effective,
+                        'date_subscription': custom.date_subscription,
                         'user_id': user,
                         'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,
@@ -264,5 +304,8 @@ class IrAttachment(models.Model):
     
     
 class ResGroups(models.Model):
-    _inherit = 'res.groups'     
+    _inherit = 'res.groups' 
+    
+class ResCurrency(models.Model):
+    _inherit = 'res.currency'     
 

@@ -17,6 +17,7 @@ from odoo.exceptions import UserError, AccessError, ValidationError, RedirectWar
 from odoo.tools.misc import format_date, get_lang
 from odoo.osv.expression import OR
 
+MONTH_LIST = [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May'), ('6', 'Jun'), ('7', 'Jul'), ('8', 'Aug'), ('9', 'Sep'), ('10', 'Oct'), ('11', 'Nov'),('12', 'Dec')]
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -63,48 +64,21 @@ class ProjectTask(models.Model):
     is_entry_attachment = fields.Boolean(string='Is Entry Attachment')
     is_entry_processed = fields.Boolean(string='Entry Processed')
     un_processed_entry = fields.Boolean(string='Un-Processed Entry')
-    
-    
-    @api.model_create_multi
-    def create(self, vals_list):
-        default_stage = dict()
-        for vals in vals_list:
-            project_id = vals.get('project_id') or self.env.context.get('default_project_id')
-            if project_id and not "company_id" in vals:
-                vals["company_id"] = self.env["project.project"].browse(
-                    project_id
-                ).company_id.id or self.env.company.id
-            if project_id and "stage_id" not in vals:
-                # 1) Allows keeping the batch creation of tasks
-                # 2) Ensure the defaults are correct (and computed once by project),
-                # by using default get (instead of _get_default_stage_id or _stage_find),
-                if project_id not in default_stage:
-                    default_stage[project_id] = self.with_context(
-                        default_project_id=project_id
-                    ).default_get(['stage_id']).get('stage_id')
-                vals["stage_id"] = default_stage[project_id]
-            # user_id change: update date_assign
-            if vals.get('user_id'):
-                vals['date_assign'] = fields.Datetime.now()
-            # Stage change: Update date_end if folded stage and date_last_stage_update
-            if vals.get('stage_id'):
-                vals.update(self.update_date_end(vals['stage_id']))
-                vals['date_last_stage_update'] = fields.Datetime.now()
-            # recurrence
-            rec_fields = vals.keys() & self._get_recurrence_fields()
-            if rec_fields and vals.get('recurring_task') is True:
-                rec_values = {rec_field: vals[rec_field] for rec_field in rec_fields}
-                rec_values['next_recurrence_date'] = fields.Datetime.today()
-                recurrence = self.env['project.task.recurrence'].create(rec_values)
-                vals['recurrence_id'] = recurrence.id
-        tasks = super().create(vals_list)
-        for task in tasks:
-            if task.project_id.privacy_visibility == 'portal':
-                task._portal_ensure_token()
-#         if  tasks.entry_attachment_id.id:       
-#             tasks.action_journal_entry_import()
-                
-        return tasks
+    reference = fields.Char(string='Reference')
+    supplier_bill_ref = fields.Char(string='Supplier Bill Ref') 
+    date_entry_year = fields.Char(string='Entry Year')
+    date_entry_month = fields.Selection(MONTH_LIST, string='Month')
+
+    f_duration_from = fields.Date(string='Duration From')
+    f_duration_to = fields.Date(string='Duration To')
+    customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
+    date_effective = fields.Date(string='Effective Date')
+    date_subscription = fields.Date(string='Date of Subscription')
+    currency_id = fields.Many2one('res.company', string='Currency')
+    t_travel_by = fields.Selection([
+        ('ticket', 'Flight Ticket'),
+        ('Vehicle', 'Vehicle Rental')],
+        string='Travel By', default='ticket') 
     
 
     @api.constrains('entry_attachment_id')
@@ -112,6 +86,8 @@ class ProjectTask(models.Model):
         if self.entry_attachment_id:
             self.is_entry_attachment = True
             self.un_processed_entry = True
+        if self.is_entry_attachment == True:
+            self.action_journal_entry_import()
 
 	
     def action_journal_entry_import(self):
@@ -144,20 +120,112 @@ class ProjectTask(models.Model):
                 rowvals = []
                 vals = []
                 line_vals = {}
+                attachment_vals = {
+                     'name': custom.entry_attachment_id.name,
+                     'type': 'binary',
+                     'datas':  custom.entry_attachment_id.datas, 
+                }
+                attachment = self.env['ir.attachment'].create(attachment_vals)
                 custom_entry_id_vals = self.custom_entry_id.id
                 if self.custom_entry_id:
                     custom_entry_id_vals = self.custom_entry_id.id
                     entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
                     for entry_line in entry.custom_entry_line:
-                        entry_line.unlink()    
-                            
+                        entry_line.unlink()
+                    custom.custom_entry_id.is_custom_entry_import = False
+                    custom.custom_entry_id.correction_reason = ' ' 
+                    custom.custom_entry_id.update({
+                           'entry_attachment_id'  : [[6, 0, attachment.ids]],
+                           'ref': custom.reference,
+                           'supplier_bill_ref': custom.supplier_bill_ref,
+                           'date_entry_year': custom.date_entry_year,
+                           'date_entry_month':  custom.date_entry_month,
+                           'description': custom.description, 
+                           })
+                    if   custom.reference :
+                        custom.custom_entry_id.update({       
+                           'ref': custom.reference,
+                           })
+                    if   custom.supplier_bill_ref :
+                        custom.custom_entry_id.update({  
+                           'supplier_bill_ref': custom.supplier_bill_ref,
+                           })
+                    if   custom.date_entry_year :
+                        custom.custom_entry_id.update({   
+                           'date_entry_year': custom.date_entry_year,
+                           })
+                    if   custom.date_entry_month :
+                        custom.custom_entry_id.update({   
+                           'date_entry_month':  custom.date_entry_month,
+                           }) 
+                    if   custom.description :
+                        custom.custom_entry_id.update({   
+                           'description': custom.description, 
+                           })
+                    if   custom.customer_type :
+                        custom.custom_entry_id.update({   
+                           'customer_type': custom.customer_type, 
+                           }) 
+                    if   custom.t_travel_by :
+                        custom.custom_entry_id.update({   
+                           'description': custom.t_travel_by, 
+                           }) 
+                    if   custom.f_duration_from :
+                        custom.custom_entry_id.update({   
+                           'description': custom.f_duration_from, 
+                           }) 
+                    if   custom.f_duration_to :
+                        custom.custom_entry_id.update({   
+                           'description': custom.f_duration_to, 
+                           }) 
+                    if   custom.date_effective :
+                        custom.custom_entry_id.update({   
+                           'description': custom.date_effective, 
+                           })     
+                    if   custom.date_subscription :
+                        custom.custom_entry_id.update({   
+                           'description': custom.date_subscription, 
+                           })     
+                    
+                    
+                                              
                 else:    
                     partner = custom.entry_partner_id.id
                     user = custom.user_id.id
+                    entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
+                    entry_id = 0
+                    entry_id = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')], limit=1).id
+                    for entry in entry_stage:
+                        if entry.custom_entry_type_ids:
+                            if self.custom_entry_type_id.id in entry.custom_entry_type_ids.ids:
+                                entry_id = entry.id
+                            for group in entry.group_id.users:
+                                if group.id == self.env.uid:
+                                    entry_id = entry.id
+
+                    name_seq = self.custom_entry_type_id.name 
+                    if self.custom_entry_type_id.automated_sequence == True:
+                        name_seq = self.custom_entry_type_id.sequence_id.next_by_id()         
                     custom_vals = {
+                        'name':  name_seq, 
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
+                        'currency_id': custom.currency_id.id,
+                        'company_id': self.env.company.id,
+                        'entry_attachment_id': [[6, 0, attachment.ids]],
+                        'ref': custom.reference,
+                        'supplier_bill_ref': custom.supplier_bill_ref,
+                        'date_entry_year': custom.date_entry_year,
+                        'date_entry_month':  custom.date_entry_month,
+                        'description': custom.description, 
+                        'customer_type': custom.customer_type,
+                        't_travel_by':  custom.t_travel_by,
+                        'f_duration_from': custom.f_duration_from, 
+                        'f_duration_to': custom.f_duration_to,
+                        'date_effective':  custom.date_effective,
+                        'date_subscription': custom.date_subscription,
                         'user_id': user,
+                        'stage_id': entry_id,
                         'custom_entry_type_id': self.custom_entry_type_id.id,
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
@@ -236,5 +304,8 @@ class IrAttachment(models.Model):
     
     
 class ResGroups(models.Model):
-    _inherit = 'res.groups'     
+    _inherit = 'res.groups' 
+    
+class ResCurrency(models.Model):
+    _inherit = 'res.currency'     
 

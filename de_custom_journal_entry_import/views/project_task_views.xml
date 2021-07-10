@@ -24,6 +24,15 @@
                     <field name="supplier_bill_ref"  invisible="1" />
                     <field name="date_entry_year"  invisible="1" />
                     <field name="date_entry_month"  invisible="1" />
+                    
+                    <field name="f_duration_from"  invisible="1" />
+                    <field name="f_duration_to"  invisible="1" />
+                    <field name="customer_type"  invisible="1" />
+                    <field name="date_effective"  invisible="1" />
+                    <field name="date_subscription"  invisible="1" />
+                    <field name="currency_id"  invisible="1" />
+                    <field name="t_travel_by"  invisible="1" />
+                   
                 </xpath>
               
            </field>

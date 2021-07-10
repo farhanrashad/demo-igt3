@@ -50,12 +50,19 @@ def get_custom_entry_final(entry_type):
 
     custom_types = request.env['account.custom.entry.type'].search([('id', '=', entry_type)], limit=1)
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
+    currencies = request.env['res.currency'].search([])
     tasks = 'project.task'
     reference = 0
     supplier_inv = 0
     month = 0
     year = 0
+    date_subscription = 0
     description = 0
+    customer_type = 0
+    t_travel_by = 0
+    date_effective = 0
+    f_duration_to = 0
+    f_duration_from = 0
     if custom_types.has_ref != 'no':
         reference = 1  
     if custom_types.has_supplier_bill != 'no':
@@ -65,6 +72,15 @@ def get_custom_entry_final(entry_type):
         year = 1
     if custom_types.has_description != 'no':
         description = 1 
+    if custom_types.has_travel != 'no':
+        customer_type = 1 
+        t_travel_by = 1
+        date_subscription = 1
+        date_effective = 1
+    if custom_types.has_rent_vechile != 'no':
+        f_duration_to = 1 
+        f_duration_from = 1
+           
         
     return {
         'entry_types': custom_types ,
@@ -74,6 +90,13 @@ def get_custom_entry_final(entry_type):
         'supplier_iv_num': supplier_inv,
         'month': month,
         'year': year,
+        'f_duration_from': f_duration_from,
+        'f_duration_to': f_duration_to,
+        'date_effective': date_effective,
+        'date_subscription': date_subscription,
+        'customer_type': customer_type,
+        'currencies': currencies,
+        't_travel_by': t_travel_by,
         'description': description,   
         'title': custom_types.name +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
         'company_info': company_info,
@@ -87,12 +110,19 @@ def get_custom_entry_final_update(entry_type, entry):
     custom_entry = request.env['account.custom.entry'].search([('id', '=', entry)], limit=1)
     custom_types = request.env['account.custom.entry.type'].search([('id', '=', entry_type)], limit=1)
     company_info = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])
+    currencies = request.env['res.currency'].search([])
     tasks = 'project.task'
     reference = 0
     supplier_inv = 0
     month = 0
     year = 0
+    date_subscription = 0
     description = 0
+    customer_type = 0
+    t_travel_by = 0
+    date_effective = 0
+    f_duration_to = 0
+    f_duration_from = 0
     if custom_types.has_ref != 'no':
         reference = 1  
     if custom_types.has_supplier_bill != 'no':
@@ -102,17 +132,32 @@ def get_custom_entry_final_update(entry_type, entry):
         year = 1
     if custom_types.has_description != 'no':
         description = 1 
+    if custom_types.has_travel != 'no':
+        customer_type = 1 
+        t_travel_by = 1
+        date_subscription = 1
+        date_effective = 1
+    if custom_types.has_rent_vechile != 'no':
+        f_duration_to = 1 
+        f_duration_from = 1
         
     return {
         'entry_types': custom_types ,
         'partner': company_info.partner_id.id,
         'custom_entry': custom_entry.id, 
         'user': company_info.id,
-        'reference': reference,
+         'reference': reference,
         'supplier_iv_num': supplier_inv,
         'month': month,
         'year': year,
-        'description': description,    
+        'f_duration_from': f_duration_from,
+        'f_duration_to': f_duration_to,
+        'date_effective': date_effective,
+        'date_subscription': date_subscription,
+        'customer_type': customer_type,
+        'currencies': currencies,
+        't_travel_by': t_travel_by,
+        'description': description,   
         'title': custom_types.name +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
         'company_info': company_info,
         'tasks': tasks,
