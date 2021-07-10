@@ -131,6 +131,27 @@ class ProjectTask(models.Model):
                            'date_entry_month':  custom.date_entry_month,
                            'description': custom.description, 
                            })
+                    if   custom.reference :
+                        custom.custom_entry_id.update({       
+                           'ref': custom.reference,
+                           })
+                    if   custom.supplier_bill_ref :
+                        custom.custom_entry_id.update({  
+                           'supplier_bill_ref': custom.supplier_bill_ref,
+                           })
+                    if   custom.date_entry_year :
+                        custom.custom_entry_id.update({   
+                           'date_entry_year': custom.date_entry_year,
+                           })
+                    if   custom.date_entry_month :
+                        custom.custom_entry_id.update({   
+                           'date_entry_month':  custom.date_entry_month,
+                           }) 
+                    if   custom.description :
+                        custom.custom_entry_id.update({   
+                           'description': custom.description, 
+                           })   
+                        
                     
                     
                                               
