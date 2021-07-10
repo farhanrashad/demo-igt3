@@ -183,7 +183,177 @@
             <div class="s_website_form_rows row s_col_no_bgcolor">
 
 
-
+                <t t-if='reference == 1'>
+              <div id ="reference" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Reference</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="reference" id="entry11"/>
+                  </div>
+                </div>
+              </div>
+            </t> 
+                
+             <t t-if='supplier_iv_num == 1'>   
+              <div id ="supplier_bill_ref" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Supplier Bill Ref</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="supplier_bill_ref" id="entry12"/>
+                  </div>
+                </div>
+              </div>
+            </t>    
+             
+            <t t-if='month == 1'>    
+              <div id ="date_entry_month" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Month</span>
+                  </label>
+                  <div class="col-sm">
+                    <select  id="date_entry_month" class="form-control  s_website_form_input" name="date_entry_month" >
+                                                            <option value="1">Jan</option>
+                                                            <option value="2">Feb</option>
+                                                            <option value="3">Mar</option>
+                                                            <option value="4">Apr</option>
+                                                            <option value="5">May</option>
+                                                            <option value="6">Jun</option>
+                                                            <option value="7">July</option>
+                                                            <option value="8">Aug</option>
+                                                            <option value="9">Sep</option>
+                                                            <option value="10">Oct</option>
+                                                            <option value="11">Nov</option>
+                                                            <option value="12">Dec</option>
+                                                           
+                                                            
+                                                </select>
+                  </div>
+                </div>
+              </div>  
+                </t>
+                  <div id ="currency" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="currency">
+                    <span class="s_website_form_label_content">Currency</span>
+                  </label>
+                  <div class="col-sm">
+                    <select class="form-control  o_website_form_input" name="currency_id" readonly="1">
+                                                                    <t t-foreach="currencies" t-as="currency">
+                                                                        <option t-att-value="currency.id">
+                                                                            <t t-esc="currency.name"    />
+                                                                        </option>
+                                                                    </t>
+                                                                </select>
+                  </div>
+                </div>
+              </div>
+                
+            <t t-if='date_subscription == 1'>
+              <div id ="date_subscription" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1sub11">
+                    <span class="s_website_form_label_content">Date of Subscription</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="date_subscription" id="entrysub11"/>
+                  </div>
+                </div>
+              </div>
+               </t>
+              <t t-if='date_effective == 1'>
+              <div id ="date_effective" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="date_effective">
+                    <span class="s_website_form_label_content">Effective Date</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="date_effective" id="date_effective"/>
+                  </div>
+                </div>
+              </div>
+               </t>  
+             
+                 <t t-if='f_duration_from == 1'>
+              <div id ="f_duration_from" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="f_duration_from">
+                    <span class="s_website_form_label_content">Duration From</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="f_duration_from" id="f_duration_from"/>
+                  </div>
+                </div>
+              </div>
+               </t>  
+                
+            
+                
+             <t t-if='f_duration_to == 1'>
+              <div id ="f_duration_to" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="f_duration_to">
+                    <span class="s_website_form_label_content">Duration To</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="f_duration_to" id="f_duration_to"/>
+                  </div>
+                </div>
+              </div>
+               </t>   
+                
+                
+              <t t-if='customer_type == 1'>    
+              <div id ="customer_type" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1ct">
+                    <span class="s_website_form_label_content">Customer Type</span>
+                  </label>
+                  <div class="col-sm">
+                    <select  id="date_entry_month" class="form-control  s_website_form_input" name="customer_type" >
+                                                            <option value="local">Local</option>
+                                                            <option value="expat">Expat</option>
+                                                           
+                                                            
+                                                </select>
+                  </div>
+                </div>
+              </div>  
+                </t>  
+                <t t-if='t_travel_by == 1'>    
+              <div id ="t_travel_by" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1t">
+                    <span class="s_website_form_label_content">Travel By</span>
+                  </label>
+                  <div class="col-sm">
+                    <select  id="date_entry_month" class="form-control  s_website_form_input" name="t_travel_by" >
+                                                            <option value="ticket">Flight Ticket</option>
+                                                            <option value="Vehicle">Vehicle Rental</option>                                                          
+                                                            
+                                                </select>
+                  </div>
+                </div>
+              </div>  
+                </t>  
+                
+                <t t-if='year == 1'>
+                 <div id ="date_entry_year" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Year</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="date_entry_year" id="entry13"/>
+                  </div>
+                </div>
+              </div>  
+            </t>
+             <t t-if='description == 1'>
               <div id ="description" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
@@ -194,6 +364,7 @@
                   </div>
                 </div>
               </div>
+               </t>
               <div id="entry_attach"  class="form-group s_website_form_field col-12 pt24" data-type="many2many"  data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="xl89fa1ymg">
@@ -346,9 +517,180 @@
                          <div class="container">
           <form action="/website_form/" method="post"  id="task_form" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-success-mode="redirect" data-success-page="/contactus-thank-you" data-model_name="project.task">
             <div class="s_website_form_rows row s_col_no_bgcolor">
+              
 
 
-
+                   <t t-if='reference == 1'>
+              <div id ="reference" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Reference</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="reference" id="entry11"/>
+                  </div>
+                </div>
+              </div>
+            </t> 
+                
+             <t t-if='supplier_iv_num == 1'>   
+              <div id ="supplier_bill_ref" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Supplier Bill Ref</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="supplier_bill_ref" id="entry12"/>
+                  </div>
+                </div>
+              </div>
+            </t>    
+             
+            <t t-if='month == 1'>    
+              <div id ="date_entry_month" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Month</span>
+                  </label>
+                  <div class="col-sm">
+                    <select  id="date_entry_month" class="form-control  s_website_form_input" name="date_entry_month" >
+                                                            <option value="1">Jan</option>
+                                                            <option value="2">Feb</option>
+                                                            <option value="3">Mar</option>
+                                                            <option value="4">Apr</option>
+                                                            <option value="5">May</option>
+                                                            <option value="6">Jun</option>
+                                                            <option value="7">July</option>
+                                                            <option value="8">Aug</option>
+                                                            <option value="9">Sep</option>
+                                                            <option value="10">Oct</option>
+                                                            <option value="11">Nov</option>
+                                                            <option value="12">Dec</option>
+                                                           
+                                                            
+                                                </select>
+                  </div>
+                </div>
+              </div>  
+                </t>
+                  <div id ="currency" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="currency">
+                    <span class="s_website_form_label_content">Currency</span>
+                  </label>
+                  <div class="col-sm">
+                    <select class="form-control  o_website_form_input" name="currency_id" >
+                                                                    <t t-foreach="currencies" t-as="currency">
+                                                                        <option t-att-value="currency.id">
+                                                                            <t t-esc="currency.name"    />
+                                                                        </option>
+                                                                    </t>
+                                                                </select>
+                  </div>
+                </div>
+              </div>
+                
+            <t t-if='date_subscription == 1'>
+              <div id ="date_subscription" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1sub11">
+                    <span class="s_website_form_label_content">Date of Subscription</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="date_subscription" id="entrysub11"/>
+                  </div>
+                </div>
+              </div>
+               </t>
+              <t t-if='date_effective == 1'>
+              <div id ="date_effective" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="date_effective">
+                    <span class="s_website_form_label_content">Effective Date</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="date_effective" id="date_effective"/>
+                  </div>
+                </div>
+              </div>
+               </t>  
+             
+                 <t t-if='f_duration_from == 1'>
+              <div id ="f_duration_from" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="f_duration_from">
+                    <span class="s_website_form_label_content">Duration From</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="f_duration_from" id="f_duration_from"/>
+                  </div>
+                </div>
+              </div>
+               </t>  
+                
+            
+                
+             <t t-if='f_duration_to == 1'>
+              <div id ="f_duration_to" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="f_duration_to">
+                    <span class="s_website_form_label_content">Duration To</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="date" class="form-control s_website_form_input" name="f_duration_to" id="f_duration_to"/>
+                  </div>
+                </div>
+              </div>
+               </t>   
+                
+                
+              <t t-if='customer_type == 1'>    
+              <div id ="customer_type" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1ct">
+                    <span class="s_website_form_label_content">Customer Type</span>
+                  </label>
+                  <div class="col-sm">
+                    <select  id="date_entry_month" class="form-control  s_website_form_input" name="customer_type" >
+                                                            <option value="local">Local</option>
+                                                            <option value="expat">Expat</option>
+                                                           
+                                                            
+                                                </select>
+                  </div>
+                </div>
+              </div>  
+                </t>  
+                <t t-if='t_travel_by == 1'>    
+              <div id ="t_travel_by" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1t">
+                    <span class="s_website_form_label_content">Travel By</span>
+                  </label>
+                  <div class="col-sm">
+                    <select  id="date_entry_month" class="form-control  s_website_form_input" name="t_travel_by" >
+                                                            <option value="ticket">Flight Ticket</option>
+                                                            <option value="Vehicle">Vehicle Rental</option>                                                          
+                                                            
+                                                </select>
+                  </div>
+                </div>
+              </div>  
+                </t>  
+                
+                <t t-if='year == 1'>
+                 <div id ="date_entry_year" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
+                    <span class="s_website_form_label_content">Year</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="text" class="form-control s_website_form_input" name="date_entry_year" id="entry13"/>
+                  </div>
+                </div>
+              </div>  
+            </t>
+             <t t-if='description == 1'>
               <div id ="description" class="form-group s_website_form_field col-12 pt16" data-type="char" data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class="col-form-label col-sm-auto s_website_form_label " style="width: 200px" for="entry1">
@@ -359,6 +701,7 @@
                   </div>
                 </div>
               </div>
+               </t>
               <div id="entry_attach"  class="form-group s_website_form_field col-12 pt24" data-type="many2many"  data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="xl89fa1ymg">
@@ -447,7 +790,7 @@
             <div class="alert alert-warning" data-oe-model="ir.ui.view" data-oe-id="2176" data-oe-field="arch" data-oe-xpath="/data/xpath/t[2]/div[1]">
                       <a
                             role="button"
-                            t-attf-href="/web/content/#{entry_types.attachment_id.id}?download=true"
+                            t-attf-href="/web/content/#{entry_types.update_attachment_id.id}?download=true"
                             class="btn-primary"
                             style="margin: 0 10px; font-size: 12px; line-height: 1.5; border-radius: 3px; padding: 8px 10px; color: #ffffff;"
                         >
