@@ -143,6 +143,7 @@ class ProjectTask(models.Model):
                                               
                 else:    
                     partner = custom.entry_partner_id.id
+                    
                     user = custom.user_id.id
                     entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
                     entry_id = 0
@@ -201,7 +202,7 @@ class ProjectTask(models.Model):
                             many2one_vals = self.env[str(search_field.relation)].search([('display_name','=',data_column)], limit=1)
 
                             inner_vals.update({
-                                keys[i]: many2one_vals.id
+                                keys[i]: many2one_vals.id if many2one_vals.id else False
                             })
                             index = index + 1
                             i = i + 1
@@ -210,24 +211,26 @@ class ProjectTask(models.Model):
                             many2one_vals = self.env[str(search_field.relation)].search([('name','=',data_column)], limit=1)
 
                             inner_vals.update({
-                                keys[i]: many2one_vals.id
+                                keys[i]: many2one_vals.id if many2one_vals.id else False
                             })
                             index = index + 1
                             i = i + 1
                         elif search_field.ttype == 'date':
-                            date_parse = parser.parse(data_column)
-                            date_vals = date_parse.strftime("%Y-%m-%d")
-                            inner_vals.update({
+                            if  data_column:
+                                date_parse = parser.parse(data_column)
+                                date_vals = date_parse.strftime("%Y-%m-%d")
+                                inner_vals.update({
                                 keys[i]: date_vals
-                            })
+                                })
                             index = index + 1
                             i = i + 1
                         elif search_field.ttype == 'datetime':
-                            datetime_parse = parser.parse(data_column)
-                            datetime_vals = datetime_parse.strftime("%Y-%m-%d %H:%M:%S")
-                            inner_vals.update({
+                            if data_column:
+                                datetime_parse = parser.parse(data_column)
+                                datetime_vals = datetime_parse.strftime("%Y-%m-%d %H:%M:%S")
+                                inner_vals.update({
                                 keys[i]: datetime_vals
-                            })
+                                })
                             index = index + 1
                             i = i + 1
 
@@ -246,7 +249,9 @@ class ProjectTask(models.Model):
                 custom.is_entry_processed = True
                 custom.un_processed_entry = False
                 custom.user_id = self.env.user.id
-
+                custom.custom_entry_id.update({
+                  'is_custom_entry_import' : False
+                 })
 
 
 class CustomEntryType(models.Model):
