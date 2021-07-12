@@ -74,7 +74,7 @@ class ProjectTask(models.Model):
     customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
     date_effective = fields.Date(string='Effective Date')
     date_subscription = fields.Date(string='Date of Subscription')
-    currency_id = fields.Many2one('res.company', string='Currency')
+    tcurrency_id = fields.Many2one('res.currency', string='Currency')
     t_travel_by = fields.Selection([
         ('ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
@@ -136,56 +136,8 @@ class ProjectTask(models.Model):
                     custom.custom_entry_id.correction_reason = ' ' 
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
-                           'ref': custom.reference,
-                           'supplier_bill_ref': custom.supplier_bill_ref,
-                           'date_entry_year': custom.date_entry_year,
-                           'date_entry_month':  custom.date_entry_month,
-                           'description': custom.description, 
                            })
-                    if   custom.reference :
-                        custom.custom_entry_id.update({       
-                           'ref': custom.reference,
-                           })
-                    if   custom.supplier_bill_ref :
-                        custom.custom_entry_id.update({  
-                           'supplier_bill_ref': custom.supplier_bill_ref,
-                           })
-                    if   custom.date_entry_year :
-                        custom.custom_entry_id.update({   
-                           'date_entry_year': custom.date_entry_year,
-                           })
-                    if   custom.date_entry_month :
-                        custom.custom_entry_id.update({   
-                           'date_entry_month':  custom.date_entry_month,
-                           }) 
-                    if   custom.description :
-                        custom.custom_entry_id.update({   
-                           'description': custom.description, 
-                           })
-                    if   custom.customer_type :
-                        custom.custom_entry_id.update({   
-                           'customer_type': custom.customer_type, 
-                           }) 
-                    if   custom.t_travel_by :
-                        custom.custom_entry_id.update({   
-                           'description': custom.t_travel_by, 
-                           }) 
-                    if   custom.f_duration_from :
-                        custom.custom_entry_id.update({   
-                           'description': custom.f_duration_from, 
-                           }) 
-                    if   custom.f_duration_to :
-                        custom.custom_entry_id.update({   
-                           'description': custom.f_duration_to, 
-                           }) 
-                    if   custom.date_effective :
-                        custom.custom_entry_id.update({   
-                           'description': custom.date_effective, 
-                           })     
-                    if   custom.date_subscription :
-                        custom.custom_entry_id.update({   
-                           'description': custom.date_subscription, 
-                           })     
+                   
                     
                     
                                               
@@ -210,7 +162,7 @@ class ProjectTask(models.Model):
                         'name':  name_seq, 
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
-                        'currency_id': custom.currency_id.id,
+                        'currency_id': custom.tcurrency_id.id,
                         'company_id': self.env.company.id,
                         'entry_attachment_id': [[6, 0, attachment.ids]],
                         'ref': custom.reference,
@@ -296,6 +248,7 @@ class ProjectTask(models.Model):
                 custom.user_id = self.env.user.id
 
 
+
 class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
@@ -307,5 +260,6 @@ class ResGroups(models.Model):
     _inherit = 'res.groups' 
     
 class ResCurrency(models.Model):
-    _inherit = 'res.currency'     
+    _inherit = 'res.currency' 
+
 

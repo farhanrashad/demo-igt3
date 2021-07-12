@@ -30,7 +30,7 @@
                     <field name="customer_type"  invisible="1" />
                     <field name="date_effective"  invisible="1" />
                     <field name="date_subscription"  invisible="1" />
-                    <field name="currency_id"  invisible="1" />
+                    <field name="tcurrency_id"  invisible="1" />
                     <field name="t_travel_by"  invisible="1" />
                    
                 </xpath>
