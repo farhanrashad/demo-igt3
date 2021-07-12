@@ -22,4 +22,7 @@ class CustomEntryLine(models.Model):
     
     project_id = fields.Many2one('project.project', string="Project", check_company=True, ondelete='cascade')
     amount = fields.Float(string='amount')
+    company_id = fields.Many2one('res.company', related='custom_entry_id.company_id')
+    currency_id = fields.Many2one('res.currency', related='custom_entry_id.currency_id')
+
 
