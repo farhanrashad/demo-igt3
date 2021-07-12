@@ -249,8 +249,9 @@ class ProjectTask(models.Model):
                 custom.is_entry_processed = True
                 custom.un_processed_entry = False
                 custom.user_id = self.env.user.id
-                custom.custom_entry_type_id.is_custom_entry_import = False
-
+                custom.custom_entry_id.update({
+                  'is_custom_entry_import' : False
+                 })
 
 
 class CustomEntryType(models.Model):
