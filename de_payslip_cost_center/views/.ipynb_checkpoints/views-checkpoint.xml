@@ -8,34 +8,7 @@
             <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree" position="inside">
                 <field name="cost_divided"/>
             </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='name']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='code']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='category_id']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='amount']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='cost_divided']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='total']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='salary_rule_id']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='rate']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-            <xpath expr="//notebook//page[@name='salary_computation']//field[@name='line_ids']//tree/field[@name='quantity']" position="attributes">
-                <attribute name="attrs">{'invisible': [('cost_divided', '=', True)]}</attribute>
-            </xpath>
-        </field>
+                </field>
     </record>
   </data>
 </odoo>

@@ -26,7 +26,6 @@
                     <group>
                         <group string="Employee's Info">
                             <field name="employee_id" attrs="{'readonly': [('state','!=','draft')]}"/>
-                            <field name="user_id" />
                             <field name="grade" />
                             <field name="position"/>
                             <field name="department_id"/>

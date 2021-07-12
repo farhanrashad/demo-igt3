@@ -28,7 +28,6 @@
         'views/grade_type_view.xml',
         'views/designation_type_view.xml',
         'views/employee_asset_view.xml',
-        'views/account_view.xml',
         'views/resume_views.xml'
     ],
     # only loaded in demonstration mode

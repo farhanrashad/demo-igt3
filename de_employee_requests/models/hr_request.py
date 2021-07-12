@@ -19,8 +19,6 @@ class HrRequest(models.Model):
                        default=lambda self: _('New'))
 
     employee_id = fields.Many2one('hr.employee', string="Employee", required=True)
-    user_id = fields.Many2one(related='employee_id.user_id')
-    
     grade = fields.Many2one('grade.type', related='employee_id.grade_type', string='Grade')
     position = fields.Char(string='Position', related='employee_id.job_title')
     department_id = fields.Many2one('hr.department', string='Department', related='employee_id.department_id')
