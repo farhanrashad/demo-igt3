@@ -810,15 +810,14 @@ class CustomEntryLine(models.Model):
     f_receipt_no = fields.Char(string='Filling Receipt No.')
     
     #fuel filling methods
-    @api.depends('f_opening_stock', 'f_product_qty')
+    @api.depends('f_product_qty', 'f_price_unit')
     def _compute_fuel_filled_closing_stock(self):
         tot = 0
         for line in self:
             if line.custom_entry_id.has_fuel_filling:
                 tot = line.f_opening_stock + line.f_product_qty
-        self.update({
-            'f_closing_stock': tot
-        })
+        self.f_closing_stock = tot
+        
         
     @api.depends('f_product_qty', 'f_price_unit')
     def _compute_fuel_filled_total(self):
