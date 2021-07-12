@@ -603,10 +603,8 @@ class CustomEntryLine(models.Model):
     date_entry = fields.Datetime(related='custom_entry_id.date_entry')
     date_entry_period = fields.Char(string='Month')
     
-    company_id = fields.Many2one(
-        string='Company', related='custom_entry_id.company_id',
-        store=True, readonly=True, index=True)
-    currency_id = fields.Many2one(related='custom_entry_id.currency_id', store=True, string='Currency', readonly=True)
+    company_id = fields.Many2one('res.company', related='custom_entry_id.company_id')
+    currency_id = fields.Many2one('res.currency',related='custom_entry_id.currency_id')
 
     invoice_lines = fields.One2many('account.move.line', 'custom_entry_line_id', string="Bill Lines", readonly=True, copy=False)
 
@@ -775,13 +773,22 @@ class CustomEntryLine(models.Model):
     other_charges = fields.Float(string='Other Charges')
     amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount')
     
+    def _compute_total_units(self):
+        for rec in self:
+            rec.total_unit = rec.closing_reading - rec.opening_reading
+
+    @api.depends('maintainence_fee','hp_fee','KHW_charges','other_charges')
+    def _compute_total_electricity_amount(self):
+        for rec in self:
+            rec.amount_total_electricity = rec.maintainence_fee + rec.hp_fee + rec.KHW_charges + rec.other_charges
+            
     #has fuel Drawn
     d_date = fields.Date(string='Drawn Date')
     d_partner_id = fields.Many2one('res.partner',string='Drawn Purchase From', ondelete='cascade')
     d_contact_id = fields.Many2one('res.partner',string='Drawn Contact From', ondelete='cascade')
     d_product_qty = fields.Float(string='Drawn Qty', default=1.0, digits='Product Unit of Measure', )
     d_price_unit = fields.Float(string='Drawn Unit Price', default=1.0, digits='Product Price')
-    d_price_subtotal = fields.Monetary(compute='_compute_fuel_drawn_total', string='Drawn Subtotal')
+    d_price_subtotal = fields.Float(compute='_compute_fuel_drawn_total', string='Drawn Subtotal')
     d_booklet_no = fields.Char(string='Booklet')
     d_receipt_no = fields.Char(string='Receipt No.')
     
@@ -790,7 +797,7 @@ class CustomEntryLine(models.Model):
     def _compute_fuel_drawn_total(self):
         tot = 0
         for line in self:
-            if line.custom_entry_id.has_fuel_drawn:
+            if line.d_product_qty and line.d_price_unit:
                 tot = line.d_product_qty * line.d_price_unit
         self.d_price_subtotal = tot
         
@@ -805,43 +812,30 @@ class CustomEntryLine(models.Model):
     f_closing_stock = fields.Float(string='Closting Stock', compute='_compute_fuel_filled_closing_stock')
     f_product_qty = fields.Float(string='Filling Qty', default=1.0, digits='Product Unit of Measure', )
     f_price_unit = fields.Float(string='Filling Unit Price', default=1.0, digits='Product Price')
-    f_price_subtotal = fields.Monetary(compute='_compute_fuel_filled_total', string='Filling Subtotal')
+    f_price_subtotal = fields.Float(compute='_compute_fuel_filled_total', string='Filling Subtotal')
     f_booklet_no = fields.Char(string='Filling Booklet')
     f_receipt_no = fields.Char(string='Filling Receipt No.')
     
     #fuel filling methods
     @api.depends('f_product_qty', 'f_price_unit')
+    def _compute_fuel_filled_total(self):
+        for line in self:
+            tot = 0
+            if line.f_product_qty and line.f_price_unit:
+                tot = line.f_product_qty * line.f_price_unit
+            line.f_price_subtotal = tot
+        
+    @api.depends('f_opening_stock', 'f_product_qty')
     def _compute_fuel_filled_closing_stock(self):
         tot = 0
         for line in self:
-            if line.custom_entry_id.has_fuel_filling:
+            if line.f_opening_stock and line.f_product_qty:
                 tot = line.f_opening_stock + line.f_product_qty
         self.f_closing_stock = tot
-        
-        
-    @api.depends('f_product_qty', 'f_price_unit')
-    def _compute_fuel_filled_total(self):
-        tot = 0
-        for line in self:
-            tot = 0
-            if line.custom_entry_id.has_fuel_filling:
-                tot = line.f_product_qty * line.f_price_unit
-        self.update({
-            'f_price_subtotal': tot
-        })
         
     def _compute_state(self):
         for line in self:
             line.state_id = line.project_id.address_id.state_id.id
-            
-    def _compute_total_units(self):
-        for rec in self:
-            rec.total_unit = rec.closing_reading - rec.opening_reading
-
-    @api.depends('maintainence_fee','hp_fee','KHW_charges','other_charges')
-    def _compute_total_electricity_amount(self):
-        for rec in self:
-            rec.amount_total_electricity = rec.maintainence_fee + rec.hp_fee + rec.KHW_charges + rec.other_charges
     
     def _prepare_account_move_line(self, move=False):
         self.ensure_one()
