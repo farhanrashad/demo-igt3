@@ -795,11 +795,11 @@ class CustomEntryLine(models.Model):
     #fuel drawn methods
     @api.depends('d_product_qty', 'd_price_unit')
     def _compute_fuel_drawn_total(self):
-        tot = 0
         for line in self:
-            if line.d_product_qty and line.d_price_unit:
+            tot = 0
+            if line.d_product_qty > 0 and line.d_price_unit > 0:
                 tot = line.d_product_qty * line.d_price_unit
-        self.d_price_subtotal = tot
+            line.d_price_subtotal = tot
         
     #Fuel Filling
     f_date = fields.Date(string='Filling Date')
