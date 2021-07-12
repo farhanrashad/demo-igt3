@@ -55,11 +55,11 @@ class PayslipBatch(models.TransientModel):
             }
             attach_file = self.env['ir.attachment'].create(attachment_vals)
             download_url = '/web/content/' + str(attach_file.id) + '?download=True'
-            base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+            #base_url = self.env['ir.config_parameter'].get_param('web.base.url')
 #             Return so it will download in your system
             return {
                     "type": "ir.actions.act_url",
-                    "url": str(base_url)  +  str(download_url),
+                    "url": str(download_url),
                     "target": "new",
             }
         
