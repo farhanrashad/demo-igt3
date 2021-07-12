@@ -139,15 +139,16 @@ class ProjectTask(models.Model):
                         entry_line.unlink()
                     custom.custom_entry_id.is_custom_entry_import = False
                     custom.custom_entry_id.correction_reason = ' '
-                    e_attachment_vals = {
-                     'name': custom.has_attachment_id.name,
-                     'type': 'binary',
-                     'datas':  custom.has_attachment_id.datas, 
-                     'res_id': custom.custom_entry_id.id,
-                     'res_name': custom.custom_entry_id.name,
-                     'res_model': 'account.custom.entry',
-                    }
-                    e_attachment = self.env['ir.attachment'].create(e_attachment_vals)
+                    if has_attachment_id:
+                        e_attachment_vals = {
+                         'name': custom.has_attachment_id.name,
+                         'type': 'binary',
+                         'datas':  custom.has_attachment_id.datas, 
+                         'res_id': custom.custom_entry_id.id,
+                         'res_name': custom.custom_entry_id.name,
+                         'res_model': 'account.custom.entry',
+                         }
+                        e_attachment = self.env['ir.attachment'].create(e_attachment_vals)
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
                            })

@@ -152,6 +152,7 @@ def get_custom_entry_final_update(entry_type, entry):
          'reference': reference,
         'supplier_iv_num': supplier_inv,
         'month': month,
+        'has_attachment': has_attachment,
         'year': year,
         'f_duration_from': f_duration_from,
         'f_duration_to': f_duration_to,
