@@ -805,7 +805,7 @@ class CustomEntryLine(models.Model):
     f_closing_stock = fields.Float(string='Closting Stock', compute='_compute_fuel_filled_closing_stock')
     f_product_qty = fields.Float(string='Filling Qty', default=1.0, digits='Product Unit of Measure', )
     f_price_unit = fields.Float(string='Filling Unit Price', default=1.0, digits='Product Price')
-    f_price_subtotal = fields.Monetary(compute='_compute_fuel_filled_total', string='Filling Subtotal', store=True)
+    f_price_subtotal = fields.Monetary(compute='_compute_fuel_filled_total', string='Filling Subtotal')
     f_booklet_no = fields.Char(string='Filling Booklet')
     f_receipt_no = fields.Char(string='Filling Receipt No.')
     
