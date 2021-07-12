@@ -86,8 +86,8 @@ class ProjectTask(models.Model):
         if self.entry_attachment_id:
             self.is_entry_attachment = True
             self.un_processed_entry = True
-        #if self.is_entry_attachment == True:
-         #   self.action_journal_entry_import()
+        if self.is_entry_attachment == True:
+            self.action_journal_entry_import()
 
 	
     def action_journal_entry_import(self):
@@ -143,7 +143,7 @@ class ProjectTask(models.Model):
                                               
                 else:    
                     partner = custom.entry_partner_id.id
-                    partner = self.env['res.partner'].search([('ref', '=', custom.entry_partner_id.ref)]).id
+                    
                     user = custom.user_id.id
                     entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
                     entry_id = 0
