@@ -60,6 +60,8 @@ class CustomEntry(models.Model):
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
     journal_type = fields.Selection(related='custom_entry_type_id.journal_type')
+    move_type = fields.Selection(related='custom_entry_type_id.move_type')
+    
     
     partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', change_default=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     
@@ -142,7 +144,7 @@ class CustomEntry(models.Model):
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
         for entry in self:
-            if entry.project_id:
+            if entry.custom_entry_type_id:
                 if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
                     entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
                         ('fold', '=', False)])
@@ -168,7 +170,7 @@ class CustomEntry(models.Model):
                 search_domain.append(('custom_entry_type_ids', '=', section_id))
         search_domain += list(domain)
         # perform search, return the first found
-        return self.env['account.custom.entry.type'].search(search_domain, order=order, limit=1).id
+        return self.env['account.custom.entry.stage'].search(search_domain, order=order, limit=1).id
     
     
     def stage_find(self, section_id, domain=[], order='sequence'):
@@ -285,7 +287,7 @@ class CustomEntry(models.Model):
         partner_invoice_id = self.partner_id.address_get(['invoice'])['invoice']
         invoice_vals = {
             'ref': self.name,
-            'move_type': move_type,
+            'move_type': self.custom_entry_type_id.move_type,
             'journal_id': journal,
             #'narration': self.notes,
             'invoice_date': fields.Datetime.now(),
@@ -399,7 +401,7 @@ class CustomEntry(models.Model):
             'partner_id': self.partner_id.id,
         }])
         move.create({
-            'move_type': 'entry',
+            'move_type': self.custom_entry_type_id.move_type,
             'custom_entry_id': self.id,
             'ref':  str(self.name), 
             'date': fields.Datetime.now(),
@@ -441,7 +443,7 @@ class CustomEntry(models.Model):
                 'project_id': line.project_id.id,
             }])
         invoice.create({
-            'move_type': 'in_invoice',
+            'move_type': self.custom_entry_type_id.move_type,
             'custom_entry_id': self.id,
             'invoice_date': fields.Datetime.now(),
             'partner_id': self.partner_id.id,
@@ -665,6 +667,8 @@ class CustomEntryLine(models.Model):
     date_arrival = fields.Date(string='Arrival Date', )    
     number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
     travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
+    t_travel_description = fields.Char(related='travel_reference.description_main')
+    t_travel_type = fields.Selection(related='travel_reference.travel_type')
     t_unit_price = fields.Float(string="Travel Unit Price")
     t_extra_charges = fields.Float(string="Travel Extra Charges")
     t_amount_travel = fields.Float(string="Travel Total Amount", compute='_compute_all_amount_travel')
@@ -721,6 +725,8 @@ class CustomEntryLine(models.Model):
     h_check_out = fields.Date(string="Check-Out")
     h_number_of_nights = fields.Float(string="Number of Nights", compute='_number_of_nights')
     h_travel_id = fields.Many2one('travel.request' , string="Travel Request")
+    h_travel_description = fields.Char(related='h_travel_id.description_main')
+    h_travel_type = fields.Selection(related='h_travel_id.travel_type')
     h_unit_price = fields.Float(string="Hotel Unit Price")
     h_extra_charges = fields.Float(string="Hote Extra Charges")
     h_amount = fields.Float(string="Total Amount", compute='_compute_all_amount_hotel')

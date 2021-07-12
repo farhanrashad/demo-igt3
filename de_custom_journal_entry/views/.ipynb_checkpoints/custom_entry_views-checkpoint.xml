@@ -24,7 +24,7 @@
                     <field name="message_needaction" invisible="1"/>
                     <field name="name" string="Number" readonly="1" decoration-bf="1"/>
                     <field name="date_entry" string="Date" widget="date" optional="show"/>
-                   
+                   <field name="partner_id" />
                     <field name="user_id" optional="show" widget="many2one_avatar_user" invisible="1"/>
                     <field name="activity_ids" widget="list_activity" optional="show"/>
                     <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1"/>
@@ -44,20 +44,19 @@
                         <field name="expense_advance" invisible="1"/>
                         
                         <button name="button_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
-                        <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                        <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': ['|',('stage_category', 'not in', ['progress']),('account_entry_type', '!=', 'none')]}"/>
                         <button name="button_done" type="object" string="Close" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['confirm'])]}"/>
 
-                        
                         <button name="button_refuse" string="Refuse" type="object" 
                         attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
                     <button name="button_cancel" string="Cancel" type="object" 
                         attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
                         
-                        <button name="%(action_custom_entry_to_bill)d" string="Create Bill" class="btn-primary" type="action" invisible="0" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>
+                       <!-- <button name="%(action_custom_entry_to_bill)d" string="Create Bill" class="btn-primary" type="action" invisible="0" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>-->
                         <button string="Create Bill" name="create_advance_expense" type="object" class="btn-primary" invisible="1"/>
                         
         
-                        <!--<button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>-->
+                        <button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>
                                                 
                         <button string="Journal Entry" name="create_journal_entry" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','entry')]}"/>
 
@@ -70,6 +69,7 @@
                         <field name="stage_category" invisible="1" />
                         <field name="account_entry_type" invisible="1" />
                         <field name="journal_type" invisible="1" />
+                        <field name="move_type" invisible="1" />
                         
                         
                         <div class="oe_button_box" name="button_box">
@@ -311,7 +311,7 @@
             <field name="res_model">account.custom.entry</field>
             <field name="view_mode">tree,kanban,form,activity</field>
             <field name="context">{}</field>
-            <field name="domain">[]</field>
+            <field name="domain">[('move_type', 'in', ['entry','out_invoice','in_invoice','out_receipt','in_receipt'])]</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a new custom journal entry!
@@ -319,7 +319,7 @@
             </field>
     </record>
         
-    <menuitem action="action_custom_entry" name="Custom Entry" id="menu_custom_entry_type_config_custom_entry" groups="account.group_account_manager" parent="custom_entry_menu" sequence="2"/>
+    <menuitem action="action_custom_entry" name="Custom Entry" id="menu_custom_entry_custom_entry" groups="account.group_account_manager" parent="custom_entry_menu" sequence="2"/>
         
     </data>
 </odoo>

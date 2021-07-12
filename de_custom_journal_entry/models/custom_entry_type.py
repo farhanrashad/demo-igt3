@@ -37,6 +37,16 @@ class CustomEntryType(models.Model):
     expense_advance = fields.Boolean(string='Pay Advance Expense')
     journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True, domain="[('type', 'not in', ['bank', 'cash'])]")
     journal_type = fields.Selection(related='journal_id.type', string="Journal Type")
+    move_type = fields.Selection(selection=[
+            ('entry', 'Journal Entry'),
+            ('out_invoice', 'Customer Invoice'),
+            ('out_refund', 'Customer Credit Note'),
+            ('in_invoice', 'Vendor Bill'),
+            ('in_refund', 'Vendor Credit Note'),
+            ('out_receipt', 'Sales Receipt'),
+            ('in_receipt', 'Purchase Receipt'),
+        ], string='Move Type', )
+    
     account_id = fields.Many2one('account.account', string="GL Account", company_dependent=True, check_company=True)
     counterpart_mode = fields.Selection([
         ('debit', 'Debit'),
