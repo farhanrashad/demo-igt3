@@ -43,6 +43,8 @@
                                 <th class="text-left">Document Number</th>
                                 <th class="text-left">Entry Date</th>
                                 <th class="text-left">Entry Type</th>
+                                <th class="text-left">Month</th> 
+                                <th class="text-left">Year</th> 
                                 <th class="text-left">Status</th>
                                 <th class="text-left">Validity</th>
                             </tr>
@@ -62,6 +64,12 @@
                                     <td class="text-left">
                                         <span t-esc="custom.custom_entry_type_id.name" />
                                     </td>
+                                    <td class="text-left">
+                                        <span t-esc="custom.date_entry_month" />
+                                    </td>
+                                     <td class="text-left">
+                                        <span t-esc="custom.date_entry_year" />
+                                    </td> 
 
                                     <td class="text-left">
                                         <span t-esc="custom.stage_id.name" />
