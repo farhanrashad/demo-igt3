@@ -358,9 +358,12 @@ class CustomEntry(models.Model):
             if self.custom_entry_type_id.counterpart_mode == 'debit':
                 #credit = line.price_subtotal
                 amount = line.price_subtotal * -1
+                counter_amount += line.price_subtotal
             else:
                 #debit = line.price_subtotal
                 amount = line.price_subtotal
+                counter_amount += line.price_subtotal * -1
+                
             balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
             debit = balance if balance > 0.0 else 0.0
             credit = -balance if balance < 0.0 else 0.0
@@ -379,12 +382,12 @@ class CustomEntry(models.Model):
                 'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                 'project_id': line.project_id.id,
             }])
-        if self.custom_entry_type_id.counterpart_mode == 'debit':
+        #if self.custom_entry_type_id.counterpart_mode == 'debit':
             #counter_debit = self.amount_total
-            counter_amount = self.amount_total
-        else:
+         #   counter_amount = self.amount_total
+        #else:
             #counter_credit = self.amount_total
-            counter_amount = self.amount_total * -1
+            #counter_amount = self.amount_total * -1
             
         counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
         counter_debit = counter_balance if counter_balance > 0.0 else 0.0
