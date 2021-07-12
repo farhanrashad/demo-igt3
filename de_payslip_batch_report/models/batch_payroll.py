@@ -71,3 +71,5 @@ class HrPayslipRun(models.Model):
         return all(slip.state in ['done', 'cancel'] for slip in self.mapped('slip_ids'))
 
 
+class IrConfig(models.Model):
+    _inherit = 'ir.config_parameter'
