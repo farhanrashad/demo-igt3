@@ -249,6 +249,7 @@ class ProjectTask(models.Model):
                 custom.is_entry_processed = True
                 custom.un_processed_entry = False
                 custom.user_id = self.env.user.id
+                custom.is_custom_entry_import = False
 
 
 
