@@ -57,6 +57,11 @@ class ProjectTask(models.Model):
                                             column2="attachment_id",
                                             string="Entry Attachment")
 
+    has_attachment_id = fields.Many2many('ir.attachment', relation="files_rel_project_task_has_entry",
+                                            column1="doc_id",
+                                            column2="attachment_id",
+                                            string="Data Attachment")
+
 
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type')
     entry_partner_id = fields.Many2one('res.partner', string='Contractor')
@@ -133,7 +138,16 @@ class ProjectTask(models.Model):
                     for entry_line in entry.custom_entry_line:
                         entry_line.unlink()
                     custom.custom_entry_id.is_custom_entry_import = False
-                    custom.custom_entry_id.correction_reason = ' ' 
+                    custom.custom_entry_id.correction_reason = ' '
+                    e_attachment_vals = {
+                     'name': custom.has_attachment_id.name,
+                     'type': 'binary',
+                     'datas':  custom.has_attachment_id.datas, 
+                     'res_id': custom.custom_entry_id.id,
+                     'res_name': custom.custom_entry_id.name,
+                     'res_model': 'account.custom.entry',
+                    }
+                    e_attachment = self.env['ir.attachment'].create(e_attachment_vals)
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
                            })

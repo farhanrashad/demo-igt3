@@ -478,7 +478,7 @@
     </template>
     
     
-    <template id="portal_custom_entry_final_update" name="Custom Entry final update">
+    <template id="portal_custom_entry_final_update" name="Custom Entry final update"> 
         <t t-call="portal.portal_layout">
                <div id="wrap">
 
@@ -517,12 +517,24 @@
                          <div class="container">
           <form action="/website_form/" method="post"  id="task_form" enctype="multipart/form-data" class="o_mark_required" data-mark="*" data-success-mode="redirect" data-success-page="/contactus-thank-you" data-model_name="project.task">
             <div class="s_website_form_rows row s_col_no_bgcolor">
-              
 
+             <t t-if="has_attachment == 1">  
               <div id="entry_attach"  class="form-group s_website_form_field col-12 pt24" data-type="many2many"  data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="xl89fa1ymg">
                     <span class="s_website_form_label_content">Attachment File</span>
+                  </label>
+                  <div class="col-sm">
+                    <input type="file" class="form-control-file s_website_form_input" name="has_attachment_id" multiple="1" />
+                  </div>
+                </div>
+              </div>
+             </t> 
+
+              <div id="data_entry_attach"  class="form-group s_website_form_field col-12 pt24" data-type="many2many"  data-name="Field">
+                <div class="row s_col_no_resize s_col_no_bgcolor">
+                  <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="xl89fa1ymg">
+                    <span class="s_website_form_label_content">Data File</span>
                   </label>
                   <div class="col-sm">
                     <input type="file" class="form-control-file s_website_form_input" name="entry_attachment_id" multiple="1" />

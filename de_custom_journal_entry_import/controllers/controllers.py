@@ -123,8 +123,11 @@ def get_custom_entry_final_update(entry_type, entry):
     date_effective = 0
     f_duration_to = 0
     f_duration_from = 0
+    has_attachment = 0 
+    if custom_types.has_attachment != 'no':
+        has_attachment = 1 
     if custom_types.has_ref != 'no':
-        reference = 1  
+        reference = 1   
     if custom_types.has_supplier_bill != 'no':
         supplier_inv = 1  
     if custom_types.has_period != 'no':
