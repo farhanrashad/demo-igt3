@@ -136,60 +136,8 @@ class ProjectTask(models.Model):
                     custom.custom_entry_id.correction_reason = ' ' 
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
-                           'ref': custom.reference,
-                           'supplier_bill_ref': custom.supplier_bill_ref,
-                           'date_entry_year': custom.date_entry_year,
-                           'date_entry_month':  custom.date_entry_month,
-                           'description': custom.description, 
                            })
-                    if   custom.reference :
-                        custom.custom_entry_id.update({       
-                           'ref': custom.reference,
-                           })
-                    if   custom.supplier_bill_ref :
-                        custom.custom_entry_id.update({  
-                           'supplier_bill_ref': custom.supplier_bill_ref,
-                           })
-                    if   custom.date_entry_year :
-                        custom.custom_entry_id.update({   
-                           'date_entry_year': custom.date_entry_year,
-                           })
-                    if   custom.date_entry_month :
-                        custom.custom_entry_id.update({   
-                           'date_entry_month':  custom.date_entry_month,
-                           }) 
-                    if   custom.description :
-                        custom.custom_entry_id.update({   
-                           'description': custom.description, 
-                           })
-                    if   custom.customer_type :
-                        custom.custom_entry_id.update({   
-                           'customer_type': custom.customer_type, 
-                           }) 
-                    if   custom.t_travel_by :
-                        custom.custom_entry_id.update({   
-                           'description': custom.t_travel_by, 
-                           }) 
-                    if   custom.f_duration_from :
-                        custom.custom_entry_id.update({   
-                           'description': custom.f_duration_from, 
-                           }) 
-                    if   custom.f_duration_to :
-                        custom.custom_entry_id.update({   
-                           'description': custom.f_duration_to, 
-                           }) 
-                    if   custom.date_effective :
-                        custom.custom_entry_id.update({   
-                           'description': custom.date_effective, 
-                           })     
-                    if   custom.date_subscription :
-                        custom.custom_entry_id.update({   
-                           'description': custom.date_subscription, 
-                           })
-                    if   custom.tcurrency_id :
-                        custom.custom_entry_id.update({   
-                           'currency_id': custom.tcurrency_id, 
-                           })     
+                   
                     
                     
                                               
