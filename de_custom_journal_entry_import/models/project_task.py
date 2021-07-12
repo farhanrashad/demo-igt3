@@ -139,7 +139,7 @@ class ProjectTask(models.Model):
                         entry_line.unlink()
                     custom.custom_entry_id.is_custom_entry_import = False
                     custom.custom_entry_id.correction_reason = ' '
-                    if has_attachment_id:
+                    if custom.has_attachment_id:
                         e_attachment_vals = {
                          'name': custom.has_attachment_id.name,
                          'type': 'binary',
