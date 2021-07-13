@@ -133,9 +133,9 @@ class ProjectTask(models.Model):
                 attachment = self.env['ir.attachment'].create(attachment_vals)
                 custom_entry_id_vals = self.custom_entry_id.id
                 
-                    custom.custom_entry_id.update({
-                           'entry_attachment_id'  : [[6, 0, attachment.ids]],
-                           })
+                custom.custom_entry_id.update({
+                      'entry_attachment_id'  : [[6, 0, attachment.ids]],
+                      })
                    
                     
                     
@@ -181,17 +181,18 @@ class ProjectTask(models.Model):
                         'custom_entry_type_id': self.custom_entry_type_id.id,
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
+                    custom_entry_id_vals = custom_entry.id
                     if custom.has_attachment_id:
                         e_attachment_vals = {
-                         'name': custom.has_attachment_id.name,
-                         'type': 'binary',
-                         'datas':  custom.has_attachment_id.datas, 
-                         'res_id': custom_entry.id,
-                         'res_name': custom_entry.name,
-                         'res_model': 'account.custom.entry',
-                         }
+                           'name': custom.has_attachment_id.name,
+                           'type': 'binary',
+                           'datas':  custom.has_attachment_id.datas, 
+                           'res_id': custom_entry.id,
+                           'res_name': custom_entry.name,
+                           'res_model': 'account.custom.entry',
+                           }
                         e_attachment = self.env['ir.attachment'].create(e_attachment_vals) 
-                    custom_entry_id_vals = custom_entry.id
+                    
                 for data_row in file_reader:
                     inner_vals = {}
                     index = 0
