@@ -183,14 +183,6 @@ class ProjectTask(models.Model):
                         'custom_entry_type_id': self.custom_entry_type_id.id,
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
-                    if custom_entry.custom_entry_type_id.has_fuel_filling != 'no':
-                        custom_entry.update({
-                            'f_partner_id':  partner,
-                        })
-                    if custom_entry.custom_entry_type_id.has_fuel_drawn != 'no':
-                        custom_entry.update({
-                            'd_partner_id':  partner,
-                        })
                     custom_entry_id_vals = custom_entry.id
                     if custom.has_attachment_id:
                         e_attachment_vals = {
@@ -229,6 +221,9 @@ class ProjectTask(models.Model):
                         elif search_field.ttype == 'many2one':
 
                             many2one_vals = self.env[str(search_field.relation)].search([('name','=',data_column)], limit=1)
+                            if search_field.relation == 'res.partner':
+                                many2one_vals = self.env[str(search_field.relation)].search([('ref','=',data_column)], limit=1)
+
 
                             inner_vals.update({
                                 keys[i]: many2one_vals.id if many2one_vals.id else False
