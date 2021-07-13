@@ -831,11 +831,11 @@ class CustomEntryLine(models.Model):
         
     @api.depends('f_opening_stock')
     def _compute_fuel_filled_closing_stock(self):
-        tot = 0
         for line in self:
+            tot = 0
             if line.f_opening_stock:
                 tot = line.f_opening_stock + line.f_product_qty
-        self.f_closing_stock = tot
+            line.f_closing_stock = tot
         
     def _compute_state(self):
         for line in self:
