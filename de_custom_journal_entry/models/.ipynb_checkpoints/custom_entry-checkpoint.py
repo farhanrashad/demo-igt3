@@ -812,8 +812,7 @@ class CustomEntryLine(models.Model):
     f_gen_capacity = fields.Integer(string='Generator Capacity')
     f_curr_drgh = fields.Float(string='Current DRGH')
     f_opening_stock = fields.Float(string='Opening Stock')
-    f_closing_stock = fields.Float(string='Closting Stock', compute='_compute_fuel_filled_closing_stock')
-    
+    f_closing_stock = fields.Float(string='Closting Stock', compute='_compute_fuel_filled_closing_stock', store=True)
     f_product_qty = fields.Float(string='Filling Qty', default=1.0, digits='Product Unit of Measure', )
     f_price_unit = fields.Float(string='Filling Unit Price', default=1.0, digits='Product Price')
     f_price_subtotal = fields.Float(compute='_compute_fuel_filled_total', string='Filling Subtotal')
@@ -828,7 +827,8 @@ class CustomEntryLine(models.Model):
             if line.f_product_qty and line.f_price_unit:
                 tot = line.f_product_qty * line.f_price_unit
             line.f_price_subtotal = tot
-        
+    
+    
     @api.depends('f_opening_stock','f_product_qty')
     def _compute_fuel_filled_closing_stock(self):
         tot = 0
