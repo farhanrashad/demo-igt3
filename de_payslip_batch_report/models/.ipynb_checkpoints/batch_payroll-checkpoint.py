@@ -1,6 +1,7 @@
 from odoo import models, fields, api, _
 
 
+
 class HrPayslipRun(models.Model):
     _name = 'hr.payslip.run'
     _description = 'Payslip Batches'

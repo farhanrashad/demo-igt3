@@ -24,16 +24,16 @@ class GenerateXLSXReport(models.Model):
         sheet.set_column(row, 2, 20)
         sheet.set_column(row, 3, 20)
         sheet.set_column(row, 4, 20)
-
+        currency_obj = self.env['res.currency'].search([('id','=',data['currency'])])
 
         employees = self.env['hr.employee'].search([])
         payslips = self.env['hr.payslip'].search([('payslip_run_id', '=', data['id'])])
         for payslip in payslips:
             sheet.write(row, 0, payslip.number, format2)
-            sheet.write(row, 1, payslip.employee_id.bank_account_id.acc_holder_name, format2)
+            sheet.write(row, 1, payslip.employee_id.bank_account_id.partner_id.name, format2)
             sheet.write(row, 2, payslip.employee_id.bank_account_id.acc_number, format2)
             sheet.write(row, 3, payslip.net_wage, format2)
-            sheet.write(row, 4, payslip.employee_id.bank_account_id.currency_id.name, format2)
+            sheet.write(row, 4, (str(currency_obj.name) +' ('+str(currecny_obj.symbol)+')'), format2)
 
 #                 sheet.write(row, 2, data['debit_ac_no'], format2)
             row = row + 1
