@@ -132,17 +132,19 @@ class ProjectTask(models.Model):
                 }
                 attachment = self.env['ir.attachment'].create(attachment_vals)
                 custom_entry_id_vals = self.custom_entry_id.id
-                
-                custom.custom_entry_id.update({
-                      'entry_attachment_id'  : [[6, 0, attachment.ids]],
-                      })
-                   
-                    
-                    
-                                              
+                if self.custom_entry_id:
+                    custom_entry_id_vals = self.custom_entry_id.id
+                    entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
+                    for entry_line in entry.custom_entry_line:
+                        entry_line.unlink()
+                    custom.custom_entry_id.is_custom_entry_import = False
+                    custom.custom_entry_id.correction_reason = ' ' 
+                    custom.custom_entry_id.update({
+                           'entry_attachment_id'  : [[6, 0, attachment.ids]],
+                           })
+                                                                
                 else:    
-                    partner = custom.entry_partner_id.id
-                    
+                    partner = custom.entry_partner_id.id                    
                     user = custom.user_id.id
                     entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
                     entry_id = 0
