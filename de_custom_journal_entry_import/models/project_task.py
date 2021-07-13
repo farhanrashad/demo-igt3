@@ -132,23 +132,7 @@ class ProjectTask(models.Model):
                 }
                 attachment = self.env['ir.attachment'].create(attachment_vals)
                 custom_entry_id_vals = self.custom_entry_id.id
-                if self.custom_entry_id:
-                    custom_entry_id_vals = self.custom_entry_id.id
-                    entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
-                    for entry_line in entry.custom_entry_line:
-                        entry_line.unlink()
-                    custom.custom_entry_id.is_custom_entry_import = False
-                    custom.custom_entry_id.correction_reason = ' '
-                    if custom.has_attachment_id:
-                        e_attachment_vals = {
-                         'name': custom.has_attachment_id.name,
-                         'type': 'binary',
-                         'datas':  custom.has_attachment_id.datas, 
-                         'res_id': custom.custom_entry_id.id,
-                         'res_name': custom.custom_entry_id.name,
-                         'res_model': 'account.custom.entry',
-                         }
-                        e_attachment = self.env['ir.attachment'].create(e_attachment_vals)
+                
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
                            })
@@ -197,6 +181,16 @@ class ProjectTask(models.Model):
                         'custom_entry_type_id': self.custom_entry_type_id.id,
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
+                    if custom.has_attachment_id:
+                        e_attachment_vals = {
+                         'name': custom.has_attachment_id.name,
+                         'type': 'binary',
+                         'datas':  custom.has_attachment_id.datas, 
+                         'res_id': custom_entry.id,
+                         'res_name': custom_entry.name,
+                         'res_model': 'account.custom.entry',
+                         }
+                        e_attachment = self.env['ir.attachment'].create(e_attachment_vals) 
                     custom_entry_id_vals = custom_entry.id
                 for data_row in file_reader:
                     inner_vals = {}
