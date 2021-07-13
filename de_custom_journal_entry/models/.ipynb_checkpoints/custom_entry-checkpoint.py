@@ -829,7 +829,7 @@ class CustomEntryLine(models.Model):
                 tot = line.f_product_qty * line.f_price_unit
             line.f_price_subtotal = tot
         
-    @api.depends('f_opening_stock')
+    @api.depends('f_opening_stock','f_product_qty')
     def _compute_fuel_filled_closing_stock(self):
         for line in self:
             tot = 0
