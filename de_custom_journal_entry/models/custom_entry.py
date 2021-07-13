@@ -774,7 +774,7 @@ class CustomEntryLine(models.Model):
     KHW_charges = fields.Float(string='KHW')
     actual_KHW_charges = fields.Float(string='Actual KHW')
     other_charges = fields.Float(string='Other Charges')
-    amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount')
+    amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount', store=True)
     
     @api.depends('opening_reading','closing_reading','additional_unit')
     def _compute_total_units(self):
