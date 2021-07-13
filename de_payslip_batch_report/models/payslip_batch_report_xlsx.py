@@ -25,7 +25,7 @@ class GenerateXLSXReport(models.Model):
         sheet.set_column(row, 3, 20)
         sheet.set_column(row, 4, 20)
         
-        currency_obj = self.env['res.currency'].search([('id','=',data['currency'])])
+        currency_obj = self.env['res.currency'].search([('id','=',data['currency'])], limit=1)
 
         employees = self.env['hr.employee'].search([])
         payslips = self.env['hr.payslip'].search([('payslip_run_id', '=', data['id'])])
@@ -34,6 +34,6 @@ class GenerateXLSXReport(models.Model):
             sheet.write(row, 1, payslip.employee_id.bank_account_id.acc_holder_name, format2)
             sheet.write(row, 2, payslip.employee_id.bank_account_id.acc_number, format2)
             sheet.write(row, 3, payslip.net_wage, format2)
-            sheet.write(row, 4, (str(currency_obj.name) +' ('+str(currecny_obj.symbol)+')'), format2)
+            sheet.write(row, 4, (str(currency_obj.name)), format2)
 
             row = row + 1

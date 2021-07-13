@@ -24,7 +24,7 @@ class PayslipBatch(models.TransientModel):
             'contract_type': self.contract_type,
             'doe': self.doe,
             'debit_ac_no': self.debit_ac_no,
-            'currency': self.currency,
+            'currency': self.currency.id,
             'id': self.batch_id.id,
         }
         return self.env.ref('de_payslip_batch_report.payslip_batch_report').report_action(self, data=datas)
@@ -37,11 +37,12 @@ class PayslipBatch(models.TransientModel):
         filename = "batch.txt"
         file_ = open(filename + str(), 'w')
         payslips = self.env['hr.payslip'].search([('payslip_run_id', '=', self.batch_id.id)])
+        line = ' ' 
         for payslip in payslips:
-            line = 'TT' + '  ' + str(payslip.number) + '        ' + str(self.debit_ac_no) + '  ' + str(self.currency.name) + str(self.date_today) + '   ' + str(payslip.net_wage) + '         ' + str(payslip.employee_id.bank_account_id.acc_number) + '                    ' + str(payslip.employee_id.address_id.street) + str(payslip.employee_id.address_id.street2) + str(payslip.employee_id.address_id.city) + ' ' + str(payslip.employee_id.address_id.country_id.name) + '                              ' + str(payslip.employee_id.bank_account_id.bank_id.name)  + '                    ' + str(payslip.employee_id.bank_account_id.bank_id.street) + "\n" + str(payslip.name) + "\n" + str(payslip.employee_id.work_email)
-            data_val = str(line)
-            file_.write(data_val)
-            file_.write("\n")
+            line += 'TT' + '  ' + str(payslip.number) + '        ' + str(self.debit_ac_no) + '  ' + str(self.currency.name) + str(self.date_today) + '   ' + str(payslip.net_wage) + '         ' + str(payslip.employee_id.bank_account_id.acc_number) + '                    ' + str(payslip.employee_id.address_id.street)+ '  '+ str(payslip.employee_id.address_id.street2) + ' '+ str(payslip.employee_id.address_id.city) + ' ' + str(payslip.employee_id.address_id.country_id.name) + '                              ' + str(payslip.employee_id.bank_account_id.bank_id.name)  + '     ' + str(payslip.employee_id.bank_account_id.bank_id.street) + ' ' + str(payslip.name) + str(payslip.employee_id.work_email) +"\n"
+        data_val = str(line)
+        file_.write(data_val)
+        file_.write("\n")
         file_.close()
         
         with open('batch.txt') as f:
