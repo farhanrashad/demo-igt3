@@ -183,6 +183,14 @@ class ProjectTask(models.Model):
                         'custom_entry_type_id': self.custom_entry_type_id.id,
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
+                    if custom_entry.custom_entry_type_id.has_fuel_filling != 'no':
+                        custom_entry.update({
+                            'f_partner_id':  partner,
+                        })
+                    if custom_entry.custom_entry_type_id.has_fuel_drawn != 'no':
+                        custom_entry.update({
+                            'd_partner_id':  partner,
+                        })
                     custom_entry_id_vals = custom_entry.id
                     if custom.has_attachment_id:
                         e_attachment_vals = {
