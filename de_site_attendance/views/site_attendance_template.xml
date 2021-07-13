@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <template id="portal_site_attendance_layout" name="Portal layout: attendance menu entry" inherit_id="portal.portal_breadcrumbs" priority="25">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'siteattendance' or siteattendance" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not site_attendance else ''}">
+                <a t-if="site_attendance" t-attf-href="/hr/site/attendances?{{ keep_query() }}">Site Attendances</a>
+                <t t-else="">Site Attendances</t>
+            </li>
+            <li t-if="site_attendance" class="breadcrumb-item active text-truncate col-8 col-lg-10">
+                <t t-esc="site_attendance.id"/>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_site_attendance_home" name="Show site attendance" customize_show="True" inherit_id="portal.portal_my_home" priority="25">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry"  groups="de_site_attendance.group_site_attendance_portal">
+                <t t-set="title">Site Attendance</t>
+                <t t-set="url" t-value="'/hr/site/attendances'"/>
+                <t t-set="placeholder_count" t-value="'site_attendance_count'"/>
+            </t>
+        </xpath>  
+    </template>
+
+    <template id="portal_hr_site_attendances" name="hr_site_attendance">
+         <t t-set="foo" t-value="2 + 1"/>
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Site Attendance</t>
+            </t>
+            <t t-if="not grouped_site_attendance">
+                <div class="alert alert-warning mt8" role="alert">
+                    There are no Site Attendance.
+                </div>
+            </t>
+            <t t-if="grouped_site_attendance">
+                <t t-call="portal.portal_table">
+                    <t t-foreach="grouped_site_attendance" t-as="attendances">
+                        <thead>
+                            <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
+                                <th class="text-left">No#</th>
+                                <th class="text-left">Incharge</th>
+                                <th class="text-left">Date From</th>
+                                <th class="text-left">Date To</th>
+                                <th class="text-left">Status</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <t t-foreach="attendances" t-as="attendance"> 
+                               <t t-if="attendance.incharge_id.user_id.id == uid">
+                                <tr>
+                                    <td class="text-left">
+                                          <a t-attf-href="/hr/site/attendance/#{attendance.id}?{{ keep_query() }}">#<span t-field="attendance.id"/></a>
+                                    </td>
+                                     <td>
+                                        <a t-attf-href="/hr/site/attendance/#{attendance.id}?{{ keep_query() }}"><span t-field="attendance.incharge_id.name"/></a>
+                                    </td>
+                                     <td class="text-left">
+                                        <span t-esc="attendance.date_from" />
+                                    </td>
+                                    <td class="text-left">
+                                        <span t-esc="attendance.date_to" />
+                                    </td>
+                                     <td class="text-center">
+                                  
+                                                <t t-if="attendance.state == 'draft'">
+                                                    <i class="badge badge-pill badge-info" >Draft</i>
+                                                </t>
+                                                <t t-if="attendance.state == 'submitted'">
+                                                    <i class="badge badge-pill badge-info" >Submitted</i>
+                                                </t>
+                                                <t t-if="attendance.state == 'approved'">
+                                                    <i class="badge badge-pill badge-info" >Approved</i>
+                                                </t>
+                                                <t t-if="attendance.state == 'refused'">
+                                                    <i class="badge badge-pill badge-info" >Refused</i>
+                                               </t>
+                                             
+
+                                    </td>	
+                                   
+                                 
+                                </tr>
+                            </t>
+                            </t>
+                            
+                             <tr>
+                                <div>
+                                    <t class="col-lg-7 col-md-8" >
+                                        <a href="/hr/site/attendance/create" > <div class="btn btn-primary pull-left" style="height:30px; line-height:100%; ">Create</div> </a> 
+                                    </t>
+                                </div>
+                            </tr> 
+                           
+                        </tbody>
+                    </t>
+                </t>
+            </t>   
+        </t>
+    </template>
+    
+    
+        <template id="portal_create_site_attendances" name="hr_site_attendance_create">
+         <t t-set="foo" t-value="2 + 1"/>
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Site Attendance</t>
+            </t>
+            <t t-if="not emps">
+                <div class="alert alert-warning mt8" role="alert">
+                    There are no Site Attendance.
+                </div>
+            </t>
+            <t t-if="emps">
+                <form id="portal_site_attendance_form" data-toggle="validator" action="/hr/site/attendance/save">
+                      <div class="form-group col-12 s_website_form_submit" data-name="Submit Button">
+                            <div style="width: 200px;" class="s_website_form_label"></div>
+                            <button type="submit" class="btn btn-primary pull-left">Submit</button>
+                            <span id="s_website_form_result"></span>
+                        </div>
+                    <t t-call="portal.portal_table">
+                            <tr>
+                                <th>Date From</th>
+                                <td>
+                                <input type="date" class="form-control s_website_form_input" name="date_from" required="1"  />
+
+                                </td>
+                                <th>Date To</th>
+                                <td>
+                                <input type="date" class="form-control s_website_form_input" name="date_to" required="1"  />
+                                </td>
+                            </tr>
+                   </t>
+                  </form>
+                    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+                    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                    <script>
+                        
+                          $(function () {
+                        
+                            $("#selectid").change(function(){                              
+                            $("#submit_1").hide();
+                              });   
+ 
+                            });
+                              
+                        $(document).ready(function(){
+                        
+                        $("#submit_1").click(function(){                              
+                            $("#submit_1").hide();
+                              });
+                        
+                        $("#selectid").click(function(){                              
+                            $("#submit_1").show();
+                              });
+                              
+                            }); 
+                        </script>  
+                
+                
+                
+                
+                <t t-call="portal.portal_table"   id="optionTable">
+                           
+                        <thead>
+                            
+                            <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
+                                <th class="text-left">Employee</th>
+                                <th class="text-left">Payable Days</th>
+                                <th class="text-left">Normal Overtime</th>
+                                <th class="text-left">Gazetted Overtime</th>
+                                <th class="text-left">Action</th>
+                            </tr>
+                            
+                        </thead>
+                        <tbody>
+                            <tr>
+                            
+                            </tr>
+                            
+                                
+                        <form id="portal_site_attendance_form_line" data-toggle="validator" action="/hr/site/attendance/line/save">
+                                
+                                <tr>
+                                   
+                                     <td > 
+                                      <select id="selectid" class="form-control  o_website_form_input" name="employee_id" readonly="1" required="1">
+                                            <t t-foreach="emps" t-as="emp">
+                                                <option t-att-value="emp.id">
+                                                    <t t-esc="emp.name"  />
+                                                </option>
+                                            </t>
+                                       </select>
+
+                                    </td>
+                                    
+                                     <td class="text-left">
+                                        <input type="float" class="form-control s_website_form_input" name="total_days" id="tot_days"   value="0"/>
+                                    </td>
+                                    <td class="text-left">
+                                        <input type="float" class="form-control s_website_form_input" name="normal_overtime" id="tot_normal_ovt"  value="0" />
+                                    </td>
+                                    <td class="text-left">
+                                        <input type="float" class="form-control s_website_form_input" name="gazetted_overtime" id="tot_gazetted_ovt"  value="0" />
+                                    </td>
+                                     
+                                        <td id="submit_1"   class="new">
+                                         <div class="form-group col-12 s_website_form_submit" data-name="Submit Button Line">
+                                            <div style="width: 200px;" class="s_website_form_label"></div>
+                                            <button type="submit" class="btn btn-primary pull-left" id="submit_line">Add</button>
+                                            <span id="s_website_form_result"></span>
+                                         </div>
+                                         </td>
+                                      
+                                </tr>
+                                </form> 
+                                 <tr>                                
+                            </tr>
+                            
+                        </tbody>
+                </t>
+            </t>   
+            
+            <br/>
+            <br/>
+            
+            <t t-call="portal.portal_table"   id="optionTable1">
+                           
+                        <thead>
+                            
+                            <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
+                                <th class="text-left"></th>
+                                <th class="text-left"></th>
+                                <th class="text-left"></th>
+                                <th class="text-left"></th>
+                                <th class="text-left"></th>
+                            </tr>
+                            
+                        </thead>
+                        <tbody>
+                           
+                            
+                                
+                            <t t-foreach="employee_list" t-as="emp_site"> 
+                                <tr>
+                                   
+                                    <td>
+                                      <span t-esc="emp_site['name']" />
+
+                                    </td>
+                                    
+                                     <td class="text-left">
+                                      <span t-esc="emp_site['days']" />
+                                    </td>
+                                    
+                                    <td class="text-left">
+                                      <span t-esc="emp_site['normal_overtime']" />
+                                    </td>
+                                    
+                                    <td class="text-left">
+                                      <span t-esc="emp_site['gazetted_overtime']" />
+                                    </td>
+                                     <td class="text-left">
+                                    </td>
+                                     
+                                       
+                                      
+                                 </tr>
+                            </t>
+                        </tbody>
+                </t>
+            
+        </t>
+    </template>
+    
+    
+    
+     <template id="de_site_attendance.site_attendane_submited" name="Site Attendance Received">
+        <t t-call="portal.portal_layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container">
+                    <div class="row">
+                        <t t-if="request.session.get('form_builder_model_model', '') == 'hr.attendance.site'">
+                            <t t-set="siteattendance" t-value="request.portal._website_form_last_record().sudo()"/>
+                        </t>
+                        <h1 class="text-center"><i class="fa fa-check-circle fa-2x text-success" role="img" aria-label="Success" title="Success"/></h1>
+                        <t t-if="siteattendance">
+                            <h1 class="text-center">Your Site Attendance Request Number is <a t-if="request.session.uid" t-attf-href="#">#<span t-field="siteattendance.id"/></a><t t-if="not request.session.get('uid')">#<span t-field="siteattendance.id"/></t>.</h1>
+                        </t>
+                        <h1 class="text-center">Thank you for Submitting your Site Attendance request!</h1>
+                    </div>
+                </div>
+            </div>
+         </t>
+    </template>
+    
+
+    
+    
+    
+    
+    <template id="portal_hr_site_attendance" name="hr_site_attendance_home">
+        <t t-call="portal.portal_layout">
+             <t t-set="o_portal_fullwidth_alert" >
+                <t t-call="portal.portal_back_in_edit_mode">
+                    <t t-set="backend_url" t-value="'/web#model=hr.attendance.site&amp;id=%s&amp;view_type=form' % (site_attendance.id)"/>
+                </t> 
+            </t>
+          
+            <div id="optional_placeholder"></div>
+            <t t-call="portal.portal_record_layout">
+                <t t-set="card_header">
+                    <div id="optional_placeholder"></div>
+                    <div class="container">
+                      <div class="card">
+                        <div class="card-header">
+                                <div class="row">
+                                    <div class="col-lg-11">
+                                        <h5 class="d-flex mb-1 mb-md-0 row">
+                                            <span t-field="site_attendance.incharge_id.name" class="col-8 text-truncate"/>
+                                            <small class="text-muted d-none d-md-inline"> (#<span t-field="site_attendance.id"/>)</small>
+                                            
+                                        </h5>
+                                    </div>
+                                    <t t-set="prev_record" t-value="1" /> 
+                                    <t t-set="next_record" t-value="2" /> 
+                                    <div style="float:right; text-align:right; width:0ox; margin-right:0px;" class=" btn-group col-lg-1" role="group">
+                                    <h5>  
+                                        <t t-if="pre_id">
+                                            <a role="button"  t-attf-href="/site/attendance/pre/#{site_attendance.id}?" ><i style="margin-right:10px; align:right" class="fa fa-chevron-left" role="img" aria-label="Previous" title="Previous"></i></a>
+                                        </t>
+                                        <t t-else="">
+                                            <a role="button"  t-att-class="disabled"  ><i style="margin-right:10px; align:right; color:#B8B7B0" class="fa fa-chevron-left" aria-label="Previous" title="Previous"></i></a>
+
+                                        </t>
+                                        <t t-if="next_id">
+                                            <a role="button" t-attf-href="/site/attendance/next/#{site_attendance.id}?" ><i class="fa fa-chevron-right" role="img" aria-label="Next" title="Next"></i></a>
+                                        </t>
+                                        <t t-else="">
+                                            <a role="button"  t-att-class="disabled"  ><i style="color:#B8B7B0" class="fa fa-chevron-right" aria-label="Next" title="Next"></i></a>
+                                        </t>
+                                    </h5>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </t>
+               <t t-set="card_body">          
+                    <div class="row mb-5">
+                        <div class="col-12 col-md-6 mb-1">
+                            <span t-field="site_attendance.incharge_id.name" />
+                        </div>
+                        <div class="col-12 col-md-6" t-if="site_attendance.id">
+                            <strong>Incharge:</strong> <span t-field="site_attendance.incharge_id.name" />
+                        </div>
+                    </div>
+                     <div class="row mb-12">
+                         <div class="col-12 col-md-12 pb-2">
+                            <div class="row">
+                                <div class="col-md-5"> <strong>Date From : </strong>
+                                    <t t-if="site_attendance.date_from">
+                                        <span t-esc="site_attendance.date_from"/>
+                                    </t>
+                                </div>
+                                <div class="col-md-7"> <strong>Date To : </strong>
+                                    <t t-if="site_attendance.date_to">
+                                        <span t-esc="site_attendance.date_to"/> 
+                                    </t>
+                                   
+                                </div>
+                            </div>
+                             
+                              <div class="row"> 
+                                <table class="table-striped table">
+                                <thead style="font-size:12px;">
+                                    <tr>
+                                        <h4>
+                                            <b>
+                                        <th class="text-left">Employee</th>
+                                        <th class="text-left">Total Days</th>
+                                        <th class="text-left">Normal Overtime</th>
+                                        <th class="text-left">Gazetted Overtime</th>
+                                        
+                                            </b>
+                                        </h4>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="site_attendance.attendance_line_ids" t-as="line">
+
+
+                                        <tr>
+                                            <td><span t-esc="line.employee_id.name"/></td>
+                                            <td><span t-esc="line.days"/></td>
+                                            <td><span t-esc="line.normal_overtime"/></td>
+                                            <td><span t-esc="line.gazetted_overtime"/></td>
+                                        </tr>
+
+                                    </t>
+                                </tbody>
+                            </table>   
+                                 
+                                
+                            </div>
+                             
+                         </div>
+                         
+                           
+                       
+                    </div> 
+                   
+                  
+                   
+                        
+                    <div class="row"> 
+                        <div t-attf-class="col-12 col-lg-12  mb-md-0 ">
+                            <hr class="mb-1"/>
+                            <div class="d-flex my-2">
+                                <strong>Site Attendance#</strong>
+                            </div>
+                            <t t-if="site_attendance.id">                                        
+                                <div class="py-1 px-2 bg-100 small" t-field="site_attendance.id"/>
+                            </t>
+                        </div> 
+                    </div>
+                   
+
+                </t> 
+            </t>
+            <div class="mt32">
+                <h4><strong>Message and communication history</strong></h4>
+                <t t-call="portal.message_thread">
+                    <t t-set="object" t-value="site_attendance"/>
+                    <t t-set="pid" t-value="pid"/>
+                    <t t-set="hash" t-value="hash"/>
+                </t>
+            </div>
+        </t>
+    </template>
+    
+
+    
+
+</odoo>
+
+
+

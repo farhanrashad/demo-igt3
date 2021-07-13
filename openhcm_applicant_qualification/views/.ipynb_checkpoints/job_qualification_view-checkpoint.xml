@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="view_hr_view_hr_job_form_inh" model="ir.ui.view">
+		<field name="name">hr.job.form</field>
+		<field name="model">hr.job</field>
+		<field name="inherit_id" ref="hr.view_hr_job_form" />
+		<field name="arch" type="xml">
+
+			<xpath expr="//notebook/page[1]" position="after">
+				<page string="Qualification Rule">
+
+					<field name="document_lines">
+						<tree editable="bottom">
+							<field name="name" options="{'no_create':True,'no_open':True}" />
+							<field name="qualification_type_line_id" domain="[('qualification_type_id','=',name)]"/>
+							<field name="score" />
+						</tree>
+					</field>
+				</page>
+			</xpath>
+
+			<xpath expr="//group" position="after">
+				<group>
+					<group>
+						<field name="qualifying_score"/>
+					</group>
+					<group>
+						<field name="is_stage_change"/>
+						<field name="next_stage_id" string='Next Stage' attrs="{'invisible' : [('is_stage_change', '=', False)]}"/>
+					</group>
+				</group>
+			</xpath>
+
+		</field>
+	</record>
+
+
+	<record id="view_qualification_form_inh" model="ir.ui.view">
+		<field name="name">hr.applicant.form</field>
+		<field name="model">hr.applicant</field>
+		<field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form" />
+		<field name="arch" type="xml">
+
+			<xpath expr="//field[@name = 'description']" position="after">
+
+				<notebook>
+					<page string="Qualification">
+						<field name="qualification_lines">
+							<tree editable="bottom">
+								<control>
+									<create name="add_line_control" string="Add a line"/>
+									<create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+								</control>
+								<field name="qualification_type_id"/>
+								<field name="qualification_type_line_id" domain="[('qualification_type_id','=',qualification_type_id)]"/>
+								<field name="score" />
+
+							</tree>
+						</field>
+						<group class="oe_subtotal_footer">
+							<field name="avg_score" class="oe_subtotal_footer_separator"/>
+						</group>
+					</page>
+				</notebook>
+			</xpath>
+
+		</field>
+	</record>
+	<record id="view_qualification_kanban_inh" model="ir.ui.view">
+		<field name="name">hr.applicant.kanban</field>
+		<field name="model">hr.applicant</field>
+		<field name="inherit_id" ref="hr_recruitment.hr_kanban_view_applicant" />
+		<field name="arch" type="xml">
+
+			<xpath expr="//field[@name = 'partner_mobile']" position="after">
+				<br />
+					<field name="avg_score"/>
+			</xpath>
+
+		</field>
+	</record>
+	<record id="view_qualification_tree_inh" model="ir.ui.view">
+		<field name="name">hr.applicant.tree</field>
+		<field name="model">hr.applicant</field>
+		<field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job" />
+		<field name="arch" type="xml">
+
+			<xpath expr="//field[@name = 'stage_id']" position="after">
+				<field name="avg_score"/>
+			</xpath>
+
+		</field>
+	</record>
+</odoo>
+
+

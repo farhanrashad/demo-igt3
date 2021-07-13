@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="menu_contract_expiry_report_parent"
+                  name="Contract Expiry Reports"
+                  parent="hr.hr_menu_hr_reports"
+                  action="de_hr_employee_report.action_contract_expiry_wizard" sequence="2"
+        />
+    </data>
+</odoo>
+
