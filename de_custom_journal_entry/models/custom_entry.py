@@ -768,7 +768,7 @@ class CustomEntryLine(models.Model):
     opening_reading = fields.Integer(string='Opening Reading', help='Opening reading of meter')
     closing_reading = fields.Integer(string='Closing Reading', help='Closing Reading of meter')
     additional_unit = fields.Integer(string='Additional Units')
-    total_unit = fields.Integer(string='Total Unit', compute='_compute_total_units')
+    total_unit = fields.Integer(string='Total Unit', compute='_compute_total_units', store=True)
     maintainence_fee = fields.Float(string='Mnt. Fees', help='Maintenance Fees')
     hp_fee = fields.Float(string='HP Fee', help='Horsepower Fees')
     KHW_charges = fields.Float(string='KHW')
@@ -776,6 +776,7 @@ class CustomEntryLine(models.Model):
     other_charges = fields.Float(string='Other Charges')
     amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount')
     
+    @api.depends('opening_reading','closing_reading','additional_unit')
     def _compute_total_units(self):
         for rec in self:
             rec.total_unit = (rec.closing_reading - rec.opening_reading) + rec.additional_unit
