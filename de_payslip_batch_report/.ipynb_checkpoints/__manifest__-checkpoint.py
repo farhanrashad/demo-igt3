@@ -8,7 +8,7 @@
     'sequence': 1,
     'category': 'Payroll',
     'version': '14.0.0.1',
-    'depends': ['base', 'hr_payroll','product' ],
+    'depends': ['base', 'hr_payroll'],
     'data': [
         'security/ir.model.access.csv',
         'wizards/payslip_batch.xml',
