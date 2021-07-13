@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+1,contract.expiry.wizard,model_contract_expiry_wizard,base.group_user,1,1,1,1
+2,cost.center.wise,model_cost_center_wise,base.group_user,1,1,1,1
+3,department.wise,model_department_wise,base.group_user,1,1,1,1
