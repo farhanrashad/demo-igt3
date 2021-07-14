@@ -63,6 +63,14 @@ def get_custom_entry_final(entry_type):
     date_effective = 0
     f_duration_to = 0
     f_duration_from = 0
+    has_attachment = 0 
+    required =  0
+    entry_name = custom_types.name
+    if custom_types.has_create_attaachment != 'no':
+        required = 1   
+         
+    if custom_types.has_attachment != 'no':
+        has_attachment = 1     
     if custom_types.has_ref != 'no':
         reference = 1  
     if custom_types.has_supplier_bill != 'no':
@@ -89,6 +97,9 @@ def get_custom_entry_final(entry_type):
         'reference': reference,
         'supplier_iv_num': supplier_inv,
         'month': month,
+        'entry_name': entry_name,
+        'required': required, 
+        'has_attachment': has_attachment,
         'year': year,
         'f_duration_from': f_duration_from,
         'f_duration_to': f_duration_to,
@@ -123,8 +134,15 @@ def get_custom_entry_final_update(entry_type, entry):
     date_effective = 0
     f_duration_to = 0
     f_duration_from = 0
+    has_attachment = 0
+    required =  0  
+    entry_name = custom_types.name
+    if custom_types.has_edit_attachment != 'no':
+        required = 1 
+    if custom_types.has_attachment != 'no':
+        has_attachment = 1 
     if custom_types.has_ref != 'no':
-        reference = 1  
+        reference = 1   
     if custom_types.has_supplier_bill != 'no':
         supplier_inv = 1  
     if custom_types.has_period != 'no':
@@ -149,6 +167,9 @@ def get_custom_entry_final_update(entry_type, entry):
          'reference': reference,
         'supplier_iv_num': supplier_inv,
         'month': month,
+        'entry_name': entry_name,
+        'required': required, 
+        'has_attachment': has_attachment,
         'year': year,
         'f_duration_from': f_duration_from,
         'f_duration_to': f_duration_to,

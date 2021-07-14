@@ -151,7 +151,7 @@
                                     <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/portal.s_banner_default_image'); background-position: 50% 0;"></span>
                                     <div class="o_we_bg_filter bg-black-50"></div>
                                     <div class="container">
-                                        <h1>Third Party Billing Request</h1>
+                                        <h1><span t-esc="entry_name" />  Request</h1>
                                     </div>
                                 </section>
                             </div>
@@ -165,7 +165,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-12">
                                                             <p>
-                                                                Submit Third Party Billing Request  From Here.
+                                                                <span t-esc="entry_name" /> Request  From Here.
                                                             </p>
 
 
@@ -370,7 +370,7 @@
               <div id="data_entry_attach"  class="form-group s_website_form_field col-12 pt24" data-type="many2many"  data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="xl89fa1ymg">
-                    <span class="s_website_form_label_content">Attachment File</span>
+                    <span class="s_website_form_label_content">Reference Attachment</span>
                   </label>
                   <div class="col-sm">
                     <input type="file" class="form-control-file s_website_form_input" name="has_attachment_id" multiple="1" />
@@ -378,18 +378,21 @@
                 </div>
               </div>
              </t> 
-
+             
+              <t t-if='required == 1'>   
               <div id="entry_attach"  class="form-group s_website_form_field col-12 pt24" data-type="many2many"  data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="xl89fa1ymg">
                     <span class="s_website_form_label_content">Data File</span>
                   </label>
-                  <div class="col-sm">
-                    <input type="file" class="form-control-file s_website_form_input" name="entry_attachment_id" multiple="1" />
+                  <div class="col-sm"> 
+                       
+                       <input type="file" class="form-control-file s_website_form_input" name="entry_attachment_id" required="1" multiple="1" />
+                     
                   </div>
                 </div>
               </div>
-
+              </t> 
 
               <div class="form-group s_website_form_field col-12    s_website_form_dnone" data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
@@ -501,7 +504,7 @@
                                     <span class="s_parallax_bg oe_img_bg" style="background-image: url('/web/image/portal.s_banner_default_image'); background-position: 50% 0;"></span>
                                     <div class="o_we_bg_filter bg-black-50"></div>
                                     <div class="container">
-                                        <h1>Third Party Billing Request</h1>
+                                        <h1><span t-esc="entry_name" /> Request</h1>
                                     </div>
                                 </section>
                             </div>
@@ -515,7 +518,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-12">
                                                             <p>
-                                                                Submit Third Party Billing Request  From Here.
+                                                                Submit <span t-esc="entry_name" /> Request  From Here.
                                                             </p>
 
 
@@ -533,18 +536,20 @@
             <div class="s_website_form_rows row s_col_no_bgcolor">
 
              
-
+             <t t-if='required == 1'>   
               <div id="data_entry_attach"  class="form-group s_website_form_field col-12 pt24" data-type="many2many"  data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
                   <label class=" col-sm-auto s_website_form_label " style="width: 200px" for="xl89fa1ymg">
                     <span class="s_website_form_label_content">Data File</span>
                   </label>
-                  <div class="col-sm">
-                    <input type="file" class="form-control-file s_website_form_input" name="entry_attachment_id" multiple="1" />
+                  <div class="col-sm"> 
+                     
+                       <input type="file" class="form-control-file s_website_form_input" name="entry_attachment_id" required="1" multiple="1" />
+                      
                   </div>
                 </div>
               </div>
-
+              </t>
 
               <div class="form-group s_website_form_field col-12    s_website_form_dnone" data-name="Field">
                 <div class="row s_col_no_resize s_col_no_bgcolor">
