@@ -11,6 +11,10 @@
                     <field name="update_attachment_id"  widget="many2many_binary"></field>
                     <field name="is_publish"   />
                 </xpath>
+                <xpath expr="//field[@name='has_attachment']" position="after">
+                    <field name="has_create_attaachment"   widget="radio" options="{'horizontal': true}" />
+                    <field name="has_edit_attachment"   widget="radio" options="{'horizontal': true}" />
+                </xpath>
               
            </field>
         </record>

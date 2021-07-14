@@ -1,7 +1,9 @@
 
 from odoo import api, fields, models, tools, _
 
-
+IMPORT_SELECTION = [
+    ('required', 'Required'),
+    ('no', 'None')]
 
 class IrAttachment(models.Model):
     
@@ -17,6 +19,7 @@ class IrAttachment(models.Model):
                                             column2="attachment_id",
                                             string="Update Attachment")
     is_publish = fields.Boolean(string='Publish on Website')
-    
+    has_create_attaachment = fields.Selection(IMPORT_SELECTION, string="Has Import Attachment", default="no", required=True,)
+    has_edit_attachment = fields.Selection(IMPORT_SELECTION, string="Has Edit Attachment", default="no", required=True,)
 
 
