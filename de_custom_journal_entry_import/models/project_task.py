@@ -57,6 +57,11 @@ class ProjectTask(models.Model):
                                             column2="attachment_id",
                                             string="Entry Attachment")
 
+    has_attachment_id = fields.Many2many('ir.attachment', relation="files_rel_project_task_has_entry",
+                                            column1="doc_id",
+                                            column2="attachment_id",
+                                            string="Data Attachment")
+
 
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type')
     entry_partner_id = fields.Many2one('res.partner', string='Contractor')
@@ -137,13 +142,9 @@ class ProjectTask(models.Model):
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
                            })
-                   
-                    
-                    
-                                              
+                                                                
                 else:    
-                    partner = custom.entry_partner_id.id
-                    
+                    partner = custom.entry_partner_id.id                    
                     user = custom.user_id.id
                     entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
                     entry_id = 0
@@ -183,6 +184,17 @@ class ProjectTask(models.Model):
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
                     custom_entry_id_vals = custom_entry.id
+                    if custom.has_attachment_id:
+                        e_attachment_vals = {
+                           'name': custom.has_attachment_id.name,
+                           'type': 'binary',
+                           'datas':  custom.has_attachment_id.datas, 
+                           'res_id': custom_entry.id,
+                           'res_name': custom_entry.name,
+                           'res_model': 'account.custom.entry',
+                           }
+                        e_attachment = self.env['ir.attachment'].create(e_attachment_vals) 
+                    
                 for data_row in file_reader:
                     inner_vals = {}
                     index = 0
@@ -209,6 +221,9 @@ class ProjectTask(models.Model):
                         elif search_field.ttype == 'many2one':
 
                             many2one_vals = self.env[str(search_field.relation)].search([('name','=',data_column)], limit=1)
+                            if search_field.relation == 'res.partner':
+                                many2one_vals = self.env[str(search_field.relation)].search([('ref','=',data_column)], limit=1)
+
 
                             inner_vals.update({
                                 keys[i]: many2one_vals.id if many2one_vals.id else False

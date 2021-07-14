@@ -63,6 +63,9 @@ def get_custom_entry_final(entry_type):
     date_effective = 0
     f_duration_to = 0
     f_duration_from = 0
+    has_attachment = 0 
+    if custom_types.has_attachment != 'no':
+        has_attachment = 1 
     if custom_types.has_ref != 'no':
         reference = 1  
     if custom_types.has_supplier_bill != 'no':
@@ -88,7 +91,8 @@ def get_custom_entry_final(entry_type):
         'user': company_info.id,
         'reference': reference,
         'supplier_iv_num': supplier_inv,
-        'month': month,
+        'month': month, 
+        'has_attachment': has_attachment,
         'year': year,
         'f_duration_from': f_duration_from,
         'f_duration_to': f_duration_to,
@@ -123,8 +127,11 @@ def get_custom_entry_final_update(entry_type, entry):
     date_effective = 0
     f_duration_to = 0
     f_duration_from = 0
+    has_attachment = 0 
+    if custom_types.has_attachment != 'no':
+        has_attachment = 1 
     if custom_types.has_ref != 'no':
-        reference = 1  
+        reference = 1   
     if custom_types.has_supplier_bill != 'no':
         supplier_inv = 1  
     if custom_types.has_period != 'no':
@@ -149,6 +156,7 @@ def get_custom_entry_final_update(entry_type, entry):
          'reference': reference,
         'supplier_iv_num': supplier_inv,
         'month': month,
+        'has_attachment': has_attachment,
         'year': year,
         'f_duration_from': f_duration_from,
         'f_duration_to': f_duration_to,
