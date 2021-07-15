@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Expense Sheet Stage -->
+        <record id="hr_expense_sheet_stage_list_view" model="ir.ui.view">
+        <field name="name">hr.expense.sheet.stage.list.view</field>
+        <field name="model">hr.expense.sheet.stage</field>
+        <field name="arch" type="xml">
+            <tree string="Stages">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="expense_sheet_type_ids"/>
+                <field name="stage_code" optional="hide"/>
+                <field name="stage_category"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="hr_expense_sheet_stage_form_view" model="ir.ui.view">
+        <field name="name">hr.expense.sheet.stage.form.view</field>
+        <field name="model">hr.expense.sheet.stage</field>
+        <field name="arch" type="xml">
+            <form string="Stage">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="stage_code"/>
+                            <field name="sequence" groups="base.group_no_one"/>
+                            <field name="expense_sheet_type_ids" widget="many2many_tags" />
+                            <field name="next_stage_id"/>
+                            <field name="prv_stage_id"/>
+                        </group>
+                        <group>
+                            <field name="fold"/>
+                            <field name="stage_category" widget="radio"/>
+                            <field name="group_id" options="{'no_create': True,'no_open':True}" />
+                        </group>
+                    </group>
+                    <separator string="Requirements"/>
+                    <field name="description"
+                           placeholder="Give your team the requirements to move a subscription to this stage."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+        
+        <record id="action_hr_expense_sheet_stage" model="ir.actions.act_window">
+            <field name="name">Stages</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.expense.sheet.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Create Expense Stage
+                </p>
+            </field>
+        </record>       
+
+        <menuitem id="menu_hr_expense_sheet_stage" action="action_hr_expense_sheet_stage" parent="hr_expense.menu_hr_expense_configuration" name="Stages" sequence="5" />
+        
+         
+        
+       
+    </data>
+</odoo>
