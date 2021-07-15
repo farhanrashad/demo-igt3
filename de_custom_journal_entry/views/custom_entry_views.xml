@@ -45,7 +45,8 @@
                         
                         <button name="button_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
                         <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': ['|',('stage_category', 'not in', ['progress']),('account_entry_type', '!=', 'none')]}"/>
-                        <button name="button_done" type="object" string="Close" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['confirm'])]}"/>
+                        
+                        <!--<button name="button_done" type="object" string="Close" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['confirm'])]}"/> -->
 
                         <button name="button_refuse" string="Refuse" type="object" 
                         attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>

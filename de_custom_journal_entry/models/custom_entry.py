@@ -258,7 +258,7 @@ class CustomEntry(models.Model):
             if group_id:
                 if not (group_id & self.env.user.groups_id):
                     raise UserError(_("You are not authorize to refuse '%s'.", order.stage_id.name))
-        if self.prv_stage_id:
+        if self.stage_id.prv_stage_id:
             self.update({
                 'stage_id' : self.stage_id.prv_stage_id.id,
             })
