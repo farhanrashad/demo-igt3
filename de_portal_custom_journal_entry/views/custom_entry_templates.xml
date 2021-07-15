@@ -251,6 +251,7 @@
                                         <th class="text-left">Total Units</th>
                                         <th class="text-left">Actual KHW Charges</th>
                                         <th class="text-left">Total</th>
+                                        <th class="text-left">Note</th>
                                             </b>
                                         </h4>
                                     </tr>
@@ -266,6 +267,7 @@
                                             <td><span t-esc="entry_line.total_unit"/></td>
                                             <td><span t-esc="entry_line.actual_KHW_charges"/></td>
                                             <td><span t-esc="entry_line.amount_total_electricity"/></td>
+                                            <td><span t-esc="entry_line.note"/></td>
                                         </tr>
 
                                     </t>
