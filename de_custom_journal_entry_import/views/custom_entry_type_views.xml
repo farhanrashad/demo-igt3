@@ -12,8 +12,8 @@
                     <field name="is_publish"   />
                 </xpath>
                 <xpath expr="//field[@name='has_attachment']" position="after">
-                    <field name="has_create_attaachment"    />
-                    <field name="has_edit_attachment"    />
+                    <field name="has_ref_attachment"    />
+                    <field name="update_ref_attachment"    />
                 </xpath>
               
            </field>
