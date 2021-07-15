@@ -66,11 +66,8 @@ def get_custom_entry_final(entry_type):
     has_attachment = 0 
     required =  0
     entry_name = custom_types.name
-    if custom_types.has_create_attaachment != 'no':
-        required = 1   
-         
-    if custom_types.has_attachment != 'no':
-        has_attachment = 1     
+    if custom_types.has_create_attaachment == True:
+        has_attachment = 1    
     if custom_types.has_ref != 'no':
         reference = 1  
     if custom_types.has_supplier_bill != 'no':
@@ -137,10 +134,9 @@ def get_custom_entry_final_update(entry_type, entry):
     has_attachment = 0
     required =  0  
     entry_name = custom_types.name
-    if custom_types.has_edit_attachment != 'no':
-        required = 1 
-    if custom_types.has_attachment != 'no':
+    if custom_types.has_edit_attachment == True:
         has_attachment = 1 
+    
     if custom_types.has_ref != 'no':
         reference = 1   
     if custom_types.has_supplier_bill != 'no':
@@ -169,7 +165,7 @@ def get_custom_entry_final_update(entry_type, entry):
         'month': month,
         'entry_name': entry_name,
         'required': required, 
-        'has_attachment': has_attachment,
+        'has_update_attachment': has_attachment,
         'year': year,
         'f_duration_from': f_duration_from,
         'f_duration_to': f_duration_to,

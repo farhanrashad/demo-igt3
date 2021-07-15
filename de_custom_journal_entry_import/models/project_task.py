@@ -133,9 +133,9 @@ class ProjectTask(models.Model):
                      'datas':  custom.entry_attachment_id.datas, 
                 }
                 attachment = self.env['ir.attachment'].create(attachment_vals)
-                custom_entry_id_vals = self.custom_entry_id.id
+                custom_entry_id_vals = custom.custom_entry_id.id
                 if self.custom_entry_id:
-                    custom_entry_id_vals = self.custom_entry_id.id
+                    custom_entry_id_vals = custom.custom_entry_id.id
                     entry = self.env['account.custom.entry'].search([('id','=', self.custom_entry_id.id)])
                     for entry_line in entry.custom_entry_line:
                         entry_line.unlink()
@@ -144,6 +144,17 @@ class ProjectTask(models.Model):
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
                            })
+                    if custom.has_attachment_id:
+                        e_attachment_vals = {
+                           'name': custom.has_attachment_id.name,
+                           'type': 'binary',
+                           'datas':  custom.has_attachment_id.datas, 
+                           'res_id': custom.custom_entry_id.id ,
+                           'res_name': custom.custom_entry_id.name,
+                           'res_model': 'account.custom.entry',
+                           }
+                        e_attachment = self.env['ir.attachment'].create(e_attachment_vals) 
+                      
                                                                 
                 else:    
                     partner = custom.entry_partner_id.id                    
