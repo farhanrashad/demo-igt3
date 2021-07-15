@@ -19,7 +19,7 @@ class IrAttachment(models.Model):
                                             column2="attachment_id",
                                             string="Update Attachment")
     is_publish = fields.Boolean(string='Publish on Website')
-    has_create_attaachment = fields.Boolean(string="Reference Attachment On Creation")
-    has_edit_attachment = fields.Boolean(string="Reference Attachment On Updation")
+    has_create_attaachment = fields.Boolean(string="Reference Attachment On Creation", default=True)
+    has_edit_attachment = fields.Boolean(string="Reference Attachment On Updation", default=True)
 
 
