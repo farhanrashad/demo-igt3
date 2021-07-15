@@ -198,7 +198,7 @@ class CustomEntry(models.Model):
         Move = self.env['account.move']
         can_read = Move.check_access_rights('read', raise_exception=False)
         for move in self:
-            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'in_invoice'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '!=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
             move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
 
    
