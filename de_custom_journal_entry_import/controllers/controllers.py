@@ -66,7 +66,7 @@ def get_custom_entry_final(entry_type):
     has_attachment = 0 
     required =  0
     entry_name = custom_types.name
-    if custom_types.has_create_attaachment == True:
+    if custom_types.has_ref_attachment == True:
         has_attachment = 1    
     if custom_types.has_ref != 'no':
         reference = 1  
@@ -106,7 +106,7 @@ def get_custom_entry_final(entry_type):
         'currencies': currencies,
         't_travel_by': t_travel_by,
         'description': description,   
-        'title': custom_types.name +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
+        'title': str(custom_types.name) +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
         'company_info': company_info,
         'tasks': tasks,
     }
@@ -134,7 +134,7 @@ def get_custom_entry_final_update(entry_type, entry):
     has_attachment = 0
     required =  0  
     entry_name = custom_types.name
-    if custom_types.has_edit_attachment == True:
+    if custom_types.update_ref_attachment == True:
         has_attachment = 1 
     
     if custom_types.has_ref != 'no':
@@ -175,7 +175,7 @@ def get_custom_entry_final_update(entry_type, entry):
         'currencies': currencies,
         't_travel_by': t_travel_by,
         'description': description,   
-        'title': custom_types.name +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
+        'title': str(custom_types.name) +' '+ str(company_info.partner_id.name) +' '+ str(fields.date.today()),
         'company_info': company_info,
         'tasks': tasks,
     }
