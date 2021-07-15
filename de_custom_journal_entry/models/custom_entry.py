@@ -56,6 +56,7 @@ class CustomEntry(models.Model):
     
     #account related fields
     stage_category = fields.Selection(related='stage_id.stage_category')
+    stage_code = fields.Char(related='stage_id.stage_code')
     account_entry_type = fields.Char(string='Accounting Entry Type', compute='_account_entry_type', )
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
