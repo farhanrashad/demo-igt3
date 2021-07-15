@@ -68,6 +68,7 @@
                     </header>
                     <sheet>
                         <field name="stage_category" invisible="1" />
+                        <field name="stage_code" invisible="1" />
                         <field name="account_entry_type" invisible="1" />
                         <field name="journal_type" invisible="1" />
                         <field name="move_type" invisible="1" />
