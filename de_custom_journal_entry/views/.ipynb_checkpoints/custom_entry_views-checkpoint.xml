@@ -178,7 +178,7 @@
                     </group>
                      <notebook>
                         <page string="Line" name="custom_entry_line">
-                            <field name="custom_entry_line" widget="one2many_list">
+                            <field name="custom_entry_line" widget="one2many_list" attrs="{'readonly': [('stage_category', '!=', 'draft')]}" >
                                 <tree string="Custom Entry Line" editable="bottom">
                                     <field name="company_id" invisible="1" />
                                     <field name="currency_id" invisible="1" />

@@ -202,6 +202,12 @@ class CustomEntry(models.Model):
             move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '!=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
             move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
 
+    def unlink(self):
+        for entry in self:
+            if not entry.stage_category == 'draft' or entry.invoice_ids:
+                raise UserError(_('You cannot delete an entry which has been posted.'))
+           
+        return super(CustomEntry, self).unlink()
    
     def _amount_all(self):
         adv = tot = 0
