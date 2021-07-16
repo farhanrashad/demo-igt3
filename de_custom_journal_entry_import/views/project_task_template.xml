@@ -373,7 +373,7 @@
                     <span class="s_website_form_label_content">Reference Attachment</span>
                   </label>
                   <div class="col-sm">
-                    <input type="file" class="form-control-file s_website_form_input" name="has_attachment_id" multiple="1" />
+                    <input type="file" class="form-control-file s_website_form_input"  required="1" name="has_attachment_id" multiple="1" />
                   </div>
                 </div>
               </div>
@@ -543,7 +543,7 @@
                     <span class="s_website_form_label_content">Reference Attachment</span>
                   </label>
                   <div class="col-sm">
-                    <input type="file" class="form-control-file s_website_form_input" name="has_attachment_id" multiple="1" />
+                    <input type="file" class="form-control-file s_website_form_input" required="1" name="has_attachment_id" multiple="1" />
                   </div>
                 </div>
               </div>
