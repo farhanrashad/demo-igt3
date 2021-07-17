@@ -102,7 +102,6 @@ class CustomEntry(models.Model):
     has_rent_vechile = fields.Selection(related="custom_entry_type_id.has_rent_vechile")
     has_travel = fields.Selection(related="custom_entry_type_id.has_travel")
     has_hotel = fields.Selection(related="custom_entry_type_id.has_hotel")
-    has_electricity = fields.Selection(related="custom_entry_type_id.has_electricity")
     has_fuel_drawn = fields.Selection(related="custom_entry_type_id.has_fuel_drawn")
     has_fuel_filling = fields.Selection(related="custom_entry_type_id.has_fuel_filling")
     
@@ -763,35 +762,7 @@ class CustomEntryLine(models.Model):
             else:
                 line.h_number_of_nights = 0
 
-    #has electricity
-    e_paid_to = fields.Selection([
-        ('govt', 'Government'),
-        ('private', 'Private')],
-        string='Paid To')
-    date_bill_from = fields.Date(string='Date From', )
-    date_bill_to = fields.Date(string='Date To', )
-    amount_advanced = fields.Float(string='Forecast', help='Advanced Amount')
-    meter_number = fields.Char(string='Meter')
-    opening_reading = fields.Integer(string='Opening Reading', help='Opening reading of meter')
-    closing_reading = fields.Integer(string='Closing Reading', help='Closing Reading of meter')
-    additional_unit = fields.Integer(string='Additional Units')
-    total_unit = fields.Integer(string='Total Unit', compute='_compute_total_units', store=True)
-    maintainence_fee = fields.Float(string='Mnt. Fees', help='Maintenance Fees')
-    hp_fee = fields.Float(string='HP Fee', help='Horsepower Fees')
-    KHW_charges = fields.Float(string='KHW')
-    actual_KHW_charges = fields.Float(string='Actual KHW')
-    other_charges = fields.Float(string='Other Charges')
-    amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount', store=True)
-    
-    @api.depends('opening_reading','closing_reading','additional_unit')
-    def _compute_total_units(self):
-        for rec in self:
-            rec.total_unit = (rec.closing_reading - rec.opening_reading) + rec.additional_unit
-
-    @api.depends('maintainence_fee','hp_fee','KHW_charges','other_charges')
-    def _compute_total_electricity_amount(self):
-        for rec in self:
-            rec.amount_total_electricity = rec.maintainence_fee + rec.hp_fee + rec.KHW_charges + rec.other_charges
+   
             
     #has fuel Drawn
     d_date = fields.Date(string='Drawn Date')

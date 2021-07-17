@@ -96,7 +96,6 @@
                                         <field name="has_rent_vechile" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_travel" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_hotel" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_electricity" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_fuel_drawn" widget="radio" options="{'horizontal': true}"/>
                                         <field name="has_fuel_filling" widget="radio" options="{'horizontal': true}"/>
                                     </group>

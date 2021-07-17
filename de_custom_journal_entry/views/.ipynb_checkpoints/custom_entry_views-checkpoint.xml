@@ -112,7 +112,6 @@
                         <field name="has_rent_vechile" invisible="1"/>
                         <field name="has_travel" invisible="1"/>
                         <field name="has_hotel" invisible="1"/>
-                        <field name="has_electricity" invisible="1"/>
                         <field name="has_fuel_drawn" invisible="1"/>
                         <field name="has_fuel_filling" invisible="1"/>
                         
@@ -231,25 +230,7 @@
                                     <field name="h_travel_id" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
                                     <field name="h_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_amount" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-
-                                    
-                                    <!-- Electricity -->
-                                    <field name="e_paid_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="amount_advanced" sum="advanced" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="date_bill_from" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="date_bill_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="meter_number" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="opening_reading" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="closing_reading" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="additional_unit" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="total_unit" sum="Total Units" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="maintainence_fee" sum="Maintenance Fee" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="hp_fee" sum="Horsepower Fee" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="KHW_charges" sum="KWH Charges" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="actual_KHW_charges" sum="Actual KWH" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="other_charges" sum="Other Chrages" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="amount_total_electricity" sum="Total Electricity" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>                                    
+                                    <field name="h_amount" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>                                 
                                     
                                     <!-- Fuel drawn-->
                                     <field name="d_date" string="Date" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
