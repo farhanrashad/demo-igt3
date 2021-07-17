@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "OM Invoices",
+    'name': "Fleet Entries",
 
     'summary': """
-        OM Invoices
+        Fleet Entries
         """,
 
     'description': """
-        OM Invoices:-
+        Fleet Entries
         
     """,
 

@@ -14,4 +14,4 @@ CATEGORY_SELECTION = [
 class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
-    has_om_fields = fields.Selection(CATEGORY_SELECTION, string="Has OM Fields", default="no", required=True,)
+    has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)

@@ -9,34 +9,34 @@ from dateutil.relativedelta import relativedelta
 import json
 from lxml import etree
 
-MONTH_LIST = [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May'), ('6', 'Jun'), ('7', 'Jul'), ('8', 'Aug'), ('9', 'Sep'), ('10', 'Oct'), ('11', 'Nov'),('12', 'Dec')]
-
 class CustomEntry(models.Model):
     _inherit = 'account.custom.entry'
     
     #App fields
-    has_om_fields = fields.Selection(related="custom_entry_type_id.has_om_fields")
+    has_rent_vechile = fields.Selection(related="custom_entry_type_id.has_rent_vechile")
+
+    #fleet/rent vehicle extra fields
+    f_duration_from = fields.Date(string='Duration From')
+    f_duration_to = fields.Date(string='Duration To')
     
 class CustomEntryLine(models.Model):
     _inherit = 'account.custom.entry.line'
     
-    #OM line Item Fields
-    o_tower_type = fields.Selection([
-        ('COW', 'COW'),
-        ('GBT', 'GBT'),
-        ('RTP', 'RTP')],
-        string='OM Tower Type')
-    o_product_id = fields.Many2one('product.product', string="OM Power Model Product", check_company=True)
-    o_date_rfi = fields.Date(string='RFI Date', )
-    o_date_onair = fields.Date(string='On Air Date', )
-    o_date_handover = fields.Date(string='Handover Date', )
-    o_date_start = fields.Date(string='Start Date', )
-    o_date_end = fields.Date(string='End Date', )
-    o_days_rfi = fields.Integer(string='RFI Days')
-    o_days_onair = fields.Integer(string='On Air Days')
-    o_amount = fields.Float(string='OM Amount' )
-    o_final_amount = fields.Float(string='OM Final Amount' )
-    o_charges = fields.Float(string='OM Service Charges' )
-
+    #has fleet/rent vehicle
+    f_fleet_id = fields.Many2one('fleet.vehicle', string="Car Detail")
+    f_driver_id = fields.Many2one('res.partner', string="Driver", ondelete='cascade')
+    f_job_scope = fields.Selection(
+        [('car rental', 'Car Rental.'),
+         ('driver ot', 'Driver OT.'),
+         ('driver salary', 'Driver Salary.'),
+         ('maintenance fee', 'Maintenance Fee.'),
+         ('management fee', 'Management Fee.'),
+         ('on demand', 'On Demand.'),
+         ('petrol charges', 'Petrol Charges.'),
+         ('toll fee', 'Toll Fee.'),
+         ('replacement', 'Replacement.')],
+        string='Job Scope', )
+    f_rent_days = fields.Float(string='Days')
+    f_amount = fields.Float(string="Amount")
     
     
