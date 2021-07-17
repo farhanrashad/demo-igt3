@@ -14,33 +14,29 @@ MONTH_LIST = [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May
 class CustomEntry(models.Model):
     _inherit = 'account.custom.entry'
     
-    #Line Item fields
-    has_hse_fields = fields.Selection(related="custom_entry_type_id.has_hse_fields")
-    has_pm_fields = fields.Selection(related="custom_entry_type_id.has_pm_fields")
-    has_sla_fields = fields.Selection(related="custom_entry_type_id.has_sla_fields")
-    has_spmrf_fields = fields.Selection(related="custom_entry_type_id.has_spmrf_fields")
+    #App fields
+    has_om_fields = fields.Selection(related="custom_entry_type_id.has_om_fields")
     
 class CustomEntryLine(models.Model):
     _inherit = 'account.custom.entry.line'
     
-    #sla
-    service_class = fields.Selection([
-        ('a', 'Critical Site'), 
-        ('b', 'Class B'), 
-        ('c', 'Class C')], default='a', string='Classification')
-    service_level = fields.Selection([
-        ('critical', 'Critical'), 
-        ('major', 'Major'), 
-        ('minor', 'Minor'), 
-        ('normal', 'Normal')], default='normal', string='Service Level')
-    uptime = fields.Float(string='Uptime', default=0.0)
-    #occurence
-    #sow
-    penalty_sow_type_id = fields.Many2one('op.penalty.config.sow.type', string='SOW Type')
-    penalty_sow_id = fields.Many2one('op.penalty.config.sow', string='SOW')
-    frequency = fields.Char(related='penalty_sow_id.frequency')
-    sow_deduct_type = fields.Selection([
-        ('a', 'A'), 
-        ('b', 'B'), 
-        ], default='a', string='Deduction Type')
+    #OM line Item Fields
+    o_tower_type = fields.Selection([
+        ('COW', 'COW'),
+        ('GBT', 'GBT'),
+        ('RTP', 'RTP')],
+        string='OM Tower Type')
+    o_product_id = fields.Many2one('product.product', string="OM Power Model Product", check_company=True)
+    o_date_rfi = fields.Date(string='RFI Date', )
+    o_date_onair = fields.Date(string='On Air Date', )
+    o_date_handover = fields.Date(string='Handover Date', )
+    o_date_start = fields.Date(string='Start Date', )
+    o_date_end = fields.Date(string='End Date', )
+    o_days_rfi = fields.Integer(string='RFI Days')
+    o_days_onair = fields.Integer(string='On Air Days')
+    o_amount = fields.Float(string='OM Amount' )
+    o_final_amount = fields.Float(string='OM Final Amount' )
+    o_charges = fields.Float(string='OM Service Charges' )
+
+    
     

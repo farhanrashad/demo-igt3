@@ -14,7 +14,4 @@ CATEGORY_SELECTION = [
 class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
-    has_hse_fields = fields.Selection(CATEGORY_SELECTION, string="HSE Penalties", default="no", required=True,)
-    has_pm_fields = fields.Selection(CATEGORY_SELECTION, string="PM Penalties", default="no", required=True,)
-    has_sla_fields = fields.Selection(CATEGORY_SELECTION, string="SLA Penalties", default="no", required=True,)
-    has_spmrf_fields = fields.Selection(CATEGORY_SELECTION, string="Spare Parts Penalties", default="no", required=True,)
+    has_om_fields = fields.Selection(CATEGORY_SELECTION, string="Has OM Fields", default="no", required=True,)
