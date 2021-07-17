@@ -14,4 +14,5 @@ CATEGORY_SELECTION = [
 class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
-    has_om_fields = fields.Selection(CATEGORY_SELECTION, string="Has OM Fields", default="no", required=True,)
+    has_fuel_drawn = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Drawn", default="no", required=True,)
+    has_fuel_filling = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Filling", default="no", required=True,)

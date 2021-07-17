@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "OM Invoices",
+    'name': "Fuel Entries",
 
     'summary': """
-        OM Invoices
+        Fuel Custom Entry
         """,
 
     'description': """
-        OM Invoices:-
+        Fuel Custom Entry:-
+        1. Fuel Drawn
+        2. Fuel Filling
         
     """,
 

@@ -8,7 +8,8 @@
             <field name="inherit_id" ref="de_custom_journal_entry.account_custom_entry_type_form_view" />
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='control_app_fields']" position="inside">
-                       <field name="has_om_fields" widget="radio" options="{'horizontal': true}"/>
+                    <field name="has_fuel_drawn" widget="radio" options="{'horizontal': true}"/>
+                    <field name="has_fuel_filling" widget="radio" options="{'horizontal': true}"/>
                 </xpath>
                 
             </field>
