@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "OM Invoices",
+    'name': "Travel Entries",
 
     'summary': """
-        OM Invoices
+        Travel Entries
         """,
 
     'description': """
-        OM Invoices:-
+        Travel Entries
         
     """,
 

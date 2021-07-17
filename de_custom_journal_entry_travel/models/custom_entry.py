@@ -9,34 +9,59 @@ from dateutil.relativedelta import relativedelta
 import json
 from lxml import etree
 
-MONTH_LIST = [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May'), ('6', 'Jun'), ('7', 'Jul'), ('8', 'Aug'), ('9', 'Sep'), ('10', 'Oct'), ('11', 'Nov'),('12', 'Dec')]
-
 class CustomEntry(models.Model):
     _inherit = 'account.custom.entry'
     
-    #App fields
-    has_om_fields = fields.Selection(related="custom_entry_type_id.has_om_fields")
+    has_travel = fields.Selection(related="custom_entry_type_id.has_travel")
+    #travel fields
+    t_travel_by = fields.Selection([
+        ('ticket', 'Flight Ticket'),
+        ('Vehicle', 'Vehicle Rental')],
+        string='Travel By', default='ticket')
     
 class CustomEntryLine(models.Model):
     _inherit = 'account.custom.entry.line'
     
-    #OM line Item Fields
-    o_tower_type = fields.Selection([
-        ('COW', 'COW'),
-        ('GBT', 'GBT'),
-        ('RTP', 'RTP')],
-        string='OM Tower Type')
-    o_product_id = fields.Many2one('product.product', string="OM Power Model Product", check_company=True)
-    o_date_rfi = fields.Date(string='RFI Date', )
-    o_date_onair = fields.Date(string='On Air Date', )
-    o_date_handover = fields.Date(string='Handover Date', )
-    o_date_start = fields.Date(string='Start Date', )
-    o_date_end = fields.Date(string='End Date', )
-    o_days_rfi = fields.Integer(string='RFI Days')
-    o_days_onair = fields.Integer(string='On Air Days')
-    o_amount = fields.Float(string='OM Amount' )
-    o_final_amount = fields.Float(string='OM Final Amount' )
-    o_charges = fields.Float(string='OM Service Charges' )
+    #has travel
+    t_travel_category = fields.Selection([
+        ('domestic', 'Domestic'),
+        ('international', 'International'),
+        ], string='Travel Category', default='domestic')
+    travel_from = fields.Char(string='From')
+    travel_to = fields.Char(string='To')
+    date_departure = fields.Date(string='Departure Date', )
+    date_arrival = fields.Date(string='Arrival Date', )    
+    number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
+    travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
+    t_travel_description = fields.Char(related='travel_reference.description_main')
+    t_travel_type = fields.Selection(related='travel_reference.travel_type')
+    t_unit_price = fields.Float(string="Travel Unit Price")
+    t_extra_charges = fields.Float(string="Travel Extra Charges")
+    t_amount_travel = fields.Float(string="Travel Total Amount", compute='_compute_all_amount_travel')
+    
+    @api.depends('number_of_days', 't_unit_price', 't_extra_charges')
+    def _compute_all_amount_travel(self):
+        total_amount_travel = 0
+        for line in self:
+            total_amount_travel = (line.number_of_days * line.t_unit_price) + line.t_extra_charges
+            line.update({
+                't_amount_travel': total_amount_travel
+            })
+    
+    @api.onchange('date_departure','date_arrival')
+    def _number_of_days(self):
+        for line in self:
+            if line.date_departure and line.date_arrival:
+                if line.date_departure > line.date_arrival:
+                    raise UserError(("Arrival Date cant be before Departure Date."))
+                else:
+                    delta = line.date_arrival - line.date_departure
+                    if abs(delta.days) > 0:
+                        line.number_of_days = abs(delta.days)
+                    else:
+                        line.number_of_days = 1
+            else:
+                line.number_of_days = 0
 
     
     
