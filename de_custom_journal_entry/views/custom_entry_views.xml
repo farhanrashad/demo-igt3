@@ -108,13 +108,6 @@
                         <field name="has_employee" invisible="1"/>
                         <field name="has_supplier" invisible="1"/>
                         <field name="has_advanced" invisible="1"/>
-                        
-                        <field name="has_rent_vechile" invisible="1"/>
-                        <field name="has_travel" invisible="1"/>
-                        <field name="has_hotel" invisible="1"/>
-                        <field name="has_fuel_drawn" invisible="1"/>
-                        <field name="has_fuel_filling" invisible="1"/>
-                        
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -141,13 +134,7 @@
                                 <span class="mr-1" attrs="{'invisible':[('has_period','==','no')]}"> - </span>
                                 <field name="date_entry_year" attrs="{'invisible':[('has_period','==','no')], 'required': [('has_period','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
                             </div>
-                            <!-- Fleet/Rent Fields -->
-                            <label for="f_duration_from" attrs="{'invisible':[('has_rent_vechile','==','no')]}"/>
-                            <div name="duration_from_div" class="d-flex" attrs="{'invisible':[('has_rent_vechile','==','no')]}">
-                                <field name="f_duration_from" attrs="{'invisible':[('has_rent_vechile','==','no')], 'required': [('has_rent_vechile','==','required')]}"/>
-                                    <span class="oe_inline o_form_label mx-3 oe_read_only"> to </span> 
-                                <field name="f_duration_to" attrs="{'invisible':[('has_rent_vechile','==','no')], 'required': [('has_rent_vechile','==','required')]}"/>
-                            </div>
+                            
 
                             <field name="date_submit" attrs="{'invisible':[('date_submit','!=',True)]}" />
                             <field name="date_approved" attrs="{'invisible':[('date_approved','!=',True)]}" />                            
@@ -159,19 +146,7 @@
 
                         </group>
                     </group>
-                    <!-- accomodation header fields -->
-                    <group col="4" attrs="{'invisible':[('has_hotel','==','no')]}">
-                        <field name="customer_type" attrs="{'invisible':[('has_hotel','==','no')], 'required': [('has_hotel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_effective" attrs="{'invisible':[('has_hotel','==','no')], 'required': [('has_hotel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_subscription" attrs="{'invisible':[('has_hotel','==','no')], 'required': [('has_hotel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                    </group>
-                    <!-- Travel header fields -->
-                    <group col="4" attrs="{'invisible':[('has_travel','==','no')]}">
-                        <field name="customer_type" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_effective" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_subscription" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="t_travel_by" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                    </group>
+                    
                     <group>
                         <field name="description" placeholder="enter narration for entry..." attrs="{'invisible':[('has_description','==','no')], 'required': [('has_description','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
                     </group>
@@ -200,64 +175,6 @@
                                     <field name="price_subtotal" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="taxes_id" widget="many2many_tags" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="advance_subtotal" attrs="{'column_invisible':[('parent.has_advanced','==','no')], 'required': [('parent.has_advanced','==','required')]}"/>
-
-                                    <!-- Travel  -->
-                                    <field name="t_travel_category" string="Category" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="travel_from" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="travel_to" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>     
-                                    <field name="date_departure" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="date_arrival" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>             
-                                    <field name="number_of_days" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="travel_reference" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_amount_travel" string="Total" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-
-
-                                    <!--  Fleet/Rent Vehicle -->
-                                    <field name="f_fleet_id" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_driver_id" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_job_scope" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_rent_days" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_amount" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-
-                                    <!-- Accomodation -->
-                                    <field name="h_category" string="Category" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="hotel_detail" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                     <field name="h_check_in" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_check_out" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_number_of_nights" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_travel_id" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_amount" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>                                 
-                                    
-                                    <!-- Fuel drawn-->
-                                    <field name="d_date" string="Date" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_partner_id" string="Purchase Partner" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_contact_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-
-                                    <field name="d_product_qty" string="Fuel Qty" sum="Drawn Product Qty" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_price_unit" string="Unit Price" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_price_subtotal" string="Subtotal" sum="Drawn Total" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_booklet_no" string="Booklet No." attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_receipt_no" string="Receipt No." attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    
-                                    <!-- Fuel Filled-->
-                                    <field name="f_date" string="Date" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_partner_id" string="Purchase Contact" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_contact_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-
-                                    <field name="f_gen_name" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_gen_capacity" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_curr_drgh" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_opening_stock" sum="Filled Opening Stock" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_closing_stock" sum="Filled Closing Stock" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_product_qty" string="Fuel Qty" sum="Filled Qty" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_price_unit" string="Unit Price" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_price_subtotal" string="Subtotal" sum="Filled Total" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_booklet_no" string="Booklet No." attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_receipt_no" string="Receipt No." attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
 
                                     <field name="employee_id" attrs="{'column_invisible':[('parent.has_employee','==','no')], 'required': [('parent.has_employee','==','required')]}"/>
                                     <field name="supplier_id" attrs="{'column_invisible':[('parent.has_supplier','==','no')], 'required': [('parent.has_supplier','==','required')]}"/>

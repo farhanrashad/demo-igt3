@@ -81,11 +81,9 @@ class CustomEntryType(models.Model):
     has_supplier = fields.Selection(CATEGORY_SELECTION, string="Has Supplier", default="no", required=True,)
     
     #feature options fields
-    has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
-    has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)
-    has_hotel = fields.Selection(CATEGORY_SELECTION, string="Has Hotel", default="no", required=True,)
-    has_fuel_drawn = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Drawn", default="no", required=True,)
-    has_fuel_filling = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Filling", default="no", required=True,)
+    
+    
+    
 
 
     @api.model

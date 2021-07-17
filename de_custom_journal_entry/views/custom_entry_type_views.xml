@@ -92,12 +92,7 @@
                                     
                                 </group>
                                 <group>
-                                    <group string="Control App Fields" name="control_app_fields" attrs="{'invisible':[('move_type', 'in', ['out_refund','in_refund'])]}">
-                                        <field name="has_rent_vechile" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_travel" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_hotel" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_fuel_drawn" widget="radio" options="{'horizontal': true}"/>
-                                        <field name="has_fuel_filling" widget="radio" options="{'horizontal': true}"/>
+                                    <group string="Control App Fields" name="control_app_fields" attrs="{'invisible':[('move_type', 'in', ['out_refund','in_refund'])]}">         
                                     </group>
                                 </group>
                             </page>
