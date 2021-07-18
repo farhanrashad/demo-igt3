@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="de_custom_journal_entry.account_custom_entry_form_view" />
             <field name="arch" type="xml">
                 <xpath expr="//sheet[1]" position="inside">
-                    <field name="has_om_fields" invisible="1"/>
+                    <field name="has_hotel" invisible="1"/>
                 </xpath>
                 <xpath expr="//sheet[1]/group[1]" position="after">
                     <!-- accomodation header fields -->
