@@ -6,16 +6,15 @@ from odoo.tools.safe_eval import safe_eval
 from odoo.tools.misc import format_date
 
 
-
 class PurchaseRequisition(models.Model):
     _inherit = 'purchase.requisition'
     
-    project_id = fields.Many2one('project.project', string='Project')
+    project_id = fields.Many2one('project.project', string='Project', domain="[('allow_site_planning','=',True)]")
     
 class PurchaseRequisitionLine(models.Model):
     _inherit = 'purchase.requisition.line'
     
-    project_id = fields.Many2one('project.project', string='Project')
+    project_id = fields.Many2one('project.project', string='Project', domain="[('allow_site_planning','=',True)]")
     state_id = fields.Many2one('res.country.state', compute='_compute_project_state')
     
     @api.depends('project_id')

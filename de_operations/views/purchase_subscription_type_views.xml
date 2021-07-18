@@ -1,33 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>	
-    <!-- Subscriptions Type -->
-    <record id="purchase_subscription_type_view_list" model="ir.ui.view">
-        <field name="name">purchase.subscription.type.list</field>
-        <field name="model">purchase.subscription.type</field>
-        <field name="arch" type="xml">
-            <tree string="Subscription Stages">
-                <field name="name"/>
-            </tree>
+<odoo>
+    <!-- subscription stage -->
+    <record id="purchase_subscription_stage_view_form_inherit_security" model="ir.ui.view">
+            <field name="name">purchase.subscription.stage.form.view.inherit.security</field>
+            <field name="model">purchase.subscription.stage</field>
+            <field name="inherit_id" ref="de_purchase_subscription.purchase_subscription_stage_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='subscription_type_ids']" position="after">
+                    <field name="next_stage_id" />
+                    <field name="prv_stage_id" />
+                    <field name="group_id" />
+                </xpath>
         </field>
     </record>
     
-    <record id="purchase_subscription_type_view_form" model="ir.ui.view">
-        <field name="name">purchase.subscription.type.form</field>
-        <field name="model">purchase.subscription.type</field>
-        <field name="arch" type="xml">
-            <form string="Subscription Stage">
-                <sheet>
-                    <group>
-                        <group>
-                            <field name="name"/>
-                        </group>
-                        <group>
-                           
-                        </group>
-                    </group>
-                  
-                </sheet>
-            </form>
+    
+    <record id="purchase_subscription_type_view_form_inherit" model="ir.ui.view">
+            <field name="name">purchase.subscription.type.form.view.inherit</field>
+            <field name="model">purchase.subscription.type</field>
+            <field name="inherit_id" ref="de_purchase_subscription.purchase_subscription_type_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="group_id" />
+                </xpath>
         </field>
     </record>
 		<record id="action_purchase_subscription_type" model="ir.actions.act_window">

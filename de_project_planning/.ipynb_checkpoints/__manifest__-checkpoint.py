@@ -13,7 +13,7 @@
     'author': "Dynexcel",
     'website': "http://www.dynexcel.com",
     'category': 'project',
-    'version': '14.0.0.7',
+    'version': '14.0.5.1',
 
     'depends': ['base', 'mail', 'note','project','purchase','purchase_requisition','stock','account','de_base_address_extended'],
 

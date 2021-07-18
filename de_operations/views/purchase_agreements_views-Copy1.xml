@@ -46,6 +46,12 @@
             </xpath>
             <xpath expr="//field[@name='subscription_plan_id']" position="after">
                 <field name="subscription_type_id" options="{'no_create':True}" />
+		<field name="rfi_date" />
+		<field name="original_amount" />
+		<field name="current_amount" />
+		<field name="amount_current" />
+		<field name="total_comitment" />
+		<field name="open_comitment" />
             </xpath>
         </field>
     </record>

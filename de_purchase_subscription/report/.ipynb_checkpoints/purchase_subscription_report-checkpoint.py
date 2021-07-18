@@ -27,7 +27,7 @@ class purchase_subscription_report(models.Model):
         ('draft', 'Draft'),
         ('progress', 'In Progress'),
         ('closed', 'Closed')], readonly=True, help="Category of the stage")
-    stage_id = fields.Many2one('sale.subscription.stage', string='Stage', readonly=True)
+    stage_id = fields.Many2one('purchase.subscription.stage', string='Stage', readonly=True)
 
     def _select(self):
         select_str = """

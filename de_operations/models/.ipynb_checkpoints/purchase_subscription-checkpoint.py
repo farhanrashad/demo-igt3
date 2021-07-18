@@ -6,6 +6,22 @@ from odoo.exceptions import UserError, AccessError, ValidationError
 from odoo.tools.safe_eval import safe_eval
 from odoo.tools.misc import format_date
 
+class PurchaseSubscriptionStage(models.Model):
+    _inherit = 'purchase.subscription.stage'
+    
+    stage_category = fields.Selection([
+        ('draft', 'Draft'),
+        ('progress', 'In Progress'),
+        ('confirm', 'Confirmed'),
+        ('closed', 'Closed'),
+        ('Cancel', 'Cancelled'),
+    ], string='Category', default='draft')
+    
+    group_id = fields.Many2one('res.groups', string='Security Group')
+    
+    next_stage_id = fields.Many2one('purchase.subscription.stage', string='Next Stage' )
+    prv_stage_id = fields.Many2one('purchase.subscription.stage', string='Previous Stage')
+    
 class PurchaseSubscriptionType(models.Model):
     _inherit = 'purchase.subscription.type'
     
@@ -17,6 +33,7 @@ class PurchaseSubscriptionType(models.Model):
     journal_id = fields.Many2one('account.journal', string="Accounting Journal",
                                  domain="[('type', '=', 'purchase')]", company_dependent=True,
                                  check_company=True,)
+    group_id = fields.Many2one('res.groups', string='Security Group')
     
     def create_deduction_invoice(self):
         self.ensure_one()
@@ -83,8 +100,49 @@ class PurchaseSubscriptionPlanSchedule(models.Model):
 class PurchaseSubscription(models.Model):
     _inherit = 'purchase.subscription'
     
-    invoicing_mode = fields.Selection(related='subscription_plan_id.invoicing_mode')
+    next_stage_id = fields.Many2one('purchase.subscription.stage',related='stage_id.next_stage_id')
+    prv_stage_id = fields.Many2one('purchase.subscription.stage',related='stage_id.prv_stage_id')
+    
+    @api.depends('recurring_price')
+    def _compute_original_amount(self):
+        self.original_amount = self.recurring_price
+        
+        
+    @api.depends('purchase_subscription_schedule_line.recurring_total')
+    def _compute_total_commitment(self):
+        for order in self:
+            recurring_amount = 0.0
+            for line in order.purchase_subscription_schedule_line:
+                recurring_amount += line.recurring_total
+            order.update({
+                'total_comitment': recurring_amount,
+                'open_comitment': recurring_amount - order.recurring_billed_total 
+            })
+            
+    @api.depends('purchase_subscription_schedule_line.recurring_price')
+    def compute_current_amount(self):
+        for order in self:
+            recurring_amount = 0.0
+            start_date = fields.date.today()
+            start_end = fields.date.today()
+            for line in order.purchase_subscription_schedule_line:
 
+                if str (line.date_from) >= str (start_date) and str (start_end) <= str (line.date_to):
+                    recurring_amount = line.recurring_price
+                    break
+            order.update({
+                'amount_current': recurring_amount,
+                
+            })            
+
+    
+    invoicing_mode = fields.Selection(related='subscription_plan_id.invoicing_mode')
+    rfi_date = fields.Date(string="RFI Date")
+    original_amount = fields.Float(string='Original Amount', compute='_compute_original_amount')
+    current_amount = fields.Float(string='Current Amount', copy=False)
+    amount_current = fields.Float(string='Current Amount', copy=False, compute='compute_current_amount')
+    total_comitment = fields.Float(string='Total Commitment', compute='_compute_total_commitment')
+    open_comitment = fields.Float(string='Open Commitment', compute='_compute_total_commitment')
         
     def generate_recurring_invoice(self):
         plan_limit = False
@@ -122,6 +180,56 @@ class PurchaseSubscription(models.Model):
                 current_date = self._get_recurring_next_date(self.recurring_interval_type, self.recurring_interval * 1, new_date, self.recurring_invoice_day)
         return True
     
+    def action_submit(self):
+        #self.ensure_one()
+        for order in self.sudo():
+            group_id = order.subscription_type_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                #if not self.env.user.has_group(self.transfer_order_category_id.group_id.name):
+                    raise UserError(_("You are not authorize to submit agreement in type '%s'.", self.subscription_type_id.name))
+        self.update({
+            'stage_id' : self.next_stage_id.id,
+        })
+        
+    def action_confirm(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to approve '%s'.", order.stage_id.name))                    
+        self.update({
+            'stage_id' : self.next_stage_id.id,
+        })
+        
+    def action_refuse(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to refuse '%s'.", order.stage_id.name))
+        if self.prv_stage_id:
+            self.update({
+                'stage_id' : self.prv_stage_id.id,
+            })
+            
+    def action_close(self):
+        for order in self.sudo():
+            stage_id = self.env['purchase_subscription.stage'].search([('subscription_type_ids','=',self.subscription_type_id.id),('stage_category','=','done')],limit=1)
+    
+    def action_cancel(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to cancel '%s'.", order.stage_id.name))
+        stage_id = self.env['stock.transfer.order.stage'].search([('transfer_order_type_ids','=',self.transfer_order_type_id.id),('transfer_order_category_ids','=',self.transfer_order_category_id.id),('stage_category','=','cancel')],limit=1)
+        self.update({
+            'stage_id': stage_id.id,
+        })
+        
+
+        
     
 class PurchaseSubscriptionLine(models.Model):
     _inherit = 'purchase.subscription.line'
@@ -146,11 +254,24 @@ class PurchaseSubscriptionSchedule(models.Model):
     discount = fields.Float(string='Discount (%)', digits='Discount')
     escalation = fields.Float(string='Escalation (%)', digits='Discount')
     
-    recurring_total = fields.Float(string="Total", compute='_compute_recurring_all')
+    recurring_total = fields.Float(string="Total")
 
     invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True)
     company_id = fields.Many2one('res.company', related='purchase_subscription_id.company_id', store=True, index=True)
-
+    
+    
+    def get_recurring_total(self):
+        discount = escalation = 0
+        for line in self:
+            if line.discount > 0 and line.discount <= 100:
+                discount = (line.recurring_price * line.discount) / 100
+            if line.escalation > 0 and line.escalation <= 100:
+                escalation = (line.recurring_price * line.escalation) / 100
+            line.recurring_sub_total = line.recurring_price * line.recurring_intervals
+            line.recurring_total = (line.recurring_price - discount + escalation) * line.recurring_intervals
+    
+    
+    
 
     @api.depends('recurring_price','recurring_intervals','discount','escalation')
     def _compute_recurring_all(self):
@@ -161,7 +282,6 @@ class PurchaseSubscriptionSchedule(models.Model):
             if line.escalation > 0 and line.escalation <= 100:
                 escalation = (line.recurring_price * line.escalation) / 100
             line.recurring_sub_total = line.recurring_price * line.recurring_intervals
-            line.recurring_total = (line.recurring_price - discount + escalation) * line.recurring_intervals
     
     def create_invoice(self):
         res = self._create_invoice()

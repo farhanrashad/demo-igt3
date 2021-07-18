@@ -14,7 +14,8 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
     
-    project_id = fields.Many2one('project.project', string='Project', compute='_assign_project', store=True, readonly=False )
+    #project_id = fields.Many2one('project.project', string='Project', compute='_assign_project', store=True, readonly=False, domain="[('allow_site_planning','=',True)]")
+    project_id = fields.Many2one('project.project', string='Project')
     
     @api.depends('purchase_line_id')
     def _assign_project(self):
