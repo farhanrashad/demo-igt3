@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="account_custom_entry_form_view_inherit_penalty" model="ir.ui.view">
-            <field name="name">account.custom.entry.form.view.inehrit.penalty</field>
+    <record id="account_custom_entry_form_view_inherit_eb" model="ir.ui.view">
+            <field name="name">account.custom.entry.form.view.inehrit.eb</field>
             <field name="model">account.custom.entry</field>
             <field name="inherit_id" ref="de_custom_journal_entry.account_custom_entry_form_view" />
             <field name="arch" type="xml">
@@ -10,7 +10,6 @@
                     
                 </xpath>
                 <xpath expr="//page[@name='custom_entry_line']/field[@name='custom_entry_line']/tree[1]" position="inside">
-                    <field name="advance_subtotal" attrs="{'column_invisible':[('parent.has_advanced','==','no')], 'required': [('parent.has_advanced','==','required')]}"/>
                     <!-- Electricity -->
                     <field name="e_paid_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
                     <field name="amount_advanced" sum="advanced" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
