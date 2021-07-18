@@ -10,6 +10,8 @@ class IrAttachment(models.Model):
     _inherit = 'account.custom.entry.type'
     
     
+    entry_template_fields = fields.Char(string='Entry Line Fields')
+#     template_fields = fields.Many2many('ir.fields.model', domain="[('model_id.model', '=', 'account.custom.entry.line')]")
     attachment_id = fields.Many2many('ir.attachment', relation="files_rel_custom_entry_type",
                                             column1="doc_id",
                                             column2="attachment_id",

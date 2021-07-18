@@ -93,8 +93,8 @@ class ProjectTask(models.Model):
         if self.entry_attachment_id:
             self.is_entry_attachment = True
             self.un_processed_entry = True
-        if self.is_entry_attachment == True:
-            self.action_journal_entry_import()
+#         if self.is_entry_attachment == True:
+#             self.action_journal_entry_import()
 
 	
     def action_journal_entry_import(self):
@@ -105,6 +105,7 @@ class ProjectTask(models.Model):
 
         for custom in self:
             if custom.is_entry_processed == False:
+                custom_entry = 0 
                 counter = 1
                 try:
                     file = str(base64.decodebytes(custom.entry_attachment_id.datas).decode('utf-8'))
@@ -269,6 +270,8 @@ class ProjectTask(models.Model):
                 custom.custom_entry_id.update({
                   'is_custom_entry_import' : False
                  })
+                custom_entry.action_generate_excel()
+
 
 
 class CustomEntryType(models.Model):

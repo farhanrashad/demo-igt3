@@ -8,6 +8,8 @@ from datetime import date, datetime
 from odoo.exceptions import Warning, UserError
 from odoo import models, fields, exceptions, api, _
 from dateutil import parser
+
+
 import ast
 from datetime import timedelta, datetime
 from random import randint
@@ -57,6 +59,11 @@ class ProjectTask(models.Model):
                                             column2="attachment_id",
                                             string="Entry Attachment")
 
+    has_attachment_id = fields.Many2many('ir.attachment', relation="files_rel_project_task_has_entry",
+                                            column1="doc_id",
+                                            column2="attachment_id",
+                                            string="Data Attachment")
+
 
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type')
     entry_partner_id = fields.Many2one('res.partner', string='Contractor')
@@ -74,7 +81,7 @@ class ProjectTask(models.Model):
     customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
     date_effective = fields.Date(string='Effective Date')
     date_subscription = fields.Date(string='Date of Subscription')
-    currency_id = fields.Many2one('res.company', string='Currency')
+    tcurrency_id = fields.Many2one('res.currency', string='Currency')
     t_travel_by = fields.Selection([
         ('ticket', 'Flight Ticket'),
         ('Vehicle', 'Vehicle Rental')],
@@ -86,8 +93,8 @@ class ProjectTask(models.Model):
         if self.entry_attachment_id:
             self.is_entry_attachment = True
             self.un_processed_entry = True
-        if self.is_entry_attachment == True:
-            self.action_journal_entry_import()
+#         if self.is_entry_attachment == True:
+#             self.action_journal_entry_import()
 
 	
     def action_journal_entry_import(self):
@@ -98,6 +105,7 @@ class ProjectTask(models.Model):
 
         for custom in self:
             if custom.is_entry_processed == False:
+                custom_entry = 0 
                 counter = 1
                 try:
                     file = str(base64.decodebytes(custom.entry_attachment_id.datas).decode('utf-8'))
@@ -136,61 +144,10 @@ class ProjectTask(models.Model):
                     custom.custom_entry_id.correction_reason = ' ' 
                     custom.custom_entry_id.update({
                            'entry_attachment_id'  : [[6, 0, attachment.ids]],
-                           'ref': custom.reference,
-                           'supplier_bill_ref': custom.supplier_bill_ref,
-                           'date_entry_year': custom.date_entry_year,
-                           'date_entry_month':  custom.date_entry_month,
-                           'description': custom.description, 
                            })
-                    if   custom.reference :
-                        custom.custom_entry_id.update({       
-                           'ref': custom.reference,
-                           })
-                    if   custom.supplier_bill_ref :
-                        custom.custom_entry_id.update({  
-                           'supplier_bill_ref': custom.supplier_bill_ref,
-                           })
-                    if   custom.date_entry_year :
-                        custom.custom_entry_id.update({   
-                           'date_entry_year': custom.date_entry_year,
-                           })
-                    if   custom.date_entry_month :
-                        custom.custom_entry_id.update({   
-                           'date_entry_month':  custom.date_entry_month,
-                           }) 
-                    if   custom.description :
-                        custom.custom_entry_id.update({   
-                           'description': custom.description, 
-                           })
-                    if   custom.customer_type :
-                        custom.custom_entry_id.update({   
-                           'customer_type': custom.customer_type, 
-                           }) 
-                    if   custom.t_travel_by :
-                        custom.custom_entry_id.update({   
-                           'description': custom.t_travel_by, 
-                           }) 
-                    if   custom.f_duration_from :
-                        custom.custom_entry_id.update({   
-                           'description': custom.f_duration_from, 
-                           }) 
-                    if   custom.f_duration_to :
-                        custom.custom_entry_id.update({   
-                           'description': custom.f_duration_to, 
-                           }) 
-                    if   custom.date_effective :
-                        custom.custom_entry_id.update({   
-                           'description': custom.date_effective, 
-                           })     
-                    if   custom.date_subscription :
-                        custom.custom_entry_id.update({   
-                           'description': custom.date_subscription, 
-                           })     
-                    
-                    
-                                              
+                                                                
                 else:    
-                    partner = custom.entry_partner_id.id
+                    partner = custom.entry_partner_id.id                    
                     user = custom.user_id.id
                     entry_stage = self.env['account.custom.entry.stage'].search([('stage_category', '=', 'draft')])
                     entry_id = 0
@@ -210,7 +167,7 @@ class ProjectTask(models.Model):
                         'name':  name_seq, 
                         'date_entry': fields.datetime.now(),
                         'partner_id': partner,
-                        'currency_id': custom.currency_id.id,
+                        'currency_id': custom.tcurrency_id.id,
                         'company_id': self.env.company.id,
                         'entry_attachment_id': [[6, 0, attachment.ids]],
                         'ref': custom.reference,
@@ -230,6 +187,17 @@ class ProjectTask(models.Model):
                     }
                     custom_entry = self.env['account.custom.entry'].create(custom_vals)
                     custom_entry_id_vals = custom_entry.id
+                    if custom.has_attachment_id:
+                        e_attachment_vals = {
+                           'name': custom.has_attachment_id.name,
+                           'type': 'binary',
+                           'datas':  custom.has_attachment_id.datas, 
+                           'res_id': custom_entry.id,
+                           'res_name': custom_entry.name,
+                           'res_model': 'account.custom.entry',
+                           }
+                        e_attachment = self.env['ir.attachment'].create(e_attachment_vals) 
+                    
                 for data_row in file_reader:
                     inner_vals = {}
                     index = 0
@@ -249,33 +217,38 @@ class ProjectTask(models.Model):
                             many2one_vals = self.env[str(search_field.relation)].search([('display_name','=',data_column)], limit=1)
 
                             inner_vals.update({
-                                keys[i]: many2one_vals.id
+                                keys[i]: many2one_vals.id if many2one_vals.id else False
                             })
                             index = index + 1
                             i = i + 1
                         elif search_field.ttype == 'many2one':
 
                             many2one_vals = self.env[str(search_field.relation)].search([('name','=',data_column)], limit=1)
+                            if search_field.relation == 'res.partner':
+                                many2one_vals = self.env[str(search_field.relation)].search([('ref','=',data_column)], limit=1)
+
 
                             inner_vals.update({
-                                keys[i]: many2one_vals.id
+                                keys[i]: many2one_vals.id if many2one_vals.id else False
                             })
                             index = index + 1
                             i = i + 1
                         elif search_field.ttype == 'date':
-                            date_parse = parser.parse(data_column)
-                            date_vals = date_parse.strftime("%Y-%m-%d")
-                            inner_vals.update({
+                            if  data_column:
+                                date_parse = parser.parse(data_column)
+                                date_vals = date_parse.strftime("%Y-%m-%d")
+                                inner_vals.update({
                                 keys[i]: date_vals
-                            })
+                                })
                             index = index + 1
                             i = i + 1
                         elif search_field.ttype == 'datetime':
-                            datetime_parse = parser.parse(data_column)
-                            datetime_vals = datetime_parse.strftime("%Y-%m-%d %H:%M:%S")
-                            inner_vals.update({
+                            if data_column:
+                                datetime_parse = parser.parse(data_column)
+                                datetime_vals = datetime_parse.strftime("%Y-%m-%d %H:%M:%S")
+                                inner_vals.update({
                                 keys[i]: datetime_vals
-                            })
+                                })
                             index = index + 1
                             i = i + 1
 
@@ -294,6 +267,11 @@ class ProjectTask(models.Model):
                 custom.is_entry_processed = True
                 custom.un_processed_entry = False
                 custom.user_id = self.env.user.id
+                custom.custom_entry_id.update({
+                  'is_custom_entry_import' : False
+                 })
+                custom_entry.action_generate_excel()
+
 
 
 class CustomEntryType(models.Model):
@@ -307,5 +285,6 @@ class ResGroups(models.Model):
     _inherit = 'res.groups' 
     
 class ResCurrency(models.Model):
-    _inherit = 'res.currency'     
+    _inherit = 'res.currency' 
+
 
