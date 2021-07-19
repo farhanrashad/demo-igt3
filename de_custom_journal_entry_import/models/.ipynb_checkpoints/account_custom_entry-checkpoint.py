@@ -32,7 +32,7 @@ class AccountCustomEntry(models.Model):
 
 
     def action_generate_excel(self):
-        filename = "batcht.csv"
+        filename = str(self.name)+".csv"
         entry = open(filename + str(), 'w')
         entry.close()
         technical_fields = []
@@ -51,31 +51,25 @@ class AccountCustomEntry(models.Model):
             header_fields.update({
                 head: head
             }) 
-        for entry_line in self.custom_entry_line: 
-              
-            for tech_field in fields_label:
-                tech_name = self.env['ir.model.fields'].search([('field_description','=', field)], limit=1)
-                tnames = tech_name.name
-                raise UserError(str(tech_name.name)+' '+str('{}.{}'.format(entry_line, tnames)))
-                if tech_name.name == '{}.{}'.format(entry_line, tnames):
-                    final_data.update({
-                        tech_field : '{}.{}'.format(entry_line, tnames)
-                    }) 
-                    
+        for entry_line in self.custom_entry_line:
+            line_vals_list = entry_line.line_vals.split('|')
+            index = 0
+            final_vals = {}
+            for entry_vals in line_vals_list:
+                final_vals.update({
+                    fields_label[index] : entry_vals
+                    })
+                index += 1
+            final_data.append(final_vals)  
+#         raise UserError(str(final_data))    
+        with open(filename, 'a') as file:
             
-        raise UserError(str(final_data)+' '+str('{}.{}'.format(entry_line, tech_name.name)))
-        
-        d1 = {'Name': 'Test', 'Age': 23}
-        d2 = {'Name': 'Test', 'Age': 23}
-        data = [d1,d2]
-        with open('batcht.csv', 'a') as file:
-            header = {'Name':'Name', 'Age':'Age'}
-            writer = csv.DictWriter(file, fieldnames=header)
-            writer.writerow(header)
-            for line in data:
+            writer = csv.DictWriter(file, fieldnames=fields_label)
+            writer.writerow(header_fields)
+            for line in final_data:
                 writer.writerow(line)
             
-        with open('batcht.csv') as f:
+        with open(filename) as f:
             read_file = f.read()
             
             attachment_vals = {
@@ -97,6 +91,10 @@ class AccountCustomEntry(models.Model):
         
 
     
+class AccountCustomEntryLine(models.Model):
+    _inherit = 'account.custom.entry.line'  
     
+    
+    line_vals = fields.Char(string='Line Vals')
     
     

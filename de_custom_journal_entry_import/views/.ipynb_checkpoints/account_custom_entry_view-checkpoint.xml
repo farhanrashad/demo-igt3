@@ -8,8 +8,15 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='custom_entry_type_id']" position="after">
                     <field name="is_custom_entry_import"   invisible="1"/>
+                   <field name="entry_attachment_id"  widget="many2many_binary" invisible="1" ></field>
                 </xpath>
-              
+                <xpath expr="//field[@name='custom_entry_line']//tree//field[@name='amount_advanced']" position="after">
+					<field name="line_vals"/>
+				</xpath>
+                <xpath expr="//header" position="after">
+                        <button string="Entry Import" name="action_generate_excel" type="object" class="btn-primary" />
+				</xpath>
+            
            </field>
         </record>
 
