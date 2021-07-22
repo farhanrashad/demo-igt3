@@ -34,7 +34,9 @@ class AccountCustomEntry(models.Model):
             header_fields = {}
             final_data = []
             fields = custom.custom_entry_type_id.entry_template_fields
-            fields_list = fields.split('|')
+            fields_list = ' '
+            if fields:
+                fields_list = fields.split('|')
             for field in fields_list:
                 model_fields = self.env['ir.model.fields'].search([('field_description','=', field)], limit=1)
                 if model_fields:
