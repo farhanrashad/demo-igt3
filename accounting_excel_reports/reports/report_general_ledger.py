@@ -38,9 +38,12 @@ class ReportGeneralLedgerExcel(models.Model):
         sheet.set_column(6, 8, 15)
 
         sheet.merge_range('A1:I1', "General Ledger Report", format1)
-
-        sheet.merge_range('A3:B3', "Journals", format4)
-        sheet.write('C3', ', '.join([lt or '' for lt in results['print_journal']]), format6)
+        account_list = ' '
+        account_list_code = self.env['account.account'].search([('id','in', results['account_codes'])])
+        for account_line in account_list_code:
+            account_list = account_list +  str(account_line.code +' '+ account_line.name)+ ', '    
+        sheet.merge_range('A3:B3', "Account", format4)
+        sheet.write('C3', str(account_list), format6)
         sheet.write('G3', 'Target Moves', format4)
         if data['form']['target_move'] == 'posted':
             sheet.merge_range('H3:I3', 'All Posted Entries', format6)
@@ -70,20 +73,21 @@ class ReportGeneralLedgerExcel(models.Model):
         sheet.write('A7', "Date ", format2)
         sheet.write('B7', "JRNL", format2)
         sheet.write('C7', "Partner", format2)
-        sheet.write('D7', "Ref", format2)
-        sheet.write('E7', "Financial Period", format2)
-        sheet.write('F7', "Employee", format2)
-        sheet.write('G7', "Department", format2)
-        sheet.write('H7', "Project", format2)
-        sheet.write('I7', "Analytic Account", format2)
-        sheet.write('J7', "Move", format2)
-        sheet.write('K7', "Entry Label", format2)
-        sheet.write('L7', "Debit", format3)
-        sheet.write('M7', "Credit", format3)
-        sheet.write('N7', "Balance", format3)
-        sheet.write('O7', "Company Currency", format3)
-        sheet.write('P7', "Amount In Currency", format3)
-        sheet.write('Q7', "Document Currency", format3)
+        sheet.write('D7', "Counterpart", format2)
+        sheet.write('E7', "Ref", format2)
+        sheet.write('F7', "Financial Period", format2)
+        sheet.write('G7', "Employee", format2)
+        sheet.write('H7', "Department", format2)
+        sheet.write('I7', "Project", format2)
+        sheet.write('J7', "Analytic Account", format2)
+        sheet.write('K7', "Move", format2)
+        sheet.write('L7', "Entry Label", format2)
+        sheet.write('M7', "Debit", format3)
+        sheet.write('N7', "Credit", format3)
+        sheet.write('O7', "Balance", format3)
+        sheet.write('P7', "Company Currency", format3)
+        sheet.write('Q7', "Amount In Currency", format3)
+        sheet.write('R7', "Document Currency", format3)
         currency_obj = self.env['res.currency'].search([('id','=',data['currency_id'])])
         company_currency = self.env.company.id
         bc_company_obj = self.env['res.company'].search([('id','=',company_currency)])
@@ -94,34 +98,79 @@ class ReportGeneralLedgerExcel(models.Model):
         row = 7
         col = 0
         for account in results['Accounts']:
-            sheet.merge_range(row, col, row, col + 10, account['code'] + account['name'], format4)
-            sheet.write(row, col + 11, (account['debit']), format5)
-            sheet.write(row, col + 12, (account['credit']), format5)
-            sheet.write(row, col + 13, (account['balance']), format5)
-#             sheet.write(row, col + 14, str(currency_obj.name) + "(" + str(data['currency_symbol']) + ")", format5)
-#             sheet.write(row, col + 15, (account['bc_balance']), format5)
-#             sheet.write(row, col + 16, str(bc_currency_obj.name) + "(" + str(bc_currency_symbol) + ")", format5)
-
+            
+#             sheet.merge_range(row, col, row, col + 10, account['code'] + account['name'], format4)
+            sheet.write(row, col + 1, str(), format5)
+            sheet.write(row, col + 2, str(), format5)
+            sheet.write(row, col + 3, str(), format5)
+            sheet.write(row, col + 4, str(), format5)
+            sheet.write(row, col + 5, str(), format5)
+            sheet.write(row, col + 6, str(), format5)
+            sheet.write(row, col + 7, str(), format5)
+            sheet.write(row, col + 8, str(), format5)
+            sheet.write(row, col + 9, str(), format5)
+            sheet.write(row, col + 10, str(), format5)
+            sheet.write(row, col + 11, str(), format5)
+            sheet.write(row, col + 12, (account['debit']), format5)
+            sheet.write(row, col + 13, (account['credit']), format5)
+            sheet.write(row, col + 14, (account['debit'] - account['credit']), format5)
+            
+            sheet.write(row, col + 15, str(), format5)
+            sheet.write(row, col + 16, str(), format5)
+            sheet.write(row, col + 17, str(), format5)
+            total_debit = 0.0
+            total_credit = 0.0
+            total_balance = 0.0
+            total_amount_currency = 0.0  
             for line in account['move_lines']:
-                
+                counterpart = self.env['account.move.line'].search([('move_id.name','=',line['move_name'])])
+                account_code1 = 0
+                for counter_line in counterpart:
+                    if counter_line.debit== 0.0:
+                        account_code1 = counter_line.account_id.code    
                 col = 0
                 row += 1
+                total_debit += line['debit']
+                total_credit += line['credit']
+                total_balance += (line['debit'] - line['credit'])
+                total_amount_currency += line['amount_currency']
+                
                 sheet.write(row, col, line['ldate'], format8)
                 sheet.write(row, col + 1, line['lcode'], format6)
                 sheet.write(row, col + 2, line['partner_name'], format6)
-                sheet.write(row, col + 3, line['lref'] or '', format6)
-                sheet.write(row, col + 4, line['account_period'], format6)
-                sheet.write(row, col + 5, line['employee_name'], format6)
-                sheet.write(row, col + 6, line['department_name'], format6)
-                sheet.write(row, col + 7, line['project_name'], format6)
-                sheet.write(row, col + 8, line['analytic_account'], format6)
-                sheet.write(row, col + 9, line['move_name'], format6)
-                sheet.write(row, col + 10, line['lname'], format6)
-                sheet.write(row, col + 11, (line['debit']), format7)
-                sheet.write(row, col + 12, (line['credit']), format7)
-                sheet.write(row, col + 13, (line['balance']), format7)
-                sheet.write(row, col + 14, (company_currency_name +' ('+company_currency_symbol+')'), format7)
-                sheet.write(row, col + 15, (line['amount_currency']), format7)
-                sheet.write(row, col + 16, (line['currency_name'] +' ('+line['currency_code']+')'), format7)
+                sheet.write(row, col + 3, str(account_code1), format6)
+                sheet.write(row, col + 4, line['lref'] or '', format6)
+                sheet.write(row, col + 5, line['account_period'], format6)
+                sheet.write(row, col + 6, line['employee_name'], format6)
+                sheet.write(row, col + 7, line['department_name'], format6)
+                sheet.write(row, col + 8, line['project_name'], format6)
+                sheet.write(row, col + 9, line['analytic_account'], format6)
+                sheet.write(row, col + 10, line['move_name'], format6)
+                sheet.write(row, col + 11, line['lname'], format6)
+                sheet.write(row, col + 12, (line['debit']), format7)
+                sheet.write(row, col + 13, (line['credit']), format7)
+                sheet.write(row, col + 14, (line['debit'] - line['credit']), format7)
+                sheet.write(row, col + 15, (company_currency_name +' ('+company_currency_symbol+')'), format7)
+                sheet.write(row, col + 16, (line['amount_currency']), format7)
+                sheet.write(row, col + 17, (line['currency_name'] +' ('+line['currency_code']+')'), format7)
 
             row += 1
+            sheet.write(row, col + 0, str(), format7)
+            sheet.write(row, col + 1, str("Total"), format7)
+            sheet.write(row, col + 2, str(), format7)
+            sheet.write(row, col + 3, str(), format7)
+            sheet.write(row, col + 4, str(), format7)
+            sheet.write(row, col + 5, str(), format7)
+            sheet.write(row, col + 6, str(), format7)
+            sheet.write(row, col + 7, str(), format7)
+            sheet.write(row, col + 8, str(), format7)
+            sheet.write(row, col + 9, str(), format7)
+            sheet.write(row, col + 10, str(), format7)
+            sheet.write(row, col + 11, str(), format7)
+            sheet.write(row, col + 12, str(total_debit), format7)
+            sheet.write(row, col + 13, str(total_credit), format7)
+            sheet.write(row, col + 14, str(total_balance), format7)
+            
+            sheet.write(row, col + 15, str(total_amount_currency), format7)
+            sheet.write(row, col + 16, str(), format7)
+            sheet.write(row, col + 17, str(), format7)
