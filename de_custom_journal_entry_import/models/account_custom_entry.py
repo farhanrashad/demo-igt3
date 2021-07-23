@@ -11,6 +11,10 @@ from odoo import api, fields, models, tools, _
 from odoo.exceptions import AccessError, ValidationError, MissingError, UserError
 from odoo.tools import config, human_size, ustr, html_escape
 from odoo.tools.mimetypes import guess_mimetype
+import pandas as pd
+from csv import DictReader
+from csv import DictWriter
+import csv
 
 _logger = logging.getLogger(__name__)
 
