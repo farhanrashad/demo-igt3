@@ -49,7 +49,7 @@ class AccountCustomEntry(models.Model):
                 }) 
             for entry_line in custom.custom_entry_line:
                 line_vals_list = ' '
-                if line_vals:
+                if entry_line.line_vals:
                     line_vals_list = entry_line.line_vals.split('|')
                 index = 0
                 final_vals = {}
