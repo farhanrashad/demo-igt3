@@ -97,12 +97,16 @@ class ReportGeneralLedgerExcel(models.Model):
         company_currency_symbol = self.env.company.currency_id.symbol
         row = 7
         col = 0
+        total_debit = 0.0
+        total_credit = 0.0
+        total_balance = 0.0
+        total_amount_currency = 0.0  
         for account in results['Accounts']:
             
 #             sheet.merge_range(row, col, row, col + 10, account['code'] + account['name'], format4)
             sheet.write(row, col + 1, str(), format5)
             sheet.write(row, col + 2, str(), format5)
-            sheet.write(row, col + 3, str(), format5)
+            sheet.write(row, col + 3, str(account['code'] + account['name']), format5)
             sheet.write(row, col + 4, str(), format5)
             sheet.write(row, col + 5, str(), format5)
             sheet.write(row, col + 6, str(), format5)
@@ -118,10 +122,7 @@ class ReportGeneralLedgerExcel(models.Model):
             sheet.write(row, col + 15, str(), format5)
             sheet.write(row, col + 16, str(), format5)
             sheet.write(row, col + 17, str(), format5)
-            total_debit = 0.0
-            total_credit = 0.0
-            total_balance = 0.0
-            total_amount_currency = 0.0  
+            
             for line in account['move_lines']:
                 counterpart = self.env['account.move.line'].search([('move_id.name','=',line['move_name'])])
                 account_code1 = 0
