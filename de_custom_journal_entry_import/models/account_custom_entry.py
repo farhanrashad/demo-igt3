@@ -55,14 +55,14 @@ class AccountCustomEntry(models.Model):
                 line_vals_list = ' '
                 if entry_line.line_vals:
                     line_vals_list = entry_line.line_vals.split('|')
-                index = 0
-                final_vals = {}
-                for entry_vals in line_vals_list:
-                    final_vals.update({
-                        fields_label[index] : entry_vals
-                        })
-                    index += 1
-                final_data.append(final_vals)  
+                    index = 0
+                    final_vals = {}
+                    for entry_vals in line_vals_list:
+                        final_vals.update({
+                            fields_label[index] : entry_vals
+                            })
+                        index += 1
+                    final_data.append(final_vals)  
 
             with open(filename, 'a') as file:
 
