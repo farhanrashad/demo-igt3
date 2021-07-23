@@ -9,13 +9,11 @@ from dateutil.relativedelta import relativedelta
 import json
 from lxml import etree
 
-MONTH_LIST = [('1', 'Jan'), ('2', 'Feb'), ('3', 'Mar'), ('4', 'Apr'), ('5', 'May'), ('6', 'Jun'), ('7', 'Jul'), ('8', 'Aug'), ('9', 'Sep'), ('10', 'Oct'), ('11', 'Nov'),('12', 'Dec')]
-
 class CustomEntry(models.Model):
     _inherit = 'account.custom.entry'
     
     #App fields
-    has_om_fields = fields.Selection(related="custom_entry_type_id.has_om_fields")
+    has_om = fields.Selection(related="custom_entry_type_id.has_om")
     
 class CustomEntryLine(models.Model):
     _inherit = 'account.custom.entry.line'
