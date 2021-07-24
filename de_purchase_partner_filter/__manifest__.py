@@ -17,13 +17,14 @@
     'version': '14.0.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['purchase'],
+    'depends': ['purchase','purchase_requisition'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/purchase_views.xml',
-        'views/templates.xml',
+        'security/ir.model.access.csv',
+        #'views/purchase_views.xml',
+        'wizard/purchase_agreement_wizard_views.xml',
+        'views/purchase_requisition_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
