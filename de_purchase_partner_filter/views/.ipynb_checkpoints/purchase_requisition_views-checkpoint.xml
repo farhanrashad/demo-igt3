@@ -7,8 +7,13 @@
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
                     <button name="%(action_open_pr_to_po_wizard)d" type="action"
-                    string="Create Purchase Order"
+                    string="New Purchase Order" class="oe_highlight"
                     attrs="{'invisible': [('state', '=', 'confirm')]}"/>
+                </xpath>
+                
+                <xpath expr="//field[@name='vendor_id']" position="attributes">
+                    <attribute name="attrs">{"readonly": [["state","=","sent"]]}</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 
         </field>

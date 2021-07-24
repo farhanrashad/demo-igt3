@@ -14,7 +14,7 @@
     'website': "https://www.dynexcel.com",
 
     'category': 'Purchase',
-    'version': '14.0.0.1',
+    'version': '14.0.0.2',
 
     # any module necessary for this one to work correctly
     'depends': ['purchase','purchase_requisition'],
