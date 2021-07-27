@@ -14,9 +14,13 @@ class CustomEntryRefuse(models.TransientModel):
     
     
     def action_correction(self):
-        self.custom_entry_id.update({
+        order = self.env['account.custom.entry'].browse(self.env.context.get('active_id'))
+        order.is_custom_entry_import == True
+        order.sudo().update({
             'correction_reason': self.reason,
-            'is_custom_entry_import': True,
-        })    
+            'allow_correction': True,
+            #'is_custom_entry_import': True,
+        })
+        
     
     
