@@ -46,7 +46,7 @@
                                 <th class="text-left">Month</th> 
                                 <th class="text-left">Year</th> 
                                 <th class="text-left">Status</th>
-                                <th class="text-left">Validity</th>
+                                <th class="text-left">Notice</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,17 +75,15 @@
                                         <span t-esc="custom.stage_id.name" />
                                     </td>
                                     
-                                    <td class="text-left">
-                                        <t t-if="custom.is_custom_entry_import == True">
-                                        <p style='color:red;'><strong>Need Correction</strong></p>
-                                         </t>     
+                                    <td class="text-left"> 
+                                        <p style='color:red;'><span t-esc="custom.correction_reason" /></p>
                                     </td>
                                     
                                     <td class="text-left">
                                          <a t-attf-href="/web/content/#{custom.entry_attachment_id.id}?download=true" title="Dowload"><i class="fa fa-download"></i></a>
                                     </td>
                                     <td class="text-left">
-                                        <t t-if="custom.is_custom_entry_import == True">
+                                        <t t-if="custom.allow_correction == True">
                                             <a t-attf-href="/entry/type/update/#{custom.id}?" title="Upload"><i class="fa fa-upload"  style='color:red;'></i></a>
                                         </t>    
                                     </td>
