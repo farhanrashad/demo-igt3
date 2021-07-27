@@ -11,8 +11,8 @@
                     <field name="allow_correction" invisible="1"/>
                 </xpath>
                 <xpath expr="//header" position="inside">
-                    <button string="Request Correction" name="action_correction_entry" type="object" class="btn-primary" attrs="{'invisible': [('stage_category', 'not in', ['confirm','close']),('allow_correction','=',False)]}"/>
-                    <button string="Request Correction" name="action_correction_entry" type="object" attrs="{'invisible': [('stage_category', 'not in', ['confirm','close']),('allow_correction','!=',False)]}"/>
+                    <button string="Request Correction" name="action_correction_entry" type="object" class="btn-primary" attrs="{'invisible': [('stage_category', 'not in', ['confirm','close']),('allow_correction','!=',False)]}"/>
+                    <button string="Request Correction" name="action_correction_entry" type="object" attrs="{'invisible': [('stage_category', 'not in', ['confirm','close']),('allow_correction','=',False)]}"/>
 
                 </xpath>
            </field>
