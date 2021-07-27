@@ -11,6 +11,10 @@ from odoo import api, fields, models, tools, _
 from odoo.exceptions import AccessError, ValidationError, MissingError, UserError
 from odoo.tools import config, human_size, ustr, html_escape
 from odoo.tools.mimetypes import guess_mimetype
+import pandas as pd
+from csv import DictReader
+from csv import DictWriter
+import csv
 
 _logger = logging.getLogger(__name__)
 
@@ -34,7 +38,10 @@ class AccountCustomEntry(models.Model):
             header_fields = {}
             final_data = []
             fields = custom.custom_entry_type_id.entry_template_fields
-            fields_list = fields.split('|')
+            fields_list = ' '
+            if fields:
+                fields_str = str(fields)
+                fields_list = fields_str.split('|')
             for field in fields_list:
                 model_fields = self.env['ir.model.fields'].search([('field_description','=', field)], limit=1)
                 if model_fields:
@@ -45,15 +52,17 @@ class AccountCustomEntry(models.Model):
                     head: head
                 }) 
             for entry_line in custom.custom_entry_line:
-                line_vals_list = entry_line.line_vals.split('|')
-                index = 0
-                final_vals = {}
-                for entry_vals in line_vals_list:
-                    final_vals.update({
-                        fields_label[index] : entry_vals
-                        })
-                    index += 1
-                final_data.append(final_vals)  
+                line_vals_list = ' '
+                if entry_line.line_vals:
+                    line_vals_list = entry_line.line_vals.split('|')
+                    index = 0
+                    final_vals = {}
+                    for entry_vals in line_vals_list:
+                        final_vals.update({
+                            fields_label[index] : entry_vals
+                            })
+                        index += 1
+                    final_data.append(final_vals)  
 
             with open(filename, 'a') as file:
 
