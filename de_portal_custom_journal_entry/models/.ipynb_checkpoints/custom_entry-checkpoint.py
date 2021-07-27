@@ -6,8 +6,8 @@ from odoo import models, fields, api, _
 class CustumEntry(models.Model):
     _inherit = 'account.custom.entry'    
     
-    correction_reason = fields.Char(string='Correction Reason')
-    
+    correction_reason = fields.Char(string='Correction Reason', tracking=True)
+    allow_correction = fields.Boolean(string='Allow Correction')
     
     def action_correction_entry(self):
         for rec in self:
@@ -23,11 +23,6 @@ class CustumEntry(models.Model):
             'target': 'new',
             'context': {'default_custom_entry_id': self.id},
         }
-    
-    
-    
-    
-    
        
 class CustumEntryline(models.Model):
     _inherit = 'account.custom.entry.line'
@@ -35,3 +30,6 @@ class CustumEntryline(models.Model):
 
 class CustumEntrystage(models.Model):
     _inherit = 'account.custom.entry.stage'    
+
+class MailMessage(models.Model):
+    _inherit = 'mail.message'    
