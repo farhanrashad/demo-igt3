@@ -12,15 +12,16 @@
                     <field name="has_spmrf_fields" invisible="1"/>
                 </xpath>
                 <xpath expr="//page[@name='custom_entry_line']/field[@name='custom_entry_line']/tree[1]" position="inside">
-                    <field name="penalty_sow_type_id" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
-                    <field name="penalty_sow_id" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
-                    <field name="frequency" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
-                    <field name="sow_deduct_type" attrs="{'invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
-                    <field name="service_class" attrs="{'invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
-                    <field name="service_level" attrs="{'invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
-                    <field name="uptime" attrs="{'invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>                    
-                    <field name="penalty_percent" />
+                    <field name="penalty_sow_type_id" attrs="{'column_invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                    <field name="penalty_sow_id" attrs="{'column_invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                    <field name="frequency" attrs="{'column_invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                    <field name="sow_deduct_type" attrs="{'column_invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
+                    <field name="service_class" attrs="{'column_invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
+                    <field name="service_level" attrs="{'column_invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
+                    <field name="uptime" attrs="{'column_invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
                     
+                    <field name="amount_penalty" attrs="{'column_invisible':[('parent.move_type','not in',['in_refund','out_refund'])]}"/>
+                     <field name="amount_approved_penalty" attrs="{'column_invisible':[('parent.move_type','not in',['in_refund','out_refund'])]}"/>
                 </xpath>
                 
             </field>
