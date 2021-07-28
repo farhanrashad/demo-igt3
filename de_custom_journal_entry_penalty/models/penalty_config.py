@@ -73,19 +73,21 @@ class PenaltyConfigOccurLine(models.Model):
     occurence = fields.Integer(string='Occurence', default=1)
     penalty_amount = fields.Float(string='Penalty Amount', default=0.0)
 
-class PenaltyConfigSOW(models.Model):
-    _name = 'op.penalty.config.sow'
-    _description = 'Penalty Config SOW'
-    
-    name = fields.Char(string='Name', required=True)
-    frequency = fields.Char(string='Frequency')
+
     
 class PenaltyConfigSOWType(models.Model):
     _name = 'op.penalty.config.sow.type'
     _description = 'Penalty Config SOW Type'
     
     name = fields.Char(string='Name', required=True)
+
+class PenaltyConfigSOW(models.Model):
+    _name = 'op.penalty.config.sow'
+    _description = 'Penalty Config SOW'
     
+    name = fields.Char(string='Name', required=True)
+    frequency = fields.Char(string='Frequency')
+    penalty_sow_type_id = fields.Many2one('op.penalty.config.sow.type', string='SOW Type')
     
 class PenaltyConfigSOWLine(models.Model):
     _name = 'op.penalty.config.sow.line'
