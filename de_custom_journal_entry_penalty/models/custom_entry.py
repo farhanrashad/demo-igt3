@@ -43,6 +43,6 @@ class CustomEntryLine(models.Model):
         ('a', 'A'), 
         ('b', 'B'), 
         ], default='a', string='Deduction Type')
-    amount_penalty = fields.Float(string='Penalty Amount')
-    amount_approved_penalty = fields.Float(string='Penalty Approved')
+    amount_penalty = fields.Float(string='Penalty Amount',copy=False)
+    amount_approved_penalty = fields.Float(string='Penalty Approved', copy=False)
     
