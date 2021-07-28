@@ -9,7 +9,6 @@ class AccountCustomEntryStage(models.Model):
     _name = 'account.custom.entry.stage'
     _description = 'Custom Entry Stage'
     _order = 'sequence, stage_category, id'
-    _rec_name = 'display_name'
 
     def _get_default_custom_entry_type_ids(self):
         default_custom_entry_type_id = self.env.context.get('default_custom_entry_type_id')
@@ -45,13 +44,8 @@ class AccountCustomEntryStage(models.Model):
     prv_stage_id = fields.Many2one('account.custom.entry.stage', string='Previous Stage')
 
     group_id = fields.Many2one('res.groups', string='Security Group')
-    display_name = fields.Char(string='Display Name', compute='_compute_display_name')
     
     _sql_constraints = [
         ('code_uniq', 'unique (stage_code)', "Code already exists!"),
     ]
-    
-    def _compute_display_name(self):
-        for stage in self:
-            stage.display_name = stage.name + '-' + stage.stage_code
 
