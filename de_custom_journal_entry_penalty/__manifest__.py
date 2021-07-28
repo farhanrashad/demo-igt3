@@ -16,7 +16,7 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Accounting',
-    'version': '14.0.0.4',
+    'version': '14.0.0.5',
 
     # any module necessary for this one to work correctly
     'depends': ['de_custom_journal_entry'],
