@@ -26,10 +26,8 @@
         'security/penalty_security.xml',
         'security/ir.model.access.csv',
         'views/penalty_menu.xml',
-        'views/custom_entry_type_views.xml',
-        #'views/penalty_stage_views.xml',
         'views/penalty_config_views.xml',
-        #'views/account_move_views.xml',
-        #'views/penalty_entry_views.xml',
+        'views/custom_entry_type_views.xml',        
+        'views/custom_entry_views.xml',
     ],
 }

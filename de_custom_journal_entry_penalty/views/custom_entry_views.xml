@@ -18,9 +18,10 @@
                     <field name="sow_deduct_type" attrs="{'column_invisible':[('parent.has_pm_fields','==','no')], 'required': [('parent.has_pm_fields','==','required')]}"/>
                     <field name="service_class" attrs="{'column_invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
                     <field name="service_level" attrs="{'column_invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
-                    <field name="uptime" attrs="{'column_invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>                    
-                    <field name="amount_penalty" />
-                    <field name="amount_approved_penalty" />
+                    <field name="uptime" attrs="{'column_invisible':[('parent.has_sla_fields','==','no')], 'required': [('parent.has_sla_fields','==','required')]}"/>
+                    
+                    <field name="amount_penalty" attrs="{'column_invisible':[('parent.move_type','not in',['in_refund','out_refund'])]}"/>
+                     <field name="amount_approved_penalty" attrs="{'column_invisible':[('parent.move_type','not in',['in_refund','out_refund'])]}"/>
                 </xpath>
                 
             </field>
