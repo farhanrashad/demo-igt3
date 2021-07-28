@@ -58,7 +58,7 @@
                                 <field name="penalty_config_sow_line" attrs="{'invisible':[('rule_type','!=','sow')]}">
                                     <tree string="penalty SOW Line" editable="bottom">
                                        <field name="penalty_sow_type_id" required="1"/>
-                                        <field name="penalty_sow_id" required="1"/>
+                                        <field name="penalty_sow_id" required="1" domain="[('penalty_sow_type_id','=',penalty_sow_type_id)]"/>
                                        <field name="penalty_deduction_a" required="1"/>
                                        <field name="penalty_deduction_b" required="1"/>
                                     </tree>
@@ -84,9 +84,93 @@
 		    
     <menuitem id="penalty_config_sla_rule_menu" name="Penalty Rules" parent="penalty_entry_config_menu"
 			action="action_penalty_rule"
-			sequence="5" />
+			sequence="1" />
 		
-			
+	<!-- SOW Type -->
+    <record id="operation_penalty_sow_type_list_view" model="ir.ui.view">
+        <field name="name">op.penalty.sow.type.list.view</field>
+        <field name="model">op.penalty.config.sow.type</field>
+        <field name="arch" type="xml">
+            <tree string="penalty SLA">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="operation_penalty_sow_type_form_view" model="ir.ui.view">
+        <field name="name">op.penalty.sow.type.form.view</field>
+        <field name="model">op.penalty.config.sow.type</field>
+        <field name="arch" type="xml">
+            <form string="SOW Type">
+                <sheet>
+                    <group col="4">
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_penalty_sow_type" model="ir.actions.act_window">
+			<field name="name">SOW Type</field>
+			<field name="res_model">op.penalty.config.sow.type</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">
+					Create a new SOW Type
+				</p>
+               
+			</field>
+		</record>
+		    
+    <menuitem id="penalty_config_sow_type_menu" name="SOW Type" parent="penalty_entry_config_menu"
+			action="action_penalty_sow_type"
+			sequence="2" />
+    
+    <!-- sow -->
+    <record id="operation_penalty_sow_list_view" model="ir.ui.view">
+        <field name="name">op.penalty.sow.list.view</field>
+        <field name="model">op.penalty.config.sow</field>
+        <field name="arch" type="xml">
+            <tree string="penalty SLA">
+                <field name="name"/>
+                <field name="frequency" />
+                <field name="penalty_sow_type_id" />
+            </tree>
+        </field>
+    </record>
+    
+    <record id="operation_penalty_sow_form_view" model="ir.ui.view">
+        <field name="name">op.penalty.sow.form.view</field>
+        <field name="model">op.penalty.config.sow</field>
+        <field name="arch" type="xml">
+            <form string="SOW Type">
+                <sheet>
+                    <group col="4">
+                        <field name="name" />
+                        <field name="frequency" required="1"/>
+                        <field name="penalty_sow_type_id" required="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_penalty_sow" model="ir.actions.act_window">
+			<field name="name">SOW</field>
+			<field name="res_model">op.penalty.config.sow</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">
+					Create a new SOW
+				</p>
+               
+			</field>
+		</record>
+		    
+    <menuitem id="penalty_config_sow_menu" name="SOW" parent="penalty_entry_config_menu"
+			action="action_penalty_sow"
+			sequence="3" />
 </odoo>
 
 
