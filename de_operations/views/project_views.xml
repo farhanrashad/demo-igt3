@@ -1,12 +1,12 @@
 <odoo>
     <data>
-        <record id="project_project_view_form_simplified_inherit_hoto" model="ir.ui.view">
-            <field name="name">project.project.view.form.simplified.inherit.hoto</field>
+        <record id="project_form_view_inherit_hoto" model="ir.ui.view">
+            <field name="name">project.form.view.inherit.hoto</field>
             <field name="model">project.project</field>
-            <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+            <field name="inherit_id" ref="project.edit_project" />
             <field name="priority">24</field>
             <field name="arch" type="xml">
-                <field name="user_id" position="after">
+                <field name="company_id" position="after">
                     <field name="site_hoto"/>
                 </field>
             </field>
@@ -30,7 +30,8 @@
                         </div>
                         <group>
                             <group>
-                                <field name="project_id" required="0" readonly="1" domain="[('active', '=', True), ('company_id', '=', company_id)]"/>
+                                <field name="partner_id" string="Partner" required="1" widget="res_partner_many2one"/>
+                                <field name="project_id" required="0" readonly="0" domain="[('site_hoto','=',True),('active', '=', True), ('company_id', '=', company_id)]"/>
                                 <field name="site_id" required="1" domain="[('allow_site_planning','=',True), ('active', '=', True), ('company_id', '=', company_id)]"/>
                                 <field name="hoto_type" required="1" />
                                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
@@ -58,6 +59,10 @@
                     <field name="name" optional="hide" />
                     <field name="project_id" optional="hide" readonly="1"/>
                     <field name="partner_id" string="Partner" />
+                     <field name="site_id" />
+                    <field name="date_handover" />
+                    <field name="date_rfi" optional="hide" readonly="1"/>
+                    <field name="date_onair" />
                     <field name="user_id" optional="hide" widget="many2one_avatar_user"/>
                     <field name="company_id" groups="base.group_multi_company" optional="hide"/>
                     <field name="activity_ids" widget="list_activity" optional="show"/>
