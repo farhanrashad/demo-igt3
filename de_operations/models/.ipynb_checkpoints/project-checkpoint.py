@@ -36,6 +36,8 @@ class ProjectTask(models.Model):
             project_id = self.env['project.project'].search([('name','=','HOTO')],limit=1)
             if not project_id:
                 project_id = self.env['project.project'].create({
-                    'name':'HOTO'
+                    'name':'HOTO',
+                    'site_hoto':True,
                 })
             task.project_id = project_id.id
+            task.name = 'New HOTO'
