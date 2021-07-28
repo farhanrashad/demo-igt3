@@ -54,6 +54,8 @@
                             <field name="account_id" attrs="{'invisible':[('journal_type','!=','general')]}"/>
                             <field name="counterpart_mode" attrs="{'invisible':[('journal_type','!=','general')]}"/>
                             <field name="counterpart_account_id" attrs="{'invisible':[('journal_type','!=','general')]}"/>
+                            <field name="entry_reverse" attrs="{'invisible':[('journal_type','!=','general')]}"/>
+
 
                             <field name="expense_advance" attrs="{'invisible': [('generate_accounting', '=', False)]}"/>
                             <field name="payment_journal_id" attrs="{'invisible': [('expense_advance', '=', False)], 'required': [('expense_advance', '=', True)]}"/>

@@ -339,65 +339,125 @@ class CustomEntry(models.Model):
         lines_data = []
         debit = credit = amount = balance = 0
         counter_debit = counter_credit = counter_amount = counter_balance = 0
-        for line in self.custom_entry_line:
-            if self.custom_entry_type_id.counterpart_mode == 'debit':
-                #credit = line.price_subtotal
-                amount = line.price_subtotal * -1
-                counter_amount += line.price_subtotal
-            else:
-                #debit = line.price_subtotal
-                amount = line.price_subtotal
-                counter_amount += line.price_subtotal * -1
+        
+        
+        suppliers = self.env['account.custom.entry.line'].read_group([('custom_entry_id', '=', self.id)], ['supplier_id'], ['supplier_id'])
+
+        if self.custom_entry_type_id.entry_reverse:
+            for supplier in suppliers:
+                counter_debit = counter_credit = counter_amount = counter_balance = 0
+                for line in self.custom_entry_line.filtered(lambda x: x.supplier_id.id == supplier['supplier_id'][0]):
+                    debit = credit = amount = balance = 0
+                    if self.custom_entry_type_id.counterpart_mode == 'debit':
+                        amount = line.price_subtotal
+                        counter_amount += line.price_subtotal * -1
+                    else:
+                        amount = line.price_subtotal * -1
+                        counter_amount += line.price_subtotal
+                    
+                    balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+                    debit = balance if balance > 0.0 else 0.0
+                    credit = -balance if balance < 0.0 else 0.0
                 
-            balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
-            debit = balance if balance > 0.0 else 0.0
-            credit = -balance if balance < 0.0 else 0.0
-                
-                
-            lines_data.append([0,0,{
-                'name': str(self.name) + ' ' + str(line.product_id.name),
-                'custom_entry_line_id': line.id,
-                'account_id': self.custom_entry_type_id.account_id.id,
-                'amount_currency': amount,
+                    counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+                    counter_debit = counter_balance if counter_balance > 0.0 else 0.0
+                    counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
+            
+                    lines_data.append([0,0,{
+                        'name': str(self.name) + ' ' ,
+                        'custom_entry_line_id': line.id,
+                        'account_id': self.custom_entry_type_id.account_id.id,
+                        'amount_currency': amount,
+                        'currency_id': self.currency_id.id,
+                        'debit': debit,
+                        'credit': credit,
+                        'partner_id': self.partner_id.id,
+                        #'analytic_account_id': line.analytic_account_id.id,
+                        #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                        'project_id': line.project_id.id,
+                    }])
+            
+                lines_data.append([0,0,{
+                    'name': str(self.name) + ' ' ,
+                    #'custom_entry_line_id': line.id,
+                    'account_id': self.custom_entry_type_id.counterpart_account_id.id,
+                    'amount_currency': counter_amount,
+                    'currency_id': self.currency_id.id,
+                    'debit': counter_debit,
+                    'credit': counter_credit,
+                    'partner_id': supplier['supplier_id'][0],
+                    #'analytic_account_id': line.analytic_account_id.id,
+                    #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                    #'project_id': line.project_id.id,
+                }])
+            move.create({
+                'move_type': self.custom_entry_type_id.move_type,
+                'custom_entry_id': self.id,
+                'ref':  str(self.name), 
+                'date': fields.Datetime.now(),
                 'currency_id': self.currency_id.id,
-                'debit': debit,
-                'credit': credit,
-                'partner_id': line.supplier_id.id,
-                'analytic_account_id': line.analytic_account_id.id,
-                'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
-                'project_id': line.project_id.id,
+                'journal_id': self.custom_entry_type_id.journal_id.id,
+                'narration': self.name,
+                'line_ids':lines_data,
+            })
+        else:
+            debit = credit = amount = balance = 0
+            counter_debit = counter_credit = counter_amount = counter_balance = 0
+            for line in self.custom_entry_line:
+                if self.custom_entry_type_id.counterpart_mode == 'debit':
+                    amount = line.price_subtotal * -1
+                    #ounter_amount += line.price_subtotal
+                else:
+                    amount = line.price_subtotal
+                    #ounter_amount += line.price_subtotal * -1    
+                
+                balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+                debit = balance if balance > 0.0 else 0.0
+                credit = -balance if balance < 0.0 else 0.0
+                
+                lines_data.append([0,0,{
+                    'name': str(self.name) + ' ' + str(line.product_id.name),
+                    'custom_entry_line_id': line.id,
+                    'account_id': self.custom_entry_type_id.account_id.id,
+                    'amount_currency': amount,
+                    'currency_id': self.currency_id.id,
+                    'debit': debit,
+                    'credit': credit,
+                    'partner_id': line.supplier_id.id,
+                    'analytic_account_id': line.analytic_account_id.id,
+                    'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                    'project_id': line.project_id.id,
+                }])
+            if self.custom_entry_type_id.counterpart_mode == 'debit':
+                counter_debit = self.amount_total
+                counter_amount = self.amount_total
+            else:
+                counter_credit = self.amount_total
+                counter_amount = self.amount_total * -1
+            counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+            counter_debit = counter_balance if counter_balance > 0.0 else 0.0
+            counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
+            
+            lines_data.append([0,0,{
+                'name': str(self.name),
+                'custom_entry_line_id': line.id,
+                'account_id': self.custom_entry_type_id.counterpart_account_id.id,
+                'debit': counter_debit,
+                'credit': counter_credit,
+                'amount_currency': counter_amount,
+                'currency_id': self.currency_id.id,
+                'partner_id': self.partner_id.id,
             }])
-        #if self.custom_entry_type_id.counterpart_mode == 'debit':
-            #counter_debit = self.amount_total
-         #   counter_amount = self.amount_total
-        #else:
-            #counter_credit = self.amount_total
-            #counter_amount = self.amount_total * -1
-            
-        counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
-        counter_debit = counter_balance if counter_balance > 0.0 else 0.0
-        counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
-            
-        lines_data.append([0,0,{
-            'name': str(self.name),
-            'custom_entry_line_id': line.id,
-            'account_id': self.custom_entry_type_id.counterpart_account_id.id,
-            'debit': counter_debit,
-            'credit': counter_credit,
-            'amount_currency': counter_amount,
-            'currency_id': self.currency_id.id,
-            'partner_id': self.partner_id.id,
-        }])
-        move.create({
-            'move_type': self.custom_entry_type_id.move_type,
-            'custom_entry_id': self.id,
-            'ref':  str(self.name), 
-            'date': fields.Datetime.now(),
-            'currency_id': self.currency_id.id,
-            'journal_id': self.custom_entry_type_id.journal_id.id,
-            'narration': self.name,
-            'line_ids':lines_data,
-        })
+            move.create({
+                'move_type': self.custom_entry_type_id.move_type,
+                'custom_entry_id': self.id,
+                'ref':  str(self.name), 
+                'date': fields.Datetime.now(),
+                'currency_id': self.currency_id.id,
+                'journal_id': self.custom_entry_type_id.journal_id.id,
+                'narration': self.name,
+                'line_ids':lines_data,
+            })
         return move
     
         
