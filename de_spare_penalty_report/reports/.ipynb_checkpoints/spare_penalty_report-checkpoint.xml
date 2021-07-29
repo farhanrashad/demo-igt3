@@ -1,0 +1,13 @@
+<odoo>
+    <data>
+        <record id="spare_penalty_report" model="ir.actions.report">
+            <field name="name">Spare Penalty Report</field>
+            <field name="model">stock.transfer.order</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">de_spare_penalty_report.spare_penalty_report_xlsx</field>
+            <field name="report_file">Spare Penalty Report</field>
+            <field name="binding_model_id" ref="de_stock_material_transfer.model_stock_transfer_order"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

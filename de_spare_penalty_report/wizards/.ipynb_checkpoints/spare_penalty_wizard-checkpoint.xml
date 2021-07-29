@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="view_spare_penalty_wizard" model="ir.ui.view">
+			<field name="name">spare.penalty.wizard</field>
+			<field name="model">spare.penalty.wizard</field>
+			<field name="arch" type="xml">
+				<form string="Spare Penalty Wizard">
+				
+					<group>
+						<field name="src" />
+						<field name="dest" />
+					</group>
+					
+				
+					<footer>
+						<button name="generate_report" type="object" string="Print" class="oe_highlight" />
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		<record id="action_spare_penalty_wizard" model="ir.actions.act_window">
+			<field name="name">Spare Penalty Report</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">spare.penalty.wizard</field>
+			<field name="view_id" ref="de_spare_penalty_report.view_spare_penalty_wizard" />
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+
+    </data>
+</odoo>

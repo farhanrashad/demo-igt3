@@ -1,0 +1,5 @@
+<odoo>
+  <data>
+      <menuitem action="action_spare_penalty_wizard" id="spare_penalty_wizard" name="Spare Penalty Report"  parent="de_stock_material_transfer.stock_requisition_main_menu" sequence="14"/>
+  </data>
+</odoo>
