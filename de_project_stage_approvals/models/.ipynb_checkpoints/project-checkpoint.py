@@ -16,6 +16,8 @@ class ProjectTaskType(models.Model):
         ('close', 'Closed'),
     ], string='Category', default='draft')
     
+    group_id = fields.Many2one('res.groups', string='Security Group')
+    
 class ProjectTask(models.Model):
     _inherit = 'project.task'
     
