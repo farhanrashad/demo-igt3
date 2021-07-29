@@ -4,7 +4,7 @@
 
 {
     "name": "Invoice Payment",
-    "summary": "Show payments from invoice",
+    "summary": "Show payments from invoice ",
     "version": "14.0.1.0.0",
     "author": "Terrabit, Dorin Hongu",
     "website": "https://www.terrabit.ro",
