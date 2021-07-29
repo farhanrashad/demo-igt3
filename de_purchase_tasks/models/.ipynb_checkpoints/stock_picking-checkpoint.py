@@ -41,3 +41,25 @@ class StockPicking(models.Model):
                 'delivery_assigned': True
             })
         return res
+    
+    def action_assign_milestone(self):
+        #task_id = self.env['project.task'].search([('id','=',self.task_id.id)])
+        tasks = task_id = self.env['project.task']
+        for picking in self:
+            if picking.task_id.completion_percent > 0:
+                picking.sudo().action_assign()
+                for line in picking.move_ids_without_package:
+                    line.quantity_done = (picking.task_id.completion_percent / 100) * line.purchase_line_id.product_qty
+                    #line.create({
+                    #    'location_dest_id':picking.location_dest_id,
+                    #    'product_uom_id': line.product_uom,
+                    #    'product_id':line.product_id.id,
+                    #    'qty_done':line.quantity_done,
+                    #})
+            tasks = self.env['project.task'].search([('purchase_id', '=', picking.purchase_id.id),('allow_picking', '=', picking.allow_picking),('stage_id.is_closed','=',True),('delivery_assigned','!=',True)])
+            for task in tasks.sorted(key=lambda r: r.sequence):
+                task_id = task
+                break
+            if not task_id:
+                raise UserError(_('There is no milestone for assignment'))
+        self.task_id = task_id.id
