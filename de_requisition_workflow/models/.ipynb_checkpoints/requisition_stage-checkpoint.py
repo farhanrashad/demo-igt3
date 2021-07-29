@@ -9,6 +9,7 @@ class PurchaseRequisitionStage(models.Model):
     _name = 'purchase.requisition.stage'
     _description = 'Requisition Stage'
     _order = 'sequence, stage_category, id'
+    _rec_name = 'display_name'
     
     def _get_default_requisition_type_ids(self):
         default_requisition_type_id = self.env.context.get('default_requisition_type_id')
@@ -38,9 +39,15 @@ class PurchaseRequisitionStage(models.Model):
     prv_stage_id = fields.Many2one('purchase.requisition.stage', string='Previous Stage')
 
     group_id = fields.Many2one('res.groups', string='Security Group')
+    
+    display_name = fields.Char(string='Display Name', compute='_compute_stage_name')
 
     _sql_constraints = [
         ('code_uniq', 'unique (stage_code)', "Code already exists!"),
     ]
+    
+    def _compute_stage_name(self):
+        for stage in self:
+            stage.display_name = str(stage.name) + '-' + str(stage.stage_code)
 
     
