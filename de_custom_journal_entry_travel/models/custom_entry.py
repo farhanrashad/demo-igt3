@@ -16,7 +16,7 @@ class CustomEntry(models.Model):
     #travel fields
     t_travel_by = fields.Selection([
         ('ticket', 'Flight Ticket'),
-        ('Vehicle', 'Vehicle Rental')],
+        ('vehicle', 'Vehicle Rental')],
         string='Travel By', default='ticket')
     
 class CustomEntryLine(models.Model):
