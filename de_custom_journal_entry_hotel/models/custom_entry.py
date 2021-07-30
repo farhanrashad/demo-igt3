@@ -27,7 +27,7 @@ class CustomEntryLine(models.Model):
     #has hotel/accomodation
     h_category = fields.Selection([
         ('travel', 'Travel'),
-        ('housing allowance', 'Housing Allowance'),
+        ('ha', 'Housing Allowance'),
         ], string='Accomodation Category', default='travel')
     hotel_detail = fields.Char(string="Hotel Detail")
     h_check_in = fields.Date(string="Check-In")
