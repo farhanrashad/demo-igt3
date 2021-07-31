@@ -43,9 +43,9 @@ class CustomEntry(models.Model):
     stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]", copy=False)
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
     
-    amount_advanced_total = fields.Float('Total Advanced', compute='_amount_all')
-    amount_total = fields.Float('Total Amount', compute='_amount_all')
-    amount_balance = fields.Float('Balance', compute='_amount_all')
+    amount_advanced_total = fields.Monetary('Total Advanced', compute='_amount_all')
+    amount_total = fields.Monetary('Total Amount', compute='_amount_all')
+    amount_balance = fields.Monetary('Balance', compute='_amount_all')
  
     custom_entry_line = fields.One2many('account.custom.entry.line', 'custom_entry_id', string='Entry Line', copy=True, auto_join=True,)
     
@@ -188,13 +188,14 @@ class CustomEntry(models.Model):
         return super(CustomEntry, self).unlink()
    
     def _amount_all(self):
-        adv = tot = 0
-        for line in self.custom_entry_line:
-            tot += line.price_subtotal
-            adv += line.advance_subtotal
-        self.amount_advanced_total = adv
-        self.amount_total = tot
-        self.amount_balance = tot - adv
+        for entry in self:
+            adv = tot = 0
+            for line in entry.custom_entry_line:
+                tot += line.price_subtotal
+                adv += line.advance_subtotal
+            entry.amount_advanced_total = adv
+            entry.amount_total = tot
+            entry.amount_balance = tot - adv
         
     def button_draft(self):
         self.write({'stage_id': self.next_stage_id.id})
