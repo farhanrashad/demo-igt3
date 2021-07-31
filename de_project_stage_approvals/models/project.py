@@ -17,7 +17,7 @@ class ProjectTaskType(models.Model):
     complete_name = fields.Char("Full Stage Name", compute='_compute_complete_name', store=True)
     next_stage_id = fields.Many2one('project.task.type', string='Next Stage', readonly=False, ondelete='restrict', tracking=True, index=True, copy=False)
     prv_stage_id = fields.Many2one('project.task.type', string='Previous Stage', readonly=False, ondelete='restrict', tracking=True, index=True, copy=False)
-    stage_code = fields.Char(string='Code', size=2)
+    stage_code = fields.Char(string='Code', size=3)
     
     stage_category = fields.Selection([
         ('draft', 'Draft'),
