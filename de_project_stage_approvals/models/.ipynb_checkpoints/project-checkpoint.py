@@ -13,6 +13,8 @@ from odoo.osv.expression import OR
 class ProjectTaskType(models.Model):
     _inherit = 'project.task.type'
     
+    stage_id = fields.Many2one('project.task.type', 'Parent Stage', index=True, ondelete='cascade')
+    complete_name = fields.Char("Full Stage Name", compute='_compute_complete_name', store=True)
     next_stage_id = fields.Many2one('project.task.type', string='Next Stage', readonly=False, ondelete='restrict', tracking=True, index=True, copy=False)
     prv_stage_id = fields.Many2one('project.task.type', string='Previous Stage', readonly=False, ondelete='restrict', tracking=True, index=True, copy=False)
     stage_code = fields.Char(string='Code', size=2)
@@ -24,6 +26,14 @@ class ProjectTaskType(models.Model):
     ], string='Category', default='draft')
     
     group_id = fields.Many2one('res.groups', string='Security Group')
+    
+    @api.depends('name', 'stage_id.complete_name')
+    def _compute_complete_name(self):
+        for stage in self:
+            if stage.stage_id:
+                stage.complete_name = '%s/%s' % (stage.stage_id.complete_name, stage.name)
+            else:
+                stage.complete_name = stage.name
     
 class ProjectTask(models.Model):
     _inherit = 'project.task'
