@@ -42,13 +42,21 @@ class PurchaseOrder(models.Model):
         self.project_id = project_id.id
         
         templates = self.env['purchase.task.template'].search([('requisition_type_id','=',self.requisition_type_id.id)])
+        #for stage in templates.stage_ids:
+            #stage.update({'project_ids': [(4, project_id.id)]})
+            
         stage_id = False
         projects = self._get_targeted_project_ids()
         for project in projects:
             for template in templates:
-                for stage in template.stage_ids:
-                    if not stage_id:
-                        stage_id = stage.id
+                #for stage in template.stage_ids:
+                    #stage.write({'project_ids': [(4, [project.id])] })
+                    #stage.project_ids = [(4, project.id)]
+                    #stage.update({'project_ids': [(4, project_id.id)]})
+                    
+                #for stage in template.stage_ids:
+                    #if not stage_id:
+                        #stage_id = stage.id
                 #stage_id = stages.search([('id','in',template.stage_ids)],limit=1)
                 task = ({
                     'project_id': project_id.id,
@@ -67,12 +75,19 @@ class PurchaseOrder(models.Model):
                     'purchase_task_stage_ids': [(6, 0, template.stage_ids.ids)],
                 })
                 task_id = self.env['project.task'].sudo().create(task)
+                task_id.update({
+                    'stage_id': task_id.purchase_task_stage_ids[0].id
+                })
                 for tdoc in template.template_doc_ids:
                     docs = ({
                         'name': tdoc.name,
                         'task_id': task_id.id,
                     })
                     doc_id = self.env['project.task.documents'].sudo().create(docs)
+                
+        for stage in task_id.purchase_task_stage_ids:
+            stage.update({'project_ids': [(4, project_id.id)]})
+            
         return res
 
     def button_cancel(self):

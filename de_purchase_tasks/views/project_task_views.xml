@@ -10,8 +10,26 @@
                     <field name="allow_milestone" />
                     <field name="submission_type" widget="radio" attrs="{'invisible':[('allow_milestone','=',False)]}"/>
                 </xpath>
+                <xpath expr="//field[@name='project_ids']" position="attributes">
+                    <attribute name="attrs">{"invisible": [["allow_milestone","=",True]]}</attribute>
+                </xpath>
             </field>
         </record>
+        <record id="project_task_type_tree_inherit_milestone" model="ir.ui.view">
+            <field name="name">project.task.type.tree.inherit.milestone</field>
+            <field name="model">project.task.type</field>
+            <field name="inherit_id" ref="project.task_type_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree[1]" position="inside">
+                    <field name="allow_milestone" invisible="1"/>
+                    <field name="submission_type" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='project_ids']" position="attributes">
+                    <attribute name="optional">hide</attribute>
+                </xpath>
+            </field>
+        </record>
+        
         <!-- Milestone Tasks -->
         <record id="project_task_view_search_inherit_purchase_tasks" model="ir.ui.view">
             <field name="name">project.task.search.inherit.purchase_tasks</field>
@@ -39,11 +57,14 @@
                     <field name="completion_percent" />
                     <field name="delivery_assigned" readonly="1"/>
                     <field name="task_sequence" string="Sequence" readonly="1"/>
+                    <field name="purchase_task_stage_ids" widget="many2many_tags" invisible="1"/>
                 </xpath>
+                <!--
                 <xpath expr="//field[@name='stage_id']" position="replace">
                     <field name="purchase_task_stage_ids" invisible="1"/>
-                    <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" domain="[('id', 'in', purchase_task_stage_ids)]" attrs="{'invisible':[('purchase_id','=',False)]}"/>
+                    <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"  attrs="{'invisible':[('purchase_id','=',False)]}"/>
                 </xpath>
+-->
                 <xpath expr="//page[@name='extra_info']" position="after">
                     <page string="Documents" name="task_documents" attrs="{'invisible': [('purchase_id', '=', False)]}">
                         <field name="task_doc_ids" widget="one2many_list" >
