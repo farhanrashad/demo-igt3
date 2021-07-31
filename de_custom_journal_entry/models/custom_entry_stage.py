@@ -9,7 +9,6 @@ class AccountCustomEntryStage(models.Model):
     _name = 'account.custom.entry.stage'
     _description = 'Custom Entry Stage'
     _order = 'sequence, stage_category, id'
-    _rec_name = 'display_name'
 
     def _get_default_custom_entry_type_ids(self):
         default_custom_entry_type_id = self.env.context.get('default_custom_entry_type_id')
