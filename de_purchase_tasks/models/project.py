@@ -11,7 +11,8 @@ class ProjectTaskType(models.Model):
     allow_milestone = fields.Boolean(string='Allow for Milestone', default=False)
     submission_type = fields.Selection(
         [('0', 'Normal'), ('1', 'Document Submission'), ('2', 'Invoice Submission')], string='Partner Submission', default='0')
-
+    
+    
 class Project(models.Model):
     _inherit = 'project.project'
 
@@ -20,17 +21,10 @@ class Project(models.Model):
 class ProjectTask(models.Model):
     _inherit = 'project.task'
     
-    def _get_default_stage_id(self):
-        """ Gives default stage_id """
-        project_id = self.env.context.get('default_project_id')
-        if not project_id:
-            return False
-        return self.stage_find(project_id, [('fold', '=', False), ('is_closed', '=', False)])
-
     purchase_id = fields.Many2one('purchase.order', 'Purchase Order', readonly=True)
     purchase_project_id = fields.Many2one('project.project', string='Site')
     
-    purchase_task_stage_ids = fields.Many2many('project.task.type', string='Stages', readonly=True)
+    purchase_task_stage_ids = fields.Many2many('project.task.type', string='Milesstone Stages', readonly=True)
     
     allow_picking = fields.Boolean(string='Allow on Picking', help='User will provide the milestone on picking with purchase order reference')
     allow_invoice = fields.Boolean(string='Allow on invoice', help='User will provide the milestone on invoice with purchase order reference')
