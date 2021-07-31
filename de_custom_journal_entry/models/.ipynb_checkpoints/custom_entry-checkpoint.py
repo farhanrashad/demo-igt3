@@ -339,12 +339,13 @@ class CustomEntry(models.Model):
         lines_data = []
         debit = credit = amount = balance = 0
         counter_debit = counter_credit = counter_amount = counter_balance = 0
-        
+        supplier_qty = 0
         
         suppliers = self.env['account.custom.entry.line'].read_group([('custom_entry_id', '=', self.id)], ['supplier_id'], ['supplier_id'])
 
         if self.custom_entry_type_id.entry_reverse:
             for supplier in suppliers:
+                supplier_qty = 0
                 counter_debit = counter_credit = counter_amount = counter_balance = 0
                 for line in self.custom_entry_line.filtered(lambda x: x.supplier_id.id == supplier['supplier_id'][0]):
                     debit = credit = amount = balance = 0
@@ -354,6 +355,7 @@ class CustomEntry(models.Model):
                     else:
                         amount = line.price_subtotal * -1
                         counter_amount += line.price_subtotal
+                    supplier_qty += line.product_qty
                     
                     balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
                     debit = balance if balance > 0.0 else 0.0
@@ -372,6 +374,9 @@ class CustomEntry(models.Model):
                         'debit': debit,
                         'credit': credit,
                         'partner_id': self.partner_id.id,
+                        'quantity': line.product_qty,
+                        'product_uom_id': line.product_uom_id.id,
+                        'product_id': line.product_id.id,
                         #'analytic_account_id': line.analytic_account_id.id,
                         #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                         'project_id': line.project_id.id,
@@ -386,6 +391,7 @@ class CustomEntry(models.Model):
                     'debit': counter_debit,
                     'credit': counter_credit,
                     'partner_id': supplier['supplier_id'][0],
+                    'quantity': supplier_qty,
                     #'analytic_account_id': line.analytic_account_id.id,
                     #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                     #'project_id': line.project_id.id,
@@ -403,7 +409,9 @@ class CustomEntry(models.Model):
         else:
             debit = credit = amount = balance = 0
             counter_debit = counter_credit = counter_amount = counter_balance = 0
+            counter_quantity = 0
             for line in self.custom_entry_line:
+                counter_quantity += line.product_qty
                 if self.custom_entry_type_id.counterpart_mode == 'debit':
                     amount = line.price_subtotal * -1
                     #ounter_amount += line.price_subtotal
@@ -423,6 +431,9 @@ class CustomEntry(models.Model):
                     'currency_id': self.currency_id.id,
                     'debit': debit,
                     'credit': credit,
+                    'quantity': line.product_qty,
+                    'product_uom_id': line.product_uom_id.id,
+                    'product_id': line.product_id.id,
                     'partner_id': line.supplier_id.id,
                     'analytic_account_id': line.analytic_account_id.id,
                     'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
@@ -441,6 +452,7 @@ class CustomEntry(models.Model):
             lines_data.append([0,0,{
                 'name': str(self.name),
                 'custom_entry_line_id': line.id,
+                'quantity': counter_quantity,
                 'account_id': self.custom_entry_type_id.counterpart_account_id.id,
                 'debit': counter_debit,
                 'credit': counter_credit,
