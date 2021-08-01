@@ -46,6 +46,8 @@ class PenaltyConfigLine(models.Model):
     _description = 'Penalty Config SLA Line'
     
     penalty_config_id = fields.Many2one('op.penalty.config', string='Penalty Config', required=True, ondelete='cascade', index=True, copy=False)
+    partner_id = fields.Many2one('res.partner',  related='penalty_config_id.partner_id')
+    effective_date = fields.Date(related='penalty_config_id.effective_date')
     service_class = fields.Selection([
         ('a', 'Critical Site'), 
         ('b', 'Class B'), 
@@ -65,6 +67,8 @@ class PenaltyConfigOccurLine(models.Model):
     _description = 'Penalty Config Occurence Line'
     
     penalty_config_id = fields.Many2one('op.penalty.config', string='Penalty Config', required=True, ondelete='cascade', index=True, copy=False)
+    partner_id = fields.Many2one('res.partner',  related='penalty_config_id.partner_id')
+    effective_date = fields.Date(related='penalty_config_id.effective_date')
     service_level = fields.Selection([
         ('1', '1st Offense'), 
         ('2', '2nd Offense'), 
@@ -86,14 +90,16 @@ class PenaltyConfigSOW(models.Model):
     _description = 'Penalty Config SOW'
     
     name = fields.Char(string='Name', required=True)
-    frequency = fields.Char(string='Frequency', required=True)
-    penalty_sow_type_id = fields.Many2one('op.penalty.config.sow.type', string='SOW Type', required=True)
+    frequency = fields.Char(string='Frequency')
+    penalty_sow_type_id = fields.Many2one('op.penalty.config.sow.type', string='SOW Type')
     
 class PenaltyConfigSOWLine(models.Model):
     _name = 'op.penalty.config.sow.line'
     _description = 'Penalty Config SOW Line'
     
     penalty_config_id = fields.Many2one('op.penalty.config', string='Penalty Config', required=True, ondelete='cascade', index=True, copy=False)
+    partner_id = fields.Many2one('res.partner',  related='penalty_config_id.partner_id')
+    effective_date = fields.Date(related='penalty_config_id.effective_date')
     penalty_sow_type_id = fields.Many2one('op.penalty.config.sow.type', string='SOW Type')
     penalty_sow_id = fields.Many2one('op.penalty.config.sow', string='SOW')
     penalty_deduction_a = fields.Float(string='Deduction-A(%)', default=0.0)
