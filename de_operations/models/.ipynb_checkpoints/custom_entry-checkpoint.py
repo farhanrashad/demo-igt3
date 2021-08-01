@@ -19,6 +19,16 @@ class CustomEntry(models.Model):
     _inherit = 'account.custom.entry'
     
     allow_advance_inv = fields.Boolean(related='custom_entry_type_id.allow_advance_inv')
+    
+    #bill_count = fields.Integer(compute="_compute_all_bills", string='Bill Count', copy=False, default=0,)
+    
+    #@api.depends('move_id')
+    def _compute_all_moves(self):
+        Move = self.env['account.move']
+        can_read = Move.check_access_rights('read', raise_exception=False)
+        for move in self:
+            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '!=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
 
     
     

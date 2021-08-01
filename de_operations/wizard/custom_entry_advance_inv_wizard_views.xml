@@ -11,15 +11,14 @@
                     </p>
                     <group>
                         <group>
-                            <field name="product_id" class="oe_inline" invisible="0"/>
-                            <field name="currency_id" class="oe_inline" invisible="0"/>
+                            <field name="product_id" class="oe_inline" invisible="1"/>
+                            <field name="currency_id" class="oe_inline" invisible="1"/>
                             <field name="amount" string="Completion %"/>
                         </group>
                         <group>
-                            <field name="deposit_account_id" invisible="0"/>
-                            <field name="deposit_taxes_id" widget="many2many_tags" invisible="0"/>
-                            <field name="amount_bal" />
-                            <field name="amount_advance" />
+                            <field name="supplier_taxes_id" widget="many2many_tags" invisible="1"/>
+                            <field name="amount_bal" invisible="1"/>
+                            <field name="amount_advance" invisible="1"/>
                         </group>
                     </group>
                     <footer>
