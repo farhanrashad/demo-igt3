@@ -11,3 +11,6 @@ access_custom_entry_stage_manager,access.custom.entry.stage.manager,de_custom_jo
 access_custom_entry_stage_user,access.custom.entry.stage.user,de_custom_journal_entry.model_account_custom_entry_stage,group_operations_penalty_user,1,0,0,0
 access_custom_entry_manager,access.custom.entry.manager,de_custom_journal_entry.model_account_custom_entry,group_operations_penalty_user,1,1,1,1
 access_custom_entry_line_manager,access.custom.entry.line.manager,de_custom_journal_entry.model_account_custom_entry_line,group_operations_penalty_user,1,1,1,1
+
+access_custom_entry_wizard_inv,access.custom.entry.wizard.inv,model_account_custom_entry_wizard_inv,de_custom_journal_entry.group_custom_entry_user,1,1,1,1
+
