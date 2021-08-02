@@ -102,7 +102,7 @@ class ReportGeneralLedgerExcel(models.Model):
         total_balance = 0.0
         total_amount_currency = 0.0  
         for account in results['Accounts']:
-            
+            account_tot_opening = account['debit'] - account['credit']
 #             sheet.merge_range(row, col, row, col + 10, account['code'] + account['name'], format4)
             sheet.write(row, col + 1, str(), format5)
             sheet.write(row, col + 2, str(), format5)
@@ -150,10 +150,11 @@ class ReportGeneralLedgerExcel(models.Model):
                 sheet.write(row, col + 11, line['lname'], format6)
                 sheet.write(row, col + 12, (line['debit']), format7)
                 sheet.write(row, col + 13, (line['credit']), format7)
-                sheet.write(row, col + 14, (line['debit'] - line['credit']), format7)
+                sheet.write(row, col + 14, (account_tot_opening + (line['debit'] - line['credit'])), format7)
                 sheet.write(row, col + 15, (company_currency_name +' ('+company_currency_symbol+')'), format7)
                 sheet.write(row, col + 16, (line['amount_currency']), format7)
                 sheet.write(row, col + 17, (line['currency_name'] +' ('+line['currency_code']+')'), format7)
+                account_tot_opening += (line['debit'] - line['credit'])
 
             row += 1
             sheet.write(row, col + 0, str(), format7)
@@ -168,10 +169,10 @@ class ReportGeneralLedgerExcel(models.Model):
             sheet.write(row, col + 9, str(), format7)
             sheet.write(row, col + 10, str(), format7)
             sheet.write(row, col + 11, str(), format7)
-            sheet.write(row, col + 12, str(total_debit), format7)
-            sheet.write(row, col + 13, str(total_credit), format7)
-            sheet.write(row, col + 14, str(total_balance), format7)
+            sheet.write(row, col + 12, str(round(total_debit,2)), format7)
+            sheet.write(row, col + 13, str(round(total_credit,2)), format7)
+            sheet.write(row, col + 14, str(round(total_balance,2)), format7)
+            sheet.write(row, col + 15, str(), format7)
+            sheet.write(row, col + 16, str(round(total_amount_currency,2)), format7)
             
-            sheet.write(row, col + 15, str(total_amount_currency), format7)
-            sheet.write(row, col + 16, str(), format7)
             sheet.write(row, col + 17, str(), format7)

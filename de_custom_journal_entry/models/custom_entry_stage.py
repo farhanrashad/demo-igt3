@@ -16,6 +16,7 @@ class AccountCustomEntryStage(models.Model):
     
     name = fields.Char(string='Stage Name', required=True, translate=True)
     stage_code = fields.Char(string='Code', size=3, copy=False)
+    active = fields.Boolean(default=True)
     description = fields.Text(
         "Requirements", help="Enter here the internal requirements for this stage. It will appear "
                              "as a tooltip over the stage's name.", translate=True)

@@ -31,7 +31,7 @@ class CustomEntry(models.Model):
     name = fields.Char(string='Order Reference', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
     date_entry = fields.Datetime(string='Entry Date', required=True, index=True, copy=False, default=fields.Datetime.now,)
     date_entry_month = fields.Selection(MONTH_LIST, string='Month')
-    date_entry_year = fields.Char(string='Year', compute='_compute_entry_year')
+    date_entry_year = fields.Char(string='Year', compute='_compute_entry_year', store=True)
 
     date_submit = fields.Datetime('Submission Date', readonly=False)
     date_approved = fields.Datetime('Approved Date', readonly=False)
@@ -43,9 +43,9 @@ class CustomEntry(models.Model):
     stage_id = fields.Many2one('account.custom.entry.stage', string='Stage', compute='_compute_stage_id', store=True, readonly=False, ondelete='restrict', tracking=True, index=True, default=_get_default_stage_id, domain="[('custom_entry_type_ids', '=', custom_entry_type_id)]", copy=False)
     custom_entry_type_id = fields.Many2one('account.custom.entry.type', string='Entry Type', index=True, required=True, readonly=True,)
     
-    amount_advanced_total = fields.Float('Total Advanced', compute='_amount_all')
-    amount_total = fields.Float('Total Amount', compute='_amount_all')
-    amount_balance = fields.Float('Balance', compute='_amount_all')
+    amount_advanced_total = fields.Monetary('Total Advanced', compute='_amount_all')
+    amount_total = fields.Monetary('Total Amount', compute='_amount_all')
+    amount_balance = fields.Monetary('Balance', compute='_amount_all')
  
     custom_entry_line = fields.One2many('account.custom.entry.line', 'custom_entry_id', string='Entry Line', copy=True, auto_join=True,)
     
@@ -56,10 +56,13 @@ class CustomEntry(models.Model):
     
     #account related fields
     stage_category = fields.Selection(related='stage_id.stage_category')
+    stage_code = fields.Char(related='stage_id.stage_code')
     account_entry_type = fields.Char(string='Accounting Entry Type', compute='_account_entry_type', )
     expense_advance = fields.Boolean(related='custom_entry_type_id.expense_advance')
     journal_id = fields.Many2one('account.journal',related='custom_entry_type_id.journal_id')
     journal_type = fields.Selection(related='custom_entry_type_id.journal_type')
+    move_type = fields.Selection(related='custom_entry_type_id.move_type')
+    
     
     partner_id = fields.Many2one('res.partner', string='Vendor', ondelete='cascade', change_default=True, domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]", help="You can find a vendor by its Name, TIN, Email or Internal Reference.")
     
@@ -87,6 +90,7 @@ class CustomEntry(models.Model):
     
     
     #optional line items fields
+    has_line_period = fields.Selection(related="custom_entry_type_id.has_line_period")
     has_project = fields.Selection(related="custom_entry_type_id.has_project")
     has_analytic = fields.Selection(related="custom_entry_type_id.has_analytic")
     has_product = fields.Selection(related="custom_entry_type_id.has_product")
@@ -94,34 +98,13 @@ class CustomEntry(models.Model):
     has_supplier = fields.Selection(related="custom_entry_type_id.has_supplier")
     has_advanced = fields.Selection(related="custom_entry_type_id.has_advanced")
     
-    #application optional fields
-    has_rent_vechile = fields.Selection(related="custom_entry_type_id.has_rent_vechile")
-    has_travel = fields.Selection(related="custom_entry_type_id.has_travel")
-    has_hotel = fields.Selection(related="custom_entry_type_id.has_hotel")
-    has_electricity = fields.Selection(related="custom_entry_type_id.has_electricity")
-    has_fuel_drawn = fields.Selection(related="custom_entry_type_id.has_fuel_drawn")
-    has_fuel_filling = fields.Selection(related="custom_entry_type_id.has_fuel_filling")
-    
-    #application common extra fields for hotel/accomodation
-    customer_type = fields.Selection([('local', 'Local'), ('expat', 'Expat')], string='Customer Type')
-    date_effective = fields.Date(string='Effective Date')
-    date_subscription = fields.Date(string='Date of Subscription')
-    
-    #fleet/rent vehicle extra fields
-    f_duration_from = fields.Date(string='Duration')
-    f_duration_to = fields.Date(string='')
-    
-    #travel fields
-    t_travel_by = fields.Selection([
-        ('ticket', 'Flight Ticket'),
-        ('Vehicle', 'Vehicle Rental')],
-        string='Travel By', default='ticket')
     
     invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
     invoice_count = fields.Integer(compute="_compute_all_moves", string='Bill Count', copy=False, default=0,)
     move_count = fields.Integer(compute="_compute_all_moves", string='Move Count', copy=False, default=0)
 
-
+    
+    @api.depends('date_entry')
     def _compute_entry_year(self):
         for entry in self:
             entry_year = entry.date_entry
@@ -140,7 +123,7 @@ class CustomEntry(models.Model):
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
         for entry in self:
-            if entry.project_id:
+            if entry.custom_entry_type_id:
                 if entry.custom_entry_type_id not in entry.stage_id.custom_entry_type_ids:
                     entry.stage_id = entry.stage_find(entry.custom_entry_type_id.id, [
                         ('fold', '=', False)])
@@ -166,7 +149,7 @@ class CustomEntry(models.Model):
                 search_domain.append(('custom_entry_type_ids', '=', section_id))
         search_domain += list(domain)
         # perform search, return the first found
-        return self.env['account.custom.entry.type'].search(search_domain, order=order, limit=1).id
+        return self.env['account.custom.entry.stage'].search(search_domain, order=order, limit=1).id
     
     
     def stage_find(self, section_id, domain=[], order='sequence'):
@@ -194,18 +177,25 @@ class CustomEntry(models.Model):
         Move = self.env['account.move']
         can_read = Move.check_access_rights('read', raise_exception=False)
         for move in self:
-            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'in_invoice')]) or 0
-            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry')]) or 0
+            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '!=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
 
+    def unlink(self):
+        for entry in self:
+            if not entry.stage_category == 'draft' or entry.invoice_ids:
+                raise UserError(_('You cannot delete an entry which has been posted.'))
+           
+        return super(CustomEntry, self).unlink()
    
     def _amount_all(self):
-        adv = tot = 0
-        for line in self.custom_entry_line:
-            tot += line.price_subtotal
-            adv += line.advance_subtotal
-        self.amount_advanced_total = adv
-        self.amount_total = tot
-        self.amount_balance = tot - adv
+        for entry in self:
+            adv = tot = 0
+            for line in entry.custom_entry_line:
+                tot += line.price_subtotal
+                adv += line.advance_subtotal
+            entry.amount_advanced_total = adv
+            entry.amount_total = tot
+            entry.amount_balance = tot - adv
         
     def button_draft(self):
         self.write({'stage_id': self.next_stage_id.id})
@@ -254,7 +244,7 @@ class CustomEntry(models.Model):
             if group_id:
                 if not (group_id & self.env.user.groups_id):
                     raise UserError(_("You are not authorize to refuse '%s'.", order.stage_id.name))
-        if self.prv_stage_id:
+        if self.stage_id.prv_stage_id:
             self.update({
                 'stage_id' : self.stage_id.prv_stage_id.id,
             })
@@ -283,7 +273,7 @@ class CustomEntry(models.Model):
         partner_invoice_id = self.partner_id.address_get(['invoice'])['invoice']
         invoice_vals = {
             'ref': self.name,
-            'move_type': move_type,
+            'move_type': self.custom_entry_type_id.move_type,
             'journal_id': journal,
             #'narration': self.notes,
             'invoice_date': fields.Datetime.now(),
@@ -350,62 +340,137 @@ class CustomEntry(models.Model):
         lines_data = []
         debit = credit = amount = balance = 0
         counter_debit = counter_credit = counter_amount = counter_balance = 0
-        for line in self.custom_entry_line:
-            if self.custom_entry_type_id.counterpart_mode == 'debit':
-                #credit = line.price_subtotal
-                amount = line.price_subtotal * -1
-            else:
-                #debit = line.price_subtotal
-                amount = line.price_subtotal
-            balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
-            debit = balance if balance > 0.0 else 0.0
-            credit = -balance if balance < 0.0 else 0.0
+        supplier_qty = 0
+        
+        suppliers = self.env['account.custom.entry.line'].read_group([('custom_entry_id', '=', self.id)], ['supplier_id'], ['supplier_id'])
+
+        if self.custom_entry_type_id.entry_reverse:
+            for supplier in suppliers:
+                supplier_qty = 0
+                counter_debit = counter_credit = counter_amount = counter_balance = 0
+                for line in self.custom_entry_line.filtered(lambda x: x.supplier_id.id == supplier['supplier_id'][0]):
+                    debit = credit = amount = balance = 0
+                    if self.custom_entry_type_id.counterpart_mode == 'debit':
+                        amount = line.price_subtotal
+                        counter_amount += line.price_subtotal * -1
+                    else:
+                        amount = line.price_subtotal * -1
+                        counter_amount += line.price_subtotal
+                    supplier_qty += line.product_qty
+                    
+                    balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+                    debit = balance if balance > 0.0 else 0.0
+                    credit = -balance if balance < 0.0 else 0.0
                 
-                
-            lines_data.append([0,0,{
-                'name': str(self.name) + ' ' + str(line.product_id.name),
-                'custom_entry_line_id': line.id,
-                'account_id': self.custom_entry_type_id.account_id.id,
-                'amount_currency': amount,
+                    counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+                    counter_debit = counter_balance if counter_balance > 0.0 else 0.0
+                    counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
+            
+                    lines_data.append([0,0,{
+                        'name': str(self.name) + ' ' ,
+                        'custom_entry_line_id': line.id,
+                        'account_id': self.custom_entry_type_id.account_id.id,
+                        'amount_currency': amount,
+                        'currency_id': self.currency_id.id,
+                        'debit': debit,
+                        'credit': credit,
+                        'partner_id': self.partner_id.id,
+                        'quantity': line.product_qty,
+                        'product_uom_id': line.product_uom_id.id,
+                        'product_id': line.product_id.id,
+                        #'analytic_account_id': line.analytic_account_id.id,
+                        #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                        'project_id': line.project_id.id,
+                    }])
+            
+                lines_data.append([0,0,{
+                    'name': str(self.name) + ' ' ,
+                    #'custom_entry_line_id': line.id,
+                    'account_id': self.custom_entry_type_id.counterpart_account_id.id,
+                    'amount_currency': counter_amount,
+                    'currency_id': self.currency_id.id,
+                    'debit': counter_debit,
+                    'credit': counter_credit,
+                    'partner_id': supplier['supplier_id'][0],
+                    'quantity': supplier_qty,
+                    #'analytic_account_id': line.analytic_account_id.id,
+                    #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                    #'project_id': line.project_id.id,
+                }])
+            move.create({
+                'move_type': self.custom_entry_type_id.move_type,
+                'custom_entry_id': self.id,
+                'ref':  str(self.name), 
+                'date': fields.Datetime.now(),
                 'currency_id': self.currency_id.id,
-                'debit': debit,
-                'credit': credit,
-                'partner_id': line.supplier_id.id,
-                'analytic_account_id': line.analytic_account_id.id,
-                'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
-                'project_id': line.project_id.id,
-            }])
-        if self.custom_entry_type_id.counterpart_mode == 'debit':
-            #counter_debit = self.amount_total
-            counter_amount = self.amount_total
+                'journal_id': self.custom_entry_type_id.journal_id.id,
+                'narration': self.name,
+                'line_ids':lines_data,
+            })
         else:
-            #counter_credit = self.amount_total
-            counter_amount = self.amount_total * -1
+            debit = credit = amount = balance = 0
+            counter_debit = counter_credit = counter_amount = counter_balance = 0
+            counter_quantity = 0
+            for line in self.custom_entry_line:
+                counter_quantity += line.product_qty
+                if self.custom_entry_type_id.counterpart_mode == 'debit':
+                    amount = line.price_subtotal * -1
+                    #ounter_amount += line.price_subtotal
+                else:
+                    amount = line.price_subtotal
+                    #ounter_amount += line.price_subtotal * -1    
+                
+                balance = line.currency_id._convert(amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+                debit = balance if balance > 0.0 else 0.0
+                credit = -balance if balance < 0.0 else 0.0
+                
+                lines_data.append([0,0,{
+                    'name': str(self.name) + ' ' + str(line.product_id.name),
+                    'custom_entry_line_id': line.id,
+                    'account_id': self.custom_entry_type_id.account_id.id,
+                    'amount_currency': amount,
+                    'currency_id': self.currency_id.id,
+                    'debit': debit,
+                    'credit': credit,
+                    'quantity': line.product_qty,
+                    'product_uom_id': line.product_uom_id.id,
+                    'product_id': line.product_id.id,
+                    'partner_id': line.supplier_id.id,
+                    'analytic_account_id': line.analytic_account_id.id,
+                    'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
+                    'project_id': line.project_id.id,
+                }])
+            if self.custom_entry_type_id.counterpart_mode == 'debit':
+                counter_debit = self.amount_total
+                counter_amount = self.amount_total
+            else:
+                counter_credit = self.amount_total
+                counter_amount = self.amount_total * -1
+            counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
+            counter_debit = counter_balance if counter_balance > 0.0 else 0.0
+            counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
             
-        counter_balance = line.currency_id._convert(counter_amount, company.currency_id, company, self.date_entry or fields.Date.context_today(line))
-        counter_debit = counter_balance if counter_balance > 0.0 else 0.0
-        counter_credit = -counter_balance if counter_balance < 0.0 else 0.0
-            
-        lines_data.append([0,0,{
-            'name': str(self.name),
-            'custom_entry_line_id': line.id,
-            'account_id': self.custom_entry_type_id.counterpart_account_id.id,
-            'debit': counter_debit,
-            'credit': counter_credit,
-            'amount_currency': counter_amount,
-            'currency_id': self.currency_id.id,
-            'partner_id': self.partner_id.id,
-        }])
-        move.create({
-            'move_type': 'entry',
-            'custom_entry_id': self.id,
-            'ref':  str(self.name), 
-            'date': fields.Datetime.now(),
-            'currency_id': self.currency_id.id,
-            'journal_id': self.custom_entry_type_id.journal_id.id,
-            'narration': self.name,
-            'line_ids':lines_data,
-        })
+            lines_data.append([0,0,{
+                'name': str(self.name),
+                'custom_entry_line_id': line.id,
+                'quantity': counter_quantity,
+                'account_id': self.custom_entry_type_id.counterpart_account_id.id,
+                'debit': counter_debit,
+                'credit': counter_credit,
+                'amount_currency': counter_amount,
+                'currency_id': self.currency_id.id,
+                'partner_id': self.partner_id.id,
+            }])
+            move.create({
+                'move_type': self.custom_entry_type_id.move_type,
+                'custom_entry_id': self.id,
+                'ref':  str(self.name), 
+                'date': fields.Datetime.now(),
+                'currency_id': self.currency_id.id,
+                'journal_id': self.custom_entry_type_id.journal_id.id,
+                'narration': self.name,
+                'line_ids':lines_data,
+            })
         return move
     
         
@@ -439,7 +504,7 @@ class CustomEntry(models.Model):
                 'project_id': line.project_id.id,
             }])
         invoice.create({
-            'move_type': 'in_invoice',
+            'move_type': self.custom_entry_type_id.move_type,
             'custom_entry_id': self.id,
             'invoice_date': fields.Datetime.now(),
             'partner_id': self.partner_id.id,
@@ -488,6 +553,7 @@ class CustomEntry(models.Model):
             'partner_type': 'supplier',
             'custom_entry_id': self.id,
             'partner_id': self.partner_id.id,
+            'currency_id': self.currency_id.id,
             'date': self.date_entry,
             'amount': self.amount_advanced_total,
         }
@@ -593,12 +659,13 @@ class CustomEntryLine(models.Model):
     _description = 'Custom Entry Line'
     
     custom_entry_id = fields.Many2one('account.custom.entry', string='Custom Entry', required=True, ondelete='cascade', index=True, copy=False)
-    note = fields.Char(string='Remarks')
+    note = fields.Char(string='Description')
     stage_category = fields.Selection(related='custom_entry_id.stage_category', readonly=True)
-    company_id = fields.Many2one(
-        string='Company', related='custom_entry_id.company_id',
-        store=True, readonly=True, index=True)
-    currency_id = fields.Many2one(related='custom_entry_id.currency_id', store=True, string='Currency', readonly=True)
+    date_entry = fields.Datetime(related='custom_entry_id.date_entry')
+    date_entry_period = fields.Char(string='Month')
+    
+    company_id = fields.Many2one('res.company', related='custom_entry_id.company_id')
+    currency_id = fields.Many2one('res.currency',related='custom_entry_id.currency_id')
 
     invoice_lines = fields.One2many('account.move.line', 'custom_entry_line_id', string="Bill Lines", readonly=True, copy=False)
 
@@ -648,191 +715,12 @@ class CustomEntryLine(models.Model):
             self.taxes_id = self.product_id.supplier_taxes_id.ids
         
             
-    #has travel
-    t_travel_category = fields.Selection([
-        ('domestic', 'Domestic'),
-        ('international', 'International'),
-        ], string='Travel Category', default='domestic')
-    travel_from = fields.Char(string='From')
-    travel_to = fields.Char(string='To')
-    date_departure = fields.Date(string='Departure Date', )
-    date_arrival = fields.Date(string='Arrival Date', )    
-    number_of_days = fields.Float(string="Number of Days" , compute = '_number_of_days')
-    travel_reference = fields.Many2one('travel.request' , string="Travel Reference")
-    t_travel_description = fields.Char(related='travel_reference.description_main', string = 'Travel Description')
-    t_travel_type = fields.Selection(related='travel_reference.travel_type', string = 'Travel For')
-    t_unit_price = fields.Float(string="Travel Unit Price")
-    t_extra_charges = fields.Float(string="Travel Extra Charges")
-    t_amount_travel = fields.Float(string="Travel Total Amount", compute='_compute_all_amount_travel')
     
-    @api.depends('number_of_days', 't_unit_price', 't_extra_charges')
-    def _compute_all_amount_travel(self):
-        total_amount_travel = 0
-        for line in self:
-            total_amount_travel = (line.number_of_days * line.t_unit_price) + line.t_extra_charges
-            line.update({
-                't_amount_travel': total_amount_travel
-            })
-    
-    @api.onchange('date_departure','date_arrival')
-    def _number_of_days(self):
-        for line in self:
-            if line.date_departure and line.date_arrival:
-                if line.date_departure > line.date_arrival:
-                    raise UserError(("Arrival Date cant be before Departure Date."))
-                else:
-                    delta = line.date_arrival - line.date_departure
-                    if abs(delta.days) > 0:
-                        line.number_of_days = abs(delta.days)
-                    else:
-                        line.number_of_days = 1
-            else:
-                line.number_of_days = 0
                 
-    #has fleet/rent vehicle
-    f_fleet_id = fields.Many2one('fleet.vehicle', string="Car Detail")
-    f_driver_id = fields.Many2one('res.partner', string="Driver", ondelete='cascade')
-    f_job_scope = fields.Selection(
-        [('car rental', 'Car Rental.'),
-         ('driver ot', 'Driver OT.'),
-         ('driver salary', 'Driver Salary.'),
-         ('maintenance fee', 'Maintenance Fee.'),
-         ('management fee', 'Management Fee.'),
-         ('on demand', 'On Demand.'),
-         ('petrol charges', 'Petrol Charges.'),
-         ('toll fee', 'Toll Fee.'),
-         ('replacement', 'Replacement.')],
-        string='Job Scope', )
-    f_rent_days = fields.Float(string='Days')
-    f_amount = fields.Float(string="Amount")
-    
-    
-    #has hotel/accomodation
-    h_category = fields.Selection([
-        ('travel', 'Travel'),
-        ('housing allowance', 'Housing Allowance'),
-        ], string='Accomodation Category', default='travel')
-    hotel_detail = fields.Char(string="Hotel Detail")
-    h_check_in = fields.Date(string="Check-In")
-    h_check_out = fields.Date(string="Check-Out")
-    h_number_of_nights = fields.Float(string="Number of Nights", compute='_number_of_nights')
-    h_travel_id = fields.Many2one('travel.request' , string="Travel Request")
-    h_travel_description = fields.Char(related='h_travel_id.description_main', string = 'Travel Description')
-    h_travel_type = fields.Selection(related='h_travel_id.travel_type', string = 'Travel For')
-    h_unit_price = fields.Float(string="Hotel Unit Price")
-    h_extra_charges = fields.Float(string="Hote Extra Charges")
-    h_amount = fields.Float(string="Total Amount", compute='_compute_all_amount_hotel')
-    
-    @api.depends('h_number_of_nights', 'h_unit_price', 'h_extra_charges')
-    def _compute_all_amount_hotel(self):
-        total_amount = 0
-        for line in self:
-            total_amount = (line.h_number_of_nights * line.h_unit_price) + line.h_extra_charges
-            line.update({
-                'h_amount': total_amount
-            })
-            
-    @api.onchange('h_check_in','h_check_out')
-    def _number_of_nights(self):
-        for line in self:
-            if line.h_check_in and line.h_check_out:
-                if line.h_check_in > line.h_check_out:
-                    raise UserError(("Check Out cant be before Check in."))
-                else:
-                    delta = line.h_check_out - line.h_check_in
-                    if abs(delta.days) > 0:
-                        line.h_number_of_nights = abs(delta.days)
-                    else:
-                        line.h_number_of_nights = 1
-            else:
-                line.h_number_of_nights = 0
-
-    #has electricity
-    e_paid_to = fields.Selection([
-        ('govt', 'Government'),
-        ('private', 'Private')],
-        string='Paid To', default='govt')
-    date_bill_from = fields.Date(string='Date From', )
-    date_bill_to = fields.Date(string='Date To', )
-    amount_advanced = fields.Float(string='Forecast', help='Advanced Amount')
-    meter_number = fields.Char(string='Meter')
-    opening_reading = fields.Integer(string='Opening Reading', help='Opening reading of meter')
-    closing_reading = fields.Integer(string='Closing Reading', help='Closing Reading of meter')
-    total_unit = fields.Integer(string='Total Unit', compute='_compute_total_units')
-    additional_unit = fields.Integer(string='Additional Units')
-    maintainence_fee = fields.Float(string='Mnt. Fees', help='Maintenance Fees')
-    hp_fee = fields.Float(string='HP Fee', help='Horsepower Fees')
-    KHW_charges = fields.Float(string='KHW')
-    actual_KHW_charges = fields.Float(string='Actual KHW')
-    other_charges = fields.Float(string='Other Charges')
-    amount_total_electricity = fields.Float(string='Total', compute='_compute_total_electricity_amount')
-    
-    #has fuel Drawn
-    d_date = fields.Date(string='Drawn Date')
-    d_partner_id = fields.Many2one('res.partner',string='Drawn Purchase From', ondelete='cascade')
-    d_product_qty = fields.Float(string='Drawn Qty', default=1.0, digits='Product Unit of Measure', )
-    d_price_unit = fields.Float(string='Drawn Unit Price', default=1.0, digits='Product Price')
-    d_price_subtotal = fields.Monetary(compute='_compute_fuel_drawn_total', string='Drawn Subtotal')
-    d_booklet_no = fields.Char(string='Booklet')
-    d_receipt_no = fields.Char(string='Receipt No.')
-    
-    #fuel drawn methods
-    @api.depends('d_product_qty', 'd_price_unit')
-    def _compute_fuel_drawn_total(self):
-        tot = 0
-        for line in self:
-            if line.custom_entry_id.has_fuel_drawn:
-                tot = line.d_product_qty * line.d_price_unit
-        self.d_price_subtotal = tot
-        
-    #Fuel Filling
-    f_date = fields.Date(string='Filling Date')
-    f_partner_id = fields.Many2one('res.partner',string='Filling Purchase From', ondelete='cascade')
-    f_gen_name = fields.Char(string='Generator Name')
-    f_gen_capacity = fields.Integer(string='Generator Capacity')
-    f_curr_drgh = fields.Float(string='Current DRGH')
-    f_opening_stock = fields.Float(string='Opening Stock')
-    f_closing_stock = fields.Float(string='Closting Stock', compute='_compute_fuel_filled_closing_stock')
-    f_product_qty = fields.Float(string='Filling Qty', default=1.0, digits='Product Unit of Measure', )
-    f_price_unit = fields.Float(string='Filling Unit Price', default=1.0, digits='Product Price')
-    f_price_subtotal = fields.Monetary(compute='_compute_fuel_filled_total', string='Filling Subtotal', store=True)
-    f_booklet_no = fields.Char(string='Filling Booklet')
-    f_receipt_no = fields.Char(string='Filling Receipt No.')
-    
-    #fuel filling methods
-    @api.depends('f_opening_stock', 'f_product_qty')
-    def _compute_fuel_filled_closing_stock(self):
-        tot = 0
-        for line in self:
-            if line.custom_entry_id.has_fuel_filling:
-                tot = line.f_opening_stock + line.f_product_qty
-        self.update({
-            'f_closing_stock': tot
-        })
-        
-    @api.depends('f_product_qty', 'f_price_unit')
-    def _compute_fuel_filled_total(self):
-        tot = 0
-        for line in self:
-            tot = 0
-            if line.custom_entry_id.has_fuel_filling:
-                tot = line.f_product_qty * line.f_price_unit
-        self.update({
-            'f_price_subtotal': tot
-        })
         
     def _compute_state(self):
         for line in self:
             line.state_id = line.project_id.address_id.state_id.id
-            
-    def _compute_total_units(self):
-        for rec in self:
-            rec.total_unit = rec.closing_reading - rec.opening_reading
-
-    @api.depends('maintainence_fee','hp_fee','KHW_charges','other_charges')
-    def _compute_total_electricity_amount(self):
-        for rec in self:
-            rec.amount_total_electricity = rec.maintainence_fee + rec.hp_fee + rec.KHW_charges + rec.other_charges
     
     def _prepare_account_move_line(self, move=False):
         self.ensure_one()

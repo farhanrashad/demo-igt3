@@ -33,8 +33,9 @@
                         </group>
                         <group>
                             <field name="user_id" widget="many2one_avatar_user"/>
-                            <field name="completion_days" />
-                            <field name="stage_ids" widget="many2many_tags" />
+                            <field name="completion_days" sting="Completion Days(From PO)"/>
+                            <field name="completion_percent" />
+                            <field name="stage_ids" widget="many2many_tags" domain="[('allow_milestone','=',True)]" options="{'no_create':True}"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
 
                         </group>
@@ -86,5 +87,7 @@
             parent="purchase.menu_purchase_config" sequence="100"/>
     
     <menuitem id="purchase_task_template_menu" action="action_purchase_task_template" parent="menu_purchases_in_config_project_task" sequence="1" name="Milestone" groups="purchase.group_purchase_manager"/>
+    
+            <menuitem action="project.open_task_type_form" id="menu_purchase_tasks_project_config_project" name="Stages" parent="menu_purchases_in_config_project_task" sequence="3" groups="purchase.group_purchase_manager,base.group_no_one"/>
 
 </odoo>

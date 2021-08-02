@@ -172,7 +172,21 @@ class ProjectTask(models.Model):
 
                     name_seq = self.custom_entry_type_id.name 
                     if self.custom_entry_type_id.automated_sequence == True:
-                        name_seq = self.custom_entry_type_id.sequence_id.next_by_id()         
+                        name_seq = self.custom_entry_type_id.sequence_id.next_by_id()  
+
+                    desc = ' '
+                    if custom.description:
+                        raw_entry_data = custom.description.split('<p>') 
+                        raw_entry_desc = str(raw_entry_data).split('</p>')
+                        for raw_desc in raw_entry_desc:
+                            new_desc = raw_desc.split("['', '") 
+                            ccount = 0
+                            for in_desc in new_desc:
+                                ccount += 1
+                                if ccount > 1:
+                                    desc += str(in_desc)                                
+                                    break 
+       
                     custom_vals = {
                         'name':  name_seq, 
                         'date_entry': fields.datetime.now(),
@@ -184,7 +198,7 @@ class ProjectTask(models.Model):
                         'supplier_bill_ref': custom.supplier_bill_ref,
                         'date_entry_year': custom.date_entry_year,
                         'date_entry_month':  custom.date_entry_month,
-                        'description': custom.description, 
+                        'description': desc, 
                         'customer_type': custom.customer_type,
                         't_travel_by':  custom.t_travel_by,
                         'f_duration_from': custom.f_duration_from, 

@@ -24,7 +24,9 @@
                     <field name="message_needaction" invisible="1"/>
                     <field name="name" string="Number" readonly="1" decoration-bf="1"/>
                     <field name="date_entry" string="Date" widget="date" optional="show"/>
-                   
+                   <field name="partner_id" />
+                    <field name="amount_total" />
+                    <field name="currency_id" optional="hide"/>
                     <field name="user_id" optional="show" widget="many2one_avatar_user" invisible="1"/>
                     <field name="activity_ids" widget="list_activity" optional="show"/>
                     <field name="company_id" groups="base.group_multi_company" optional="show" readonly="1"/>
@@ -44,22 +46,22 @@
                         <field name="expense_advance" invisible="1"/>
                         
                         <button name="button_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
-                        <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
-                        <button name="button_done" type="object" string="Close" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['confirm'])]}"/>
-
+                        <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': ['|',('stage_category', 'not in', ['progress']),('account_entry_type', '!=', 'none')]}"/>
                         
+                        <!--<button name="button_done" type="object" string="Close" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['confirm'])]}"/> -->
+
                         <button name="button_refuse" string="Refuse" type="object" 
                         attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
                     <button name="button_cancel" string="Cancel" type="object" 
                         attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
                         
-                        <button name="%(action_custom_entry_to_bill)d" string="Create Bill" class="btn-primary" type="action" invisible="0" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>
+                       <!-- <button name="%(action_custom_entry_to_bill)d" string="Create Bill" class="btn-primary" type="action" invisible="0" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>-->
                         <button string="Create Bill" name="create_advance_expense" type="object" class="btn-primary" invisible="1"/>
                         
         
-                        <!--<button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>-->
+                        <button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','bill')]}"/>
                                                 
-                        <button string="Journal Entry" name="create_journal_entry" type="object" class="btn-primary" attrs="{'invisible':['|',('invoice_count','=',1),('account_entry_type','!=','entry')]}"/>
+                        <button string="Journal Entry" name="create_journal_entry" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','entry')]}"/>
 
                         <button string="Create Payment" name="create_payment" type="object" class="btn-primary" attrs="{'invisible':[('account_entry_type','!=','payment')]}" invisible="0"/>
 
@@ -68,8 +70,10 @@
                     </header>
                     <sheet>
                         <field name="stage_category" invisible="1" />
+                        <field name="stage_code" invisible="1" />
                         <field name="account_entry_type" invisible="1" />
                         <field name="journal_type" invisible="1" />
+                        <field name="move_type" invisible="1" />
                         
                         
                         <div class="oe_button_box" name="button_box">
@@ -99,20 +103,13 @@
                         <field name="has_picking" invisible="1"/>
                         <field name="has_invoice" invisible="1"/>
                         
+                        <field name="has_line_period" invisible="1"/>
                         <field name="has_project" invisible="1"/>
                         <field name="has_analytic" invisible="1"/>
                         <field name="has_product" invisible="1"/>
                         <field name="has_employee" invisible="1"/>
                         <field name="has_supplier" invisible="1"/>
                         <field name="has_advanced" invisible="1"/>
-                        
-                        <field name="has_rent_vechile" invisible="1"/>
-                        <field name="has_travel" invisible="1"/>
-                        <field name="has_hotel" invisible="1"/>
-                        <field name="has_electricity" invisible="1"/>
-                        <field name="has_fuel_drawn" invisible="1"/>
-                        <field name="has_fuel_filling" invisible="1"/>
-                        
                         <div class="oe_title">
                             <h1>
                                 <field name="name" readonly="1"/>
@@ -139,13 +136,7 @@
                                 <span class="mr-1" attrs="{'invisible':[('has_period','==','no')]}"> - </span>
                                 <field name="date_entry_year" attrs="{'invisible':[('has_period','==','no')], 'required': [('has_period','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
                             </div>
-                            <!-- Fleet/Rent Fields -->
-                            <label for="f_duration_from" attrs="{'invisible':[('has_rent_vechile','==','no')]}"/>
-                            <div name="duration_from_div" class="d-flex" attrs="{'invisible':[('has_rent_vechile','==','no')]}">
-                                <field name="f_duration_from" attrs="{'invisible':[('has_rent_vechile','==','no')], 'required': [('has_rent_vechile','==','required')]}"/>
-                                    <span class="oe_inline o_form_label mx-3 oe_read_only"> to </span> 
-                                <field name="f_duration_to" attrs="{'invisible':[('has_rent_vechile','==','no')], 'required': [('has_rent_vechile','==','required')]}"/>
-                            </div>
+                            
 
                             <field name="date_submit" attrs="{'invisible':[('date_submit','!=',True)]}" />
                             <field name="date_approved" attrs="{'invisible':[('date_approved','!=',True)]}" />                            
@@ -157,31 +148,21 @@
 
                         </group>
                     </group>
-                    <!-- accomodation header fields -->
-                    <group col="4" attrs="{'invisible':[('has_hotel','==','no')]}">
-                        <field name="customer_type" attrs="{'invisible':[('has_hotel','==','no')], 'required': [('has_hotel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_effective" attrs="{'invisible':[('has_hotel','==','no')], 'required': [('has_hotel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_subscription" attrs="{'invisible':[('has_hotel','==','no')], 'required': [('has_hotel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                    </group>
-                    <!-- Travel header fields -->
-                    <group col="4" attrs="{'invisible':[('has_travel','==','no')]}">
-                        <field name="customer_type" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_effective" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="date_subscription" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                        <field name="t_travel_by" attrs="{'invisible':[('has_travel','==','no')], 'required': [('has_travel','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
-                    </group>
+                    
                     <group>
                         <field name="description" placeholder="enter narration for entry..." attrs="{'invisible':[('has_description','==','no')], 'required': [('has_description','==','required')], 'readonly':[('stage_category','!=', 'draft')]}" />
                     </group>
                      <notebook>
                         <page string="Line" name="custom_entry_line">
-                            <field name="custom_entry_line" widget="one2many_list">
+                            <field name="custom_entry_line" widget="one2many_list" attrs="{'readonly': [('stage_category', '!=', 'draft')]}" >
                                 <tree string="Custom Entry Line" editable="bottom">
                                     <field name="company_id" invisible="1" />
                                     <field name="currency_id" invisible="1" />
                                     <field name="product_uom_category_id" invisible="1" />
                                     
-                                    <!-- Project -->
+                                    <!-- Line Item -->
+                                    <field name="date_entry_period" attrs="{'column_invisible':[('parent.has_line_period','==','no')], 'required': [('parent.has_line_period','==','required')]}"/>
+                                   <!-- Project --> 
                                     <field name="project_id" attrs="{'column_invisible':[('parent.has_project','==','no')], 'required': [('parent.has_project','==','required')]}" options="{'no_create':True}" />
                                     <field name="state_id" attrs="{'column_invisible':[('parent.has_project','==','no')]}" optional="hide" />
 
@@ -191,83 +172,11 @@
                                     <!-- Product -->
                                     <field name="product_id" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="product_uom_id" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
-                                    <field name="product_qty" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
+                                    <field name="product_qty" sum="Quantity" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="price_unit" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="price_subtotal" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="taxes_id" widget="many2many_tags" attrs="{'column_invisible':[('parent.has_product','==','no')], 'required': [('parent.has_product','==','required')]}"/>
                                     <field name="advance_subtotal" attrs="{'column_invisible':[('parent.has_advanced','==','no')], 'required': [('parent.has_advanced','==','required')]}"/>
-
-                                    <!-- Travel  -->
-                                    <field name="t_travel_category" string="Category" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="travel_from" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="travel_to" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>     
-                                    <field name="date_departure" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="date_arrival" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>             
-                                    <field name="number_of_days" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="travel_reference" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-                                    <field name="t_amount_travel" string="Total" attrs="{'column_invisible':[('parent.has_travel','==','no')], 'required': [('parent.has_travel','==','required')]}"/>
-
-
-                                    <!--  Fleet/Rent Vehicle -->
-                                    <field name="f_fleet_id" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_driver_id" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_job_scope" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_rent_days" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-                                    <field name="f_amount" attrs="{'column_invisible':[('parent.has_rent_vechile','==','no')], 'required': [('parent.has_rent_vechile','==','required')]}"/>
-
-                                    <!-- Accomodation -->
-                                    <field name="h_category" string="Category" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="hotel_detail" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                     <field name="h_check_in" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_check_out" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_number_of_nights" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_travel_id" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_unit_price" string="Unit Price" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_extra_charges" string="Extra Charges" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-                                    <field name="h_amount" attrs="{'column_invisible':[('parent.has_hotel','==','no')], 'required': [('parent.has_hotel','==','required')]}"/>
-
-                                    
-                                    <!-- Electricity -->
-                                    <field name="e_paid_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="amount_advanced" sum="advanced" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="date_bill_from" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="date_bill_to" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="meter_number" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="opening_reading" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="closing_reading" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="additional_unit" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="total_unit" sum="Total Units" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="maintainence_fee" sum="Maintenance Fee" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="hp_fee" sum="Horsepower Fee" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="KHW_charges" sum="KWH Charges" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="actual_KHW_charges" sum="Actual KWH" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="other_charges" sum="Other Chrages" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>
-                                    <field name="amount_total_electricity" sum="Total Electricity" attrs="{'column_invisible':[('parent.has_electricity','==','no')], 'required': [('parent.has_electricity','==','required')]}"/>                                    
-                                    
-                                    <!-- Fuel drawn-->
-                                    <field name="d_date" string="Date" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_partner_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_product_qty" string="Fuel Qty" sum="Drawn Product Qty" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_price_unit" string="Unit Price" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_price_subtotal" string="Subtotal" sum="Drawn Total" attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_booklet_no" string="Booklet No." attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    <field name="d_receipt_no" string="Receipt No." attrs="{'column_invisible':[('parent.has_fuel_drawn','==','no')], 'required': [('parent.has_fuel_drawn','==','required')]}"/>
-                                    
-                                    <!-- Fuel Filled-->
-                                    <field name="f_date" string="Date" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_partner_id" string="Purchase From" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_gen_name" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_gen_capacity" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_curr_drgh" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_opening_stock" sum="Filled Opening Stock" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_closing_stock" sum="Filled Closing Stock" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_product_qty" string="Fuel Qty" sum="Filled Qty" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_price_unit" string="Unit Price" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_price_subtotal" string="Subtotal" sum="Filled Total" attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_booklet_no" string="Booklet No." attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
-                                    <field name="f_receipt_no" string="Receipt No." attrs="{'column_invisible':[('parent.has_fuel_filling','==','no')], 'required': [('parent.has_fuel_filling','==','required')]}"/>
 
                                     <field name="employee_id" attrs="{'column_invisible':[('parent.has_employee','==','no')], 'required': [('parent.has_employee','==','required')]}"/>
                                     <field name="supplier_id" attrs="{'column_invisible':[('parent.has_supplier','==','no')], 'required': [('parent.has_supplier','==','required')]}"/>
@@ -304,7 +213,7 @@
             <field name="res_model">account.custom.entry</field>
             <field name="view_mode">tree,kanban,form,activity</field>
             <field name="context">{}</field>
-            <field name="domain">[]</field>
+            <field name="domain">[('move_type', 'in', ['entry','out_invoice','in_invoice','out_receipt','in_receipt'])]</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create a new custom journal entry!
@@ -312,7 +221,7 @@
             </field>
     </record>
         
-    <menuitem action="action_custom_entry" name="Custom Entry" id="menu_custom_entry_type_config_custom_entry" groups="account.group_account_manager" parent="custom_entry_menu" sequence="2"/>
+    <menuitem action="action_custom_entry" name="Custom Entry" id="menu_custom_entry_custom_entry" groups="account.group_account_manager" parent="custom_entry_menu" sequence="2"/>
         
     </data>
 </odoo>

@@ -3,6 +3,7 @@ from odoo import api, fields, models, _
 
 class EmployeeAssets(models.Model):
     _name = 'employee.asset'
+    _description = 'Employee Asset'
 
     name = fields.Char('Asset Name')
     code = fields.Char('Asset Code')
@@ -20,6 +21,7 @@ class HrEmployee(models.Model):
     
 class EmployeeAssetsLine(models.Model):
     _name = 'employee.asset.line'
+    _description = 'Employee Asset Line'
 
     employee_id = fields.Many2one('hr.employee')
     asset_id = fields.Many2one('employee.asset')
@@ -32,6 +34,7 @@ class EmployeeAssetsLine(models.Model):
     
 class EmployeeTeamBuilding(models.Model):
     _name = 'employee.teambuilding'
+    _description = 'Employee Team Building'
 
     name = fields.Char('Activty Name')
     code = fields.Char('Activity Code')
@@ -41,6 +44,7 @@ class EmployeeTeamBuilding(models.Model):
 
 class EmployeeTeamBuildingLine(models.Model):
     _name = 'employee.teambuilding.line'
+    _description = 'Employee Team Building Line'
 
     employee_id = fields.Many2one('hr.employee')
     tb_id = fields.Many2one('employee.teambuilding')
@@ -48,12 +52,13 @@ class EmployeeTeamBuildingLine(models.Model):
     winner = fields.Selection([
         ('first', 'Winner'),
         ('runnerup', 'Runner-Up'),
-        ], string='Position', index=True, copy=False, track_visibility='onchange')
+        ], string='Position', index=True, copy=False, )
     comment = fields.Text('Comment')
 
     
 class EmployeeIncident(models.Model):
     _name = 'employee.incident'
+    _description = 'Employee Incident'
 
     name = fields.Char('Activty Name')
     description = fields.Text('Description')
@@ -62,6 +67,7 @@ class EmployeeIncident(models.Model):
 
 class EmployeeIncidentLine(models.Model):
     _name = 'employee.incident.line'
+    _description = 'Employee Incident Line'
 
     employee_id = fields.Many2one('hr.employee')
     incident_id = fields.Many2one('employee.incident')

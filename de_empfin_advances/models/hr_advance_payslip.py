@@ -9,7 +9,6 @@ class SalaryRuleInput(models.Model):
         amount = 0 
         adv_salary = self.env['hr.salary.advance'].search([('employee_id', '=', self.employee_id.id),
                                                         ('state', '=', 'approve'),('deductable','=',True)])
-        
         if adv_salary:
             for adv_obj in adv_salary:
                 current_date = datetime.strptime(str(self.date_from), '%Y-%m-%d').date().month

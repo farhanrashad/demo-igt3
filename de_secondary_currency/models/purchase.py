@@ -17,7 +17,7 @@ from odoo.tools.misc import formatLang, get_lang
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
     
-    company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
+    company_currency_id = fields.Many2one('res.currency', string='Company Currency', related='company_id.currency_id')
     
     total_base_signed = fields.Monetary(string='Total base.Curr.', readonly=True, compute='_compute_all_currency_conversion_amount', currency_field='company_currency_id')
 
@@ -41,7 +41,7 @@ class PurchaseOrder(models.Model):
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
     
-    company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id')
+    company_currency_id = fields.Many2one('res.currency', string='Company Currency', related='company_id.currency_id')
     
     price_unit_base = fields.Monetary(string='BC Price', readonly=True, compute='_compute_all_currency_conversion_amount', currency_field='company_currency_id')
     price_total_base = fields.Monetary(string='BC Total', readonly=True, compute='_compute_all_currency_conversion_amount', currency_field='company_currency_id')

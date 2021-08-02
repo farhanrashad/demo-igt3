@@ -29,7 +29,6 @@
         'views/stock_refill_menu.xml',
         'views/stock_location_views.xml',
         'views/stock_refill_views.xml',
-        'views/res_partner.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

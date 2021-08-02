@@ -60,30 +60,31 @@ class HRPayslip(models.Model):
     
     def compute_sheet(self):
         amount = 0 
-        
+        overtime = False
         #day based overtime calcualtion
-        overtime = self.env['hr.overtime.request.line'].search([('employee_id', '=', self.employee_id.id),('state', '=', 'approved'),('type', '=', 'cash'),('date_overtime', '>=', self.date_from_overtime),('date_overtime', '<=', self.date_to_overtime)])
-        if overtime:
-            for ot_obj in overtime:
-                if ot_obj:
-                    amount += ot_obj.approved_amount
+        for payslip in self:
+            overtime = self.env['hr.overtime.request.line'].search([('employee_id', '=', payslip.employee_id.id),('state', '=', 'approved'),('type', '=', 'cash'),('date_overtime', '>=', payslip.date_from_overtime),('date_overtime', '<=', payslip.date_to_overtime)])
+            if overtime:
+                for ot_obj in overtime:
+                    if ot_obj:
+                        amount += ot_obj.approved_amount
                     #amount = 40
             
-            input_exists = self.env['hr.payslip.input'].search([('payslip_id', '=', self.id), ('code', '=', 'OT100')])              
-            if not input_exists:
-                input_type_exists = self.env['hr.payslip.input.type'].search([('code', '=', 'OT100')])   
-                input_exists.create({
-                    'input_type_id': input_type_exists.id,
-                    'code': 'OT100',
-                    'amount': amount,
-                    'contract_id': self.contract_id.id,
-                    'payslip_id': self.id,
-                })
-            else:
-                input_exists.write({
-                    'amount': amount,
-                })
-            self.overtime_line_ids = overtime
+                input_exists = self.env['hr.payslip.input'].search([('payslip_id', '=', payslip.id), ('code', '=', 'OT100')])              
+                if not input_exists:
+                    input_type_exists = self.env['hr.payslip.input.type'].search([('code', '=', 'OT100')])   
+                    input_exists.create({
+                        'input_type_id': input_type_exists.id,
+                        'code': 'OT100',
+                        'amount': amount,
+                        'contract_id': payslip.contract_id.id,
+                        'payslip_id': payslip.id,
+                    })
+                else:
+                    input_exists.write({
+                        'amount': amount,
+                    })
+            payslip.overtime_line_ids = overtime
         rec = super(HRPayslip, self).compute_sheet()
         return rec
     

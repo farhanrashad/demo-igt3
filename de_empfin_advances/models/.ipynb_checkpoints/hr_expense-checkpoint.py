@@ -7,10 +7,27 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import email_split, float_is_zero
 
+class HrExpenseSheetType(models.Model):
+    _name = 'hr.expense.sheet.type'
+    _description = 'Expense Sheet Type'
+    
+    name = fields.Char(string='Expense Type', required=True, translate=True)
+    
 class HrExpenseSheet(models.Model):
     _inherit = 'hr.expense.sheet'
     
     hr_salary_advance_id  = fields.Many2one('hr.salary.advance', string='Advances Request', domain='[("employee_id","=", employee_id), ("state","in", ("paid","close"))]')
+    
+    hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', string='Expense Type')
+    
+    total_currency_amount = fields.Float(string='Total curr.Amount', compute='_compute_curr_amount', store=True, tracking=True)
+    
+    @api.depends('expense_line_ids.total_amount')
+    def _compute_curr_amount(self):
+        for sheet in self:
+            sheet.total_currency_amount = sum(sheet.expense_line_ids.mapped('total_amount'))
+
+
     
     # --------------------------------------------
     # Actions
@@ -41,11 +58,19 @@ class HrExpenseSheet(models.Model):
         (self - to_post).write({'state': 'done'})
         self.activity_update()
         # change status of advances
+        #expense.hr_salary_advance_id.hr_expense_sheet_id = self.id
         for expense in expense_line_ids:
-            expense.hr_salary_advance_id.state = 'close'
-            expense.hr_salary_advance_id.hr_expense_id = expense.id
+            #expense.hr_salary_advance_id.state = 'close'
+            expense.advance_line_id.state = 'close'
+            #expense.hr_salary_advance_id.hr_expense_id = expense.id
+            #expense.hr_salary_advance_id.hr_expense_id = expense.id
         return res
-        
+    
+class HrExpenseType(models.Model):
+    _name = 'hr.expense.type'
+    _description = 'Expense Type'
+    
+    name = fields.Char(string='Expense Category', required=True, translate=True)
 
 class HrExpense(models.Model):
     _inherit = 'hr.expense'
@@ -53,11 +78,12 @@ class HrExpense(models.Model):
     #hr_salary_advance_id  = fields.Many2one('hr.salary.advance', string='Advances Request', domain='[("employee_id","=", employee_id), ("state","in", ("paid","close"))]')
 
     hr_salary_advance_id  = fields.Many2one('hr.salary.advance', string='Advances Request', )
-
-    #advance_line_id  = fields.Many2one('hr.salary.advance.line', string='Advances Line', domain='[("advance_id","=", hr_salary_advance_id)]')
+    advance_line_id  = fields.Many2one('hr.salary.advance.line', string='Advances Line', domain='[("advance_id","=", hr_salary_advance_id)]')
+    hr_expense_sheet_type_id  = fields.Many2one('hr.expense.sheet.type', related='sheet_id.hr_expense_sheet_type_id')
+    expense_type_id = fields.Many2one('hr.expense.type', string='Expense Category', copy=False)
 
     
-    @api.depends('product_id', 'company_id')
+    #@api.depends('product_id', 'company_id')
     def _compute_from_product_id_company_id(self):
         for expense in self.filtered('product_id'):
             expense = expense.with_company(expense.company_id)
@@ -77,8 +103,9 @@ class HrExpense(models.Model):
         if self.hr_salary_advance_id:
             self.update({
                 'name': self.hr_salary_advance_id.name, 
-                'product_id': self.hr_salary_advance_id.product_id.id,
+                #'product_id': self.hr_salary_advance_id.product_id.id,
                 'unit_amount': self.hr_salary_advance_id.amount_total,
+                'currency_id': self.hr_salary_advance_id.currency_id,
                 'quantity': 1,
                 'payment_mode': 'own_account',
             })

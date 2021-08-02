@@ -1043,7 +1043,7 @@ class StockTransferOrderLine(models.Model):
         picking_code = ''
         for line in self:
             if line.stock_transfer_order_id.action_type != 'normal':
-                if line.stock_transfer_order_id.state == 'delivered':
+                if line.stock_transfer_order_id.stage_id.stage_category == 'transfer':
                     picking_code = line.stock_transfer_order_id.transfer_order_category_id.return_picking_type_id.code
                 else:
                     picking_code = line.stock_transfer_order_id.picking_type_code
@@ -1191,7 +1191,7 @@ class StockTransferReturnLine(models.Model):
         picking_code = ''
         for line in self:
             if line.stock_transfer_order_id.action_type != 'normal':
-                if line.stock_transfer_order_id.state == 'delivered':
+                if line.stock_transfer_order_id.stage_id.stage_category == 'transfer':
                     picking_code = line.stock_transfer_order_id.transfer_order_category_id.return_picking_type_id.code
                 else:
                     picking_code = line.stock_transfer_order_id.picking_type_code

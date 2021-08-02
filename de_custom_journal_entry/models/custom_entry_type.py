@@ -37,12 +37,23 @@ class CustomEntryType(models.Model):
     expense_advance = fields.Boolean(string='Pay Advance Expense')
     journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True, domain="[('type', 'not in', ['bank', 'cash'])]")
     journal_type = fields.Selection(related='journal_id.type', string="Journal Type")
+    move_type = fields.Selection(selection=[
+            ('entry', 'Journal Entry'),
+            ('out_invoice', 'Customer Invoice'),
+            ('out_refund', 'Customer Credit Note'),
+            ('in_invoice', 'Vendor Bill'),
+            ('in_refund', 'Vendor Credit Note'),
+            ('out_receipt', 'Sales Receipt'),
+            ('in_receipt', 'Purchase Receipt'),
+        ], string='Move Type', )
+    
     account_id = fields.Many2one('account.account', string="GL Account", company_dependent=True, check_company=True)
     counterpart_mode = fields.Selection([
         ('debit', 'Debit'),
         ('credit', 'Credit')],
         string='Counterpart Mode', default='debit')
     counterpart_account_id = fields.Many2one('account.account', string="Counterpart Account", company_dependent=True, check_company=True)
+    entry_reverse = fields.Boolean(string='Reverse Entry')
     payment_journal_id = fields.Many2one('account.journal', string="Payment Journal", required=True, company_dependent=True, check_company=True,  domain="[('type', 'in', ['bank', 'cash'])]")
     currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=lambda self: self.env.company.currency_id.id)
 
@@ -62,19 +73,18 @@ class CustomEntryType(models.Model):
     has_invoice = fields.Selection(CATEGORY_SELECTION, string="Has Invoice", default="no", required=True,)
 
     #Line Item fields
+    has_line_period = fields.Selection(CATEGORY_SELECTION, string="Has Line Period", default="no", required=True,)
     has_project = fields.Selection(CATEGORY_SELECTION, string="Has Project", default="no", required=True,)
     has_product = fields.Selection(CATEGORY_SELECTION, string="Has Product", default="no", required=True,)
     has_advanced = fields.Selection(CATEGORY_SELECTION, string="Has Advanced Amount", default="no", required=True,)
     has_analytic = fields.Selection(CATEGORY_SELECTION, string="Has Analytic", default="no", required=True,)
     has_employee = fields.Selection(CATEGORY_SELECTION, string="Has Employee", default="no", required=True,)
     has_supplier = fields.Selection(CATEGORY_SELECTION, string="Has Supplier", default="no", required=True,)
+    
     #feature options fields
-    has_rent_vechile = fields.Selection(CATEGORY_SELECTION, string="Has Rent Vehicle", default="no", required=True,)
-    has_travel = fields.Selection(CATEGORY_SELECTION, string="Has Travel", default="no", required=True,)
-    has_hotel = fields.Selection(CATEGORY_SELECTION, string="Has Hotel", default="no", required=True,)
-    has_electricity = fields.Selection(CATEGORY_SELECTION, string="Has Electricity", default="no", required=True,)
-    has_fuel_drawn = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Drawn", default="no", required=True,)
-    has_fuel_filling = fields.Selection(CATEGORY_SELECTION, string="Has Fuel Filling", default="no", required=True,)
+    
+    
+    
 
 
     @api.model

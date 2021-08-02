@@ -9,8 +9,8 @@
     """,
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
-    'category': 'Uncategorized',
-    'version': '14.0.0.1',
+    'category': 'Accounting',
+    'version': '14.0.0.2',
     'depends': ['account'],
     'data': [
         # 'security/ir.model.access.csv',

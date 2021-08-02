@@ -65,9 +65,8 @@ class CustomerPortal(CustomerPortal):
 
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
-        user = request.env['res.users'].search([('id','=', http.request.env.context.get('uid'))], limit=1)
         if 'transfer_count' in counters:
-            values['transfer_count'] = request.env['stock.transfer.order'].search_count([('partner_id','=',user.partner_id.id)])
+            values['transfer_count'] = request.env['stock.transfer.order'].search_count([])
         return values
   
     def _transfer_get_page_view_values(self,transfer, next_id = 0,pre_id= 0, transfer_user_flag = 0, access_token = None, **kwargs):

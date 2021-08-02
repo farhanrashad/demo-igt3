@@ -7,9 +7,9 @@ from odoo.exceptions import UserError
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    project_id = fields.Many2one('project.project', string='Project')
+    project_id = fields.Many2one('project.project', string='Project', copy=False)
     project_count = fields.Integer(string='Project counts', compute='_compute_project')
-    task_ids = fields.One2many('project.task', 'purchase_id', string='Tasks')
+    task_ids = fields.One2many('project.task', 'purchase_id', string='Tasks', copy=False)
     task_count = fields.Integer(string='Task counts', compute='_compute_task_ids')
 
     def _get_targeted_project_ids(self):
@@ -42,27 +42,52 @@ class PurchaseOrder(models.Model):
         self.project_id = project_id.id
         
         templates = self.env['purchase.task.template'].search([('requisition_type_id','=',self.requisition_type_id.id)])
+        #for stage in templates.stage_ids:
+            #stage.update({'project_ids': [(4, project_id.id)]})
+            
         stage_id = False
         projects = self._get_targeted_project_ids()
         for project in projects:
             for template in templates:
-                for stage in template.stage_ids:
-                    if not stage_id:
-                        stage_id = stage.id
+                #for stage in template.stage_ids:
+                    #stage.write({'project_ids': [(4, [project.id])] })
+                    #stage.project_ids = [(4, project.id)]
+                    #stage.update({'project_ids': [(4, project_id.id)]})
+                    
+                #for stage in template.stage_ids:
+                    #if not stage_id:
+                        #stage_id = stage.id
                 #stage_id = stages.search([('id','in',template.stage_ids)],limit=1)
                 task = ({
                     'project_id': project_id.id,
                     'purchase_project_id': project.id,
                     'purchase_id': self.id,
                     'name': project.name + ' - ' + template.name,
+                    'partner_id': self.partner_id.id,
                     'user_id': template.user_id.id,
                     'date_deadline': fields.Date.to_string(self.date_approve + timedelta(template.completion_days)),
                     'allow_picking': template.allow_picking,
                     'allow_invoice': template.allow_invoice,
+                    'completion_days': template.completion_days,
+                    'completion_percent': template.completion_percent,
+                    'task_sequence': template.sequence,
                     'stage_id': stage_id,
                     'purchase_task_stage_ids': [(6, 0, template.stage_ids.ids)],
                 })
                 task_id = self.env['project.task'].sudo().create(task)
+                task_id.update({
+                    'stage_id': task_id.purchase_task_stage_ids[0].id
+                })
+                for tdoc in template.template_doc_ids:
+                    docs = ({
+                        'name': tdoc.name,
+                        'task_id': task_id.id,
+                    })
+                    doc_id = self.env['project.task.documents'].sudo().create(docs)
+                
+        for stage in task_id.purchase_task_stage_ids:
+            stage.update({'project_ids': [(4, project_id.id)]})
+            
         return res
 
     def button_cancel(self):
@@ -76,7 +101,7 @@ class PurchaseOrder(models.Model):
     
     def _compute_proj_count(self):
         for rec in self:
-            self.project_count = self.env['project.project'].search_count([('purchase_order_id', '=', self.id)])
+            self.project_count = self.env['project.project'].search_count([('project_id', '=', self.id)])
 
     def action_view_project(self):
         """
@@ -96,7 +121,7 @@ class PurchaseOrder(models.Model):
 
     def _compute_task_count(self):
         for rec in self:
-            self.task_count = self.env['project.task'].search_count([('purchase_order_id', '=', self.id)])
+            self.task_count = self.env['project.task'].search_count([('purchase_id', '=', self.id)])
 
     def action_view_tasks(self):
         """

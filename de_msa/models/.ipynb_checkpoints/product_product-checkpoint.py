@@ -8,6 +8,7 @@ from dateutil.relativedelta import relativedelta
 
 class ProductProductInh(models.Model):
     _inherit = 'product.product'
+    _description = 'Product Product MSA'
     
     is_product_category_power = fields.Boolean(string='Is Category Power?')
     is_product_category_tower = fields.Boolean(string='Is Category Tower?')

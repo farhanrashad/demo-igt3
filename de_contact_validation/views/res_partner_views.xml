@@ -1,6 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+    <!-- Partner Stage Views -->
+    <record id="contact_stage_view_list" model="ir.ui.view">
+        <field name="name">contact.stage.view.list</field>
+        <field name="model">res.partner.stage</field>
+        <field name="arch" type="xml">
+            <tree string="Custom Entry Stages">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="category_ids"/>
+                <field name="stage_code" optional="hide"/>
+                <field name="stage_category"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="contact_stage_view_form" model="ir.ui.view">
+        <field name="name">contact.stage.form</field>
+        <field name="model">res.partner.stage</field>
+        <field name="arch" type="xml">
+            <form string="Subscription Stage">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="stage_code"/>
+                            <field name="sequence" groups="base.group_no_one"/>
+                            <field name="category_ids" widget="many2many_tags" groups="base.group_no_one"/>
+                            <field name="next_stage_id"/>
+                            <field name="prv_stage_id"/>
+                        </group>
+                        <group>
+                            <field name="fold"/>
+                            <field name="stage_category" widget="radio"/>
+                            <field name="group_id" options="{'no_create': True,'no_open':True}" />
+                        </group>
+                    </group>
+                    <separator string="Requirements"/>
+                    <field name="description"
+                           placeholder="Give your team the requirements to move a subscription to this stage."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+		<record id="action_contact_stage" model="ir.actions.act_window">
+			<field name="name">Contact Stage</field>
+			<field name="res_model">res.partner.stage</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">tree,form</field>
+			<field name="help" type="html">
+				<p class="o_view_nocontent_smiling_face">
+					Create a new contact stage
+				</p>
+               
+			</field>
+		</record>
+    
+	<menuitem id="menu_partner_stage_form"
+        action="action_contact_stage"
+        name="Contact Stage"
+        sequence="5" parent="contacts.res_partner_menu_config"/>
+    
+    <!-- Partner Views -->
     <record id='view_partner_form_inherit_validation' model='ir.ui.view'>
         <field name="name">view.partner.form.inherit.validation</field>
         <field name="model">res.partner</field>
@@ -8,11 +69,13 @@
         <field name="arch" type="xml">
             <xpath expr="/form/*" position="before">
                 <header>
-                    <button name="action_to_approve" states="draft" groups="de_contact_validation.group_contact_user" string="Submit" type="object" class="oe_highlight"/>
-                    <button name="action_approved"  states="to_approve"   groups="de_contact_validation.group_contact_manager" string="Approve" type="object" class="oe_highlight"/>
-                    <button name="action_draft"  states="to_approve,approved"   groups="de_contact_validation.group_contact_manager" string="Reset to Draft" type="object"/>
+                    <button name="button_submit" groups="de_contact_validation.group_contact_user" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible':[('stage_category','!=','draft')]}"/>
+                    <button name="button_confirm"  groups="de_contact_validation.group_contact_manager" string="Approve" type="object" class="oe_highlight" attrs="{'invisible':[('stage_category','!=','progress')]}"/>
+                    <button name="button_draft"  groups="de_contact_validation.group_contact_manager" string="Reset to Draft" type="object" attrs="{'invisible':[('stage_category','not in',['progress','confirm'])]}"/>
 
-                    <field name="state" widget="statusbar" options="{'readonly': '1'}"/>
+                    <field name="state" widget="statusbar" invisible="1" options="{'readonly': '1'}"/>
+                    <field name="stage_id" widget="statusbar" />
+                    <field name="stage_category" invisible="1" />
                 </header>
             </xpath>
         </field>
@@ -25,7 +88,8 @@
         <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//tree" position="inside">
-                <field name="state" optional="show"/>
+                <field name="state" invisible="1"/>
+                <field name="stage_id" optional="show"/>
             </xpath>
         </field>
     </record>

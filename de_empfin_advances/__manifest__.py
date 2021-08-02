@@ -2,7 +2,7 @@
 
 {
     'name': 'EMPFIN Employee Advances',
-    'version': '14.0.0.7',
+    'version': '14.0.1.3',
     'summary': 'Employee Advance Request',
     'description': """
         Helps you to manage Advance Salary Request of your company's staff.
@@ -16,9 +16,10 @@
         'hr_payroll', 'de_empfin_core', 'account_accountant',  'hr_expense'
     ],
     'data': [
-        'security/ir.model.access.csv',
         'security/security.xml',
+        'security/ir.model.access.csv',
         'data/salary_advance_data.xml',
+        'views/product_views.xml',
         'views/salary_structure_views.xml',
         'views/salary_advance_views.xml',
         'views/hr_advance_type_views.xml',

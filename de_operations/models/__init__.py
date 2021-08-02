@@ -7,3 +7,5 @@ from . import account_journal
 from . import account_move
 from . import purchase_subscription
 from . import purchase_subscription_deductions
+from . import project
+from . import custom_entry

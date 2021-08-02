@@ -3,20 +3,21 @@
     'name': "Employee Assets",
 
     'summary': """
-        This module adds an assets page on employee form""",
+    Employee Assets
+        """,
 
     'description': """
-        Long description of module's purpose
+        Employee Assets
     """,
 
-    'author': "My Dynexcel",
+    'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'hr',
-    'version': '14.0.0.1',
+    'version': '14.0.0.2',
 
     # any module necessary for this one to work correctly
     'depends': ['base','hr'],

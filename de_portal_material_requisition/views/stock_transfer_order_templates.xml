@@ -49,12 +49,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-set="material_partner" t-value="0"/>
-                            <t t-foreach="request.env['res.users'].search([('id','=',uid)])" t-as="user">
-                              <t t-set="material_partner" t-value="user.partner_id.id"/>
-                            </t>
                             <t t-foreach="transfers" t-as="material">
-                                <t t-if="material.partner_id.id==material_partner" >
+                                <t t-if="material.user_id.id==uid" >
                                 <tr>
                                     <td class="text-left">
                                           <a t-attf-href="/transfer/order/#{material.id}?{{ keep_query() }}">#<span t-field="material.id"/></a>
@@ -78,14 +74,7 @@
                             </t>
                             <tr>
 
-                            </tr>
-                            <tr>
-                                <div>
-                                    <t class="col-lg-7 col-md-8" >
-                                        <a href="/material/document" > <div class="btn btn-primary pull-left" style="height:30px; line-height:100%; ">Create</div> </a>
-                                    </t>
-                                </div>
-                            </tr>
+                            </tr>   
                         </tbody>
                     </t>
                 </t>
@@ -172,16 +161,6 @@
                                         <span t-esc="transfer.date_scheduled"/>
                                     </t>
                                 </div>
-                                <div class="col-md-5"> <strong>Transfer Category : </strong>
-                                    <t t-if="transfer.transfer_order_category_id">
-                                        <span t-esc="transfer.transfer_order_category_id.name"/>
-                                    </t>
-                                </div>
-                                <div class="col-md-5"> <strong>Delivery Date : </strong>
-                                    <t t-if="transfer.delivery_deadline">
-                                        <span t-esc="transfer.delivery_deadline"/>
-                                    </t>
-                                </div>
                             </div>
                              <div class="row"> 
                                 <table class="table-striped table">
@@ -222,66 +201,11 @@
                                  
                                 
                             </div>
-
-                             <t t-if="transfer.action_type != 'normal'">
-
-
-                                      <div class="row" >
-                                          <p><strong>Return Products</strong></p>
-                                <table class="table-striped table">
-                                <thead style="font-size:12px;">
-                                    <tr>
-                                        <h4>
-                                            <b>
-                                        <th class="text-left">Product</th>
-                                        <th class="text-left">Project</th>
-                                        <th class="text-left">Demand Qty</th>
-                                        <th class="text-left">Unit Of Measure</th>
-                                        <th class="text-left">From</th>
-                                        <th class="text-left">To</th>
-                                        <th class="text-left">Status</th>
-
-                                            </b>
-                                        </h4>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="transfer.stock_transfer_return_line" t-as="t_line">
-
-
-                                        <tr>
-                                            <td><span t-esc="t_line.product_id.name"/></td>
-                                            <td><span t-esc="t_line.project_id.name"/></td>
-                                            <td><span t-esc="t_line.product_uom_qty"/></td>
-                                            <td><span t-esc="t_line.product_uom.name"/></td>
-                                            <td><span t-esc="t_line.location_src_id.name"/></td>
-                                            <td><span t-esc="t_line.location_dest_id.name"/></td>
-                                            <td><span t-esc="t_line.return_status"/></td>
-
-                                        </tr>
-
-                                    </t>
-                                </tbody>
-                            </table>
-
-
-                            </div>
-                             </t>
                         </div>
                        
                     </div> 
                    
-                    <div class="row">
-                        <div t-attf-class="col-12 col-lg-12  mb-md-0 ">
-                            <hr class="mb-1"/>
-                            <div class="d-flex my-2">
-                                <strong>Terms and Conditions</strong>
-                            </div>
-                            <t t-if="transfer.description">
-                                <div class="py-1 px-2 bg-100 small" t-field="transfer.description"/>
-                            </t>
-                        </div>
-                    </div>
+                  
                         
                     <div class="row"> 
                         <div t-attf-class="col-12 col-lg-12  mb-md-0 ">

@@ -26,7 +26,7 @@ class monthly_tower_load(models.Model):
     _name = 'monthly.tower.load'
     _description = 'Monthly Tower Load'
     
-    load = fields.Selection([('access_low','Access Low'),('access_high','Access High'),
+    load_type = fields.Selection([('access_low','Access Low'),('access_high','Access High'),
                              ('dwdm','DWDM'),('standard_hub','Standard Hub')], string='Load', default='access_low', required=True)
     msa_id = fields.Many2one('master.service.agreement', string='Master Service Agreement', required=True)
     site_id = fields.Many2one('project.project', string='Site', required=True)

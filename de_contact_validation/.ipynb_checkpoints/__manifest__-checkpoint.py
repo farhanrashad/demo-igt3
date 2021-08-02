@@ -18,11 +18,11 @@
     'author': "Dynexcel",
     'website': "https://www.dynexcel.com",
     'category': 'Marketing',
-    'version': '14.0.0.1',
-    'depends': ['base'],
+    'version': '14.0.0.2',
+    'depends': ['base','contacts'],
     'data': [
-        # 'security/ir.model.access.csv',
         'security/contact_security.xml',
+        'security/ir.model.access.csv',
         'views/res_partner_views.xml',
         
     ],

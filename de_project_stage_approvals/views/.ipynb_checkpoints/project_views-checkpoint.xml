@@ -6,17 +6,33 @@
             <field name="model">project.task.type</field>
             <field name="inherit_id" ref="project.task_type_edit"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="stage_code" />
+                    <field name="stage_id" />
+                    <field name="complete_name" />
+                </xpath>
                 <xpath expr="//group[1]" position="after">
                     <group string="Workflow" name="task_workflow">
                         <group >
-                            <field name="stage_code" />
                             <field name="next_stage_id" />
                             <field name="prv_stage_id" />
                         </group>
                         <group>
                             <field name="stage_category" widget="radio"/>
+                            <field name="group_id" options="{'no_create': True,'no_open':True}"/>
                         </group>
                     </group>
+                </xpath>
+            </field>
+        </record>
+        
+        <record id="project_task_type_tree_inherit" model="ir.ui.view">
+            <field name="name">project.task.type.tree.view.inherit</field>
+            <field name="model">project.task.type</field>
+            <field name="inherit_id" ref="project.task_type_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="complete_name" />
                 </xpath>
             </field>
         </record>

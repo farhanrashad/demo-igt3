@@ -102,7 +102,7 @@
 			<tree editable="bottom">
 				<field name="msa_id"/>
 				<field name="site_id"/>
-				<field name="load"/>
+				<field name="load_type"/>
 				<field name="period"/>
 			</tree>
 		</field>
@@ -115,7 +115,7 @@
 			<search>
 				<field name="msa_id"/>
 				<field name="site_id"/>
-				<field name="load"/>
+				<field name="load_type"/>
 				<field name="period"/>
 			</search>
 		</field>

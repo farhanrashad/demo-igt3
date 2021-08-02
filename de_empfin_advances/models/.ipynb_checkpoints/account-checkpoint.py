@@ -12,4 +12,10 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     hr_salary_advance_id = fields.Many2one('hr.salary.advance', string='Salary Advance')
+    
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    hr_salary_advance_line_id = fields.Many2one('hr.salary.advance.line', string='Salary Advance Line')
+
 

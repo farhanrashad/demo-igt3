@@ -8,7 +8,13 @@
                 <xpath expr="//field[@name='origin']" position="after">
                     <field name="purchase_id" invisible="1"/>
                     <field name="allow_picking" invisible="1"/>
-                    <field name="task_id" attrs="{'invisible':[('allow_picking','=',False)],'required':[('allow_picking','!=',False)]}" options="{'no_create':True,'no_open':True}"/>
+                    <div class="o_row no-gutters d-flex">
+                        <label for="task_id" attrs="{'invisible':[('allow_picking','=',False)]}"/>
+                        <div class="o_row" attrs="{'invisible':[('allow_picking','=',False)]}">
+                            <field name="task_id" attrs="{'invisible':[('allow_picking','=',False)]}" class="oe_inline" options="{'no_create':True,'no_open':True}"/>
+                            <button name="action_assign_milestone" type="object" class="" aria-label="Assign Milestone" title="Assign Milestone" string="Assign Milestone" attrs="{'invisible':['|',('task_id','!=',False),('state','in',['done','cancel'])]}"/>
+                        </div>
+                    </div>
                 </xpath>
             </field>
         </record>

@@ -70,7 +70,6 @@
                                 <field name="currency_id" groups="base.group_multi_currency" attrs="{'readonly':[('state','!=','draft')]}" />
                                 <field name="company_id"  groups="base.group_multi_currency" attrs="{'readonly':[('state','!=','draft')]}" />
                                 <field name="employee_contract_id" required="1" invisible="1" groups="hr.group_hr_manager,hr.group_hr_user"/>
-                                <field name="product_id" required="1" string="Advance/Expense Type" attrs="{'readonly':[('state','!=','draft')]}" />
 	                    	</group>
                     	</group>
                         <notebook>
@@ -78,9 +77,10 @@
                                <field name="cash_line_ids" attrs="{'readonly':[('state','in',('paid','cancel','close','reject'))]}" >
                                 <tree editable="bottom">
                                     <field name="currency_id" invisible="1" />
-                                  <field name="type_id" attrs="{'readonly':[('state','!=','draft')]}" />
-                                 <field name="product_id" attrs="{'readonly':[('state','!=','draft')]}" optional="hide"/>
-                                 <field name="description" attrs="{'readonly':[('state','!=','draft')]}" />
+                                <field name="name" invisible="1"/>
+                                  <field name="type_id" options="{'no_create':True}" attrs="{'readonly':[('state','!=','draft')]}" />
+                                 <field name="product_id" options="{'no_create':True}" attrs="{'readonly':[('state','!=','draft')]}" />
+                                 <field name="desc" attrs="{'readonly':[('state','!=','draft')]}" />
                                  <field name="quantity" attrs="{'readonly':[('state','!=','draft')]}" />
                                  <field name="unit_price" attrs="{'readonly':[('state','!=','draft')]}" />
                                  <field name="total_amount" sum="Total"/>  
@@ -113,13 +113,13 @@
                                         <field name="payment_date"  />
 
                                         <field name="payment_method_id"  attrs="{'invisible':[('journal_type','=','purchase')],'required':[('journal_type','in',['cash','bank'])]}" />
-                                        <field name="account_id"   attrs="{'invisible':[('journal_type','!=','purchase')]}" />
                                         <field name="payment_amount" />
                                     </group>
                                     <group string="Expense">
-                                        <field name="hr_expense_id" />
-                                        <field name="hr_expense_sheet_id" invisible="1"/>
-                                        <field name="expense_deadline" widget="remaining_days" string="Remittance Date"/>
+                                        <field name="hr_expense_id" invisible="1"/>
+                                        <field name="hr_expense_sheet_id" invisible="0"/>
+                                        <field name="date_due_expense" widget="date" string='Due Date'/>
+                                        <field name="expense_deadline" widget="remaining_days" string="Remittance Days"/>
                                         <field name="remittance_outstanding_days" invisible="1"/>
                                         <field name="remittance_overdue_days" invisible="1"/>
                                     </group>
@@ -199,5 +199,23 @@
         
         <menuitem id="menu_salary_advance" action="action_my_salary_advance_request_approved" parent="employee_salary_advance_menu" name="Approved Request" sequence="3" groups="hr.group_hr_manager,hr.group_hr_user,account.group_account_manager"/>
 
+        <!-- Advance Invoices -->
+        <record id="action_move_in_invoice_type_advance" model="ir.actions.act_window">
+            <field name="name">Advance Invoices</field>
+            <field name="res_model">account.move</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_id" ref="account.view_in_invoice_tree"/>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="domain">[('move_type', '=', 'in_invoice'),('hr_salary_advance_id', '!=', False)]</field>
+            <field name="context">{'default_move_type': 'in_invoice', 'create':False}</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create an Advance invoice
+              </p>
+            </field>
+        </record>
+        
+        <menuitem id="menu_advance_invoice" action="action_move_in_invoice_type_advance" parent="employee_salary_advance_menu" name="Advance Invoice" sequence="4" groups="account.group_account_manager"/>
+        
     </data>
 </odoo>

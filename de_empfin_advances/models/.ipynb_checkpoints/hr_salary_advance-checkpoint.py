@@ -7,9 +7,12 @@ from odoo.tools.misc import format_date
 
 class SalaryAdvancePayment(models.Model):
     _name = "hr.salary.advance"
+    _description = 'Salary Advance'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     
-    
+    @api.model
+    def _default_employee_id(self):
+        return self.env.user.employee_id
 
     def _default_get_contract(self):
         contract_id = self.env['hr.contract'].search([('employee_id','=', self.employee_id.id),('state','=','open')], limit=1)        
@@ -18,8 +21,13 @@ class SalaryAdvancePayment(models.Model):
         else:
             self.employee_contract_id = None       
 
-    name = fields.Char(string='Name', readonly=True, select=True, default=lambda self: 'Adv/')
-    employee_id = fields.Many2one('hr.employee', string='Employee', required=True)
+    name = fields.Char(string='Name', readonly=True, default=lambda self: 'Adv/')
+    #employee_id = fields.Many2one('hr.employee', string='Employee', required=True)
+    employee_id = fields.Many2one('hr.employee', compute='_compute_employee_id', string="Employee",
+        store=True, required=True, readonly=False, tracking=True,
+        states={'approved': [('readonly', True)], 'done': [('readonly', True)]},
+        default=_default_employee_id, check_company=True)
+    
     date = fields.Date(string='Date', required=True, default=lambda self: fields.Date.today())
     reason = fields.Text(string='Reason')
     currency_id = fields.Many2one('res.currency', string='Currency', required=True,
@@ -38,11 +46,8 @@ class SalaryAdvancePayment(models.Model):
                               ('paid', 'Open'),
                               ('close', 'Close'),
                               ('cancel', 'Cancelled'),
-                              ('reject', 'Rejected')], string='Status', default='draft', track_visibility='onchange')
+                              ('reject', 'Rejected')], string='Status', default='draft', compute='_compute_state', store=True)
     employee_contract_id = fields.Many2one('hr.contract', string='Contract', default=_default_get_contract, domain="[('employee_id','=',employee_id),('state','=','open')]")
-    
-    product_id = fields.Many2one('product.product', string='Product', domain="[('can_be_expensed','=', True)]", required=True, change_default=True)
-
         
     deductable = fields.Boolean(string='Deductable', default=False)
     partner_id = fields.Many2one('res.partner', 'Employee Partner', readonly=False, states={'paid': [('readonly', True)]},)
@@ -53,10 +58,10 @@ class SalaryAdvancePayment(models.Model):
     payment_date = fields.Date(string='Payment Date', compute='_compute_payment_date')
 
     payment_amount = fields.Monetary(string='Payment Amount', compute='_compute_payment_amount')
-    account_id = fields.Many2one('account.account',string="Account")
-    payment_method_id = fields.Many2one('account.payment.method', string='Payment Method Type', oldname="payment_method",)
+    #account_id = fields.Many2one('account.account',string="Account")
+    payment_method_id = fields.Many2one('account.payment.method', string='Payment Method Type')
     bill_count = fields.Integer(string='Advances Bill', compute='get_bill_count')
-    payment_count = fields.Integer(string='Payment', compute='get_payment_count')
+    payment_count = fields.Integer(string='Payment Count', compute='get_payment_count')
     
     cash_line_ids = fields.One2many('hr.salary.advance.line', 'advance_id', string='Advances Line')
     amount_total = fields.Monetary(string='Approved Amount', store=True, readonly=True, compute='_amount_all')
@@ -64,11 +69,43 @@ class SalaryAdvancePayment(models.Model):
     #expense details
     hr_expense_sheet_id = fields.Many2one('hr.expense.sheet', string='Expense Sheet', compute='_compute_expense_id')
     hr_expense_id = fields.Many2one('hr.expense', string='Expense', compute='_compute_expense_id')
+    date_due_expense = fields.Datetime(string='Due On', compute='_compute_expense_deadline', )
     expense_deadline = fields.Datetime(string='Expense Deadline', compute='_compute_expense_deadline', )
+    
     remittance_outstanding_days = fields.Integer(string='Remittance Outstanding day(s)', compute='_compute_remittance_days')
     remittance_overdue_days = fields.Integer(string='Remittance Overdue day(s)', compute='_compute_remittance_days')
 
+    api.depends('company_id')
+    def _compute_employee_id(self):
+        if not self.env.context.get('default_employee_id'):
+            for adv in self:
+                adv.employee_id = self.env.user.with_company(adv.company_id).employee_id
     
+    @api.depends('cash_line_ids.state')
+    def _compute_state(self):
+        status = ''
+        for adv in self:
+            #state = adv.mapped('cash_line_ids.state')
+            #if state:
+            if adv.cash_line_ids:
+                for line in adv.cash_line_ids:
+                    if line.state == 'close':
+                        status = 'close'
+                    else:
+                        status = adv.state
+                        break
+            else:
+                status = 'draft'
+                #if state.count('close'):
+                 #   status = 'close'
+                #elif state.count('draft'):
+                 #   status = 'draft'
+                #else:
+                 #   status = adv.state
+            #else:
+                #status = adv.state
+            adv.state = status
+            
     def _compute_remittance_days(self):
         date = expense_date = self.date
         for request in self:
@@ -92,6 +129,7 @@ class SalaryAdvancePayment(models.Model):
             days = 30
             dt = fields.Date.to_string(request.date + timedelta(days))
             request.expense_deadline = dt
+            request.date_due_expense = dt
 
     
     def _compute_expense_id(self):
@@ -148,6 +186,10 @@ class SalaryAdvancePayment(models.Model):
             else:
                 request.payment_date = False
 
+    @api.onchange('employee_id')
+    def _onchange_employee(self):
+        self.partner_id = self.employee_id.address_home_id.id
+        
     def unlink(self):
         if any(self.filtered(lambda loan: loan.state not in ('draft', 'cancel'))):
             raise UserError(_('You cannot delete a Loan which is not draft or cancelled!'))
@@ -262,24 +304,25 @@ class SalaryAdvancePayment(models.Model):
     
     def action_payment(self):
         invoice = False
-        if self.account_id:
-            account_id = self.account_id.id
-        else:
-            account_id = False
+        #if self.account_id:
+            #account_id = self.account_id.id
+        #else:
+            #account_id = False
             
         if self.journal_id.type == 'purchase':
             invoice = self.env['account.move']
             lines_data = []
             for line in self.cash_line_ids:
-                if self.account_id:
-                    account_id = self.account_id
-                else:
-                    account_id = False
+                #if self.account_id:
+                    #account_id = self.account_id
+                #else:
+                    #account_id = False
                 lines_data.append([0,0,{
                     'product_id': line.product_id.id,
-                    'name': line.description,
+                    'name': line.desc,
                     'price_unit': line.approved_amount,
-                    'account_id': account_id,
+                    #'account_id': account_id,
+                    'hr_salary_advance_line_id': line.id,
                     'quantity': 1,
                 }])
             invoice.create({
@@ -290,6 +333,7 @@ class SalaryAdvancePayment(models.Model):
                 'invoice_date':self.date,
                 'journal_id':self.journal_id.id,
                 'hr_salary_advance_id':self.id,
+                'currency_id': self.currency_id.id,
                 'invoice_line_ids':lines_data,
             })
         
@@ -311,6 +355,10 @@ class SalaryAdvancePayment(models.Model):
         self.update({
             'state': 'paid'
         })
+        for cash_line in self.cash_line_ids:
+            cash_line.update({
+                'state': 'paid'
+            })
         return invoice
     
     
@@ -329,13 +377,15 @@ class SalaryAdvancePayment(models.Model):
     
 class AdvancePayment(models.Model):
     _name = "hr.salary.advance.line"
+    _description = 'Salary Advance Line'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _rec_name='description'
+    _rec_name='name'
     
+    name = fields.Char(string='Name', compute='_compute_name')
     type_id = fields.Many2one('hr.advance.type', string='Type')
     #product_id = fields.Many2one('product.product', string='Product', domain="[('can_be_expensed','=', True)]", required=True, change_default=True)
-    product_id = fields.Many2one('product.product', related='advance_id.product_id')
-    description = fields.Char(related='product_id.name', string='Description')
+    product_id = fields.Many2one('product.product', string='Product', domain=[('type', '=', 'service')], change_default=True)
+    desc = fields.Char(string='Description', oldname='description')
     quantity = fields.Float(string='Qunatity', required=1, default=1.0)
     unit_price = fields.Float(string='Unit Price', required=True, default=1.0)
     total_amount = fields.Monetary(compute='_compute_amount', string='Subtotal')
@@ -354,17 +404,27 @@ class AdvancePayment(models.Model):
                               ('finance_approval', 'Waiting Finance Approval'),
                               ('accepted', 'Waiting Account Entries'),
                               ('approved', 'Waiting Payment'),
-                              ('paid', 'Paid'),
+                              ('paid', 'Open'),
                               ('close', 'Close'),
                               ('cancel', 'Cancelled'),
-                              ('reject', 'Rejected')], string='Status', default='draft', track_visibility='onchange')
+                              ('reject', 'Rejected')], string='Status', default='draft')
     
     #@api.constrains('approved_amount')
     #def _check_approved_amount(self):
         #for line in self:
             #if line.approved_amount > line.total_amount:
                 #raise UserError(_('The amount is exceeded than requested amount'))
+    
+    def _compute_name(self):
+        for line in self:
+            line.name = line.advance_id.name + ' - ' + line.product_id.name
             
+    @api.onchange('type_id')
+    def _onchange_type(self):
+        for line in self:
+            line.product_id = line.type_id.product_id.id
+            #line.description = line.product_id.name
+        
     @api.onchange('total_amount')
     def onchange_amount(self):
         for line in self:

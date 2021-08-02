@@ -8,17 +8,17 @@
         """,
 
     'description': """
-Employee Training
+        Employee Training
         1-provide employee training through sessions""",
-
+    'sequence': 1,
     'author': "Dynexcel",
-    'website': "http://www.dynexcel.co",
+    'website': "https://www.dynexcel.com",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/13.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
-    'category': 'Employee',
-    'version': '0.1',
+    'category': 'Human Resource',
+    'version': '14.0.0.1',
 
     # any module necessary for this one to work correctly
     'depends': ['base','hr','mail'],
@@ -29,6 +29,7 @@ Employee Training
         'data/course_seq.xml',
         'data/mail_template_data.xml',
         'security/ir.model.access.csv',
+        'views/delivery_method_view.xml',
         'views/sessions_views.xml',
         'views/course_views.xml',
         'views/configuration_view.xml',

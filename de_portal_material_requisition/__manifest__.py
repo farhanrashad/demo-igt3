@@ -24,7 +24,7 @@
     'version': '14.0.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'portal',  'rating', 'resource', 'web', 'web_tour', 'digest', 'de_stock_material_transfer', 'de_project_material_requisition_import'],
+    'depends': ['base', 'portal',  'rating', 'resource', 'web', 'web_tour', 'digest', 'de_stock_material_transfer'],
 
     # always loaded
     'data': [
