@@ -20,7 +20,7 @@
     # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Accounting',
-    'version': '14.0.0.7',
+    'version': '14.0.0.8',
 
     # any module necessary for this one to work correctly
     'depends': ['de_purchase_subscription','de_project_planning','de_custom_journal_entry'],
@@ -41,6 +41,8 @@
         'views/purchase_agreements_deductions_views.xml',
         'views/custom_journal_entry_views.xml',
         'views/project_views.xml',
+        'wizard/custom_entry_advance_inv_wizard_views.xml',
+        'views/custom_entry_views.xml',
         #'views/sale_agreements_views.xml',
         #'views/stock_fuel_views.xml',
         #'views/account_journal_views.xml',
