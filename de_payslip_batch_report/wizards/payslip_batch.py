@@ -37,9 +37,9 @@ class PayslipBatch(models.TransientModel):
         filename = "batch.txt"
         file_ = open(filename + str(), 'w')
         payslips = self.env['hr.payslip'].search([('payslip_run_id', '=', self.batch_id.id)])
-        line = ' ' 
+        line = '' 
         for payslip in payslips:
-            line += 'TT' + '  ' + str(payslip.number) + '        ' + str(self.debit_ac_no) + '  ' + str(self.currency.name) + str(self.date_today) + '   ' + str(payslip.net_wage) + '         ' + str(payslip.employee_id.bank_account_id.acc_number) + '                    ' + str(payslip.employee_id.address_id.street)+ '  '+ str(payslip.employee_id.address_id.street2) + ' '+ str(payslip.employee_id.address_id.city) + ' ' + str(payslip.employee_id.address_id.country_id.name) + '                              ' + str(payslip.employee_id.bank_account_id.bank_id.name)  + '     ' + str(payslip.employee_id.bank_account_id.bank_id.street) + ' ' + str(payslip.name) + str(payslip.employee_id.work_email) +"\n"
+            line += 'TT' + '  ' + str(payslip.number) + '        ' + str(round(self.debit_ac_no)) + '  ' + str(self.currency.name) + str(self.date_today.strftime("%Y%m%d")) + '   ' + str(payslip.net_wage) + '         ' + ' NNOUR'+str(payslip.employee_id.bank_account_id.acc_number) + '                    ' + str(self.currency.name)+str(payslip.employee_id.bank_account_id.acc_holder_name)+'     '+str(payslip.employee_id.address_id.street)+ '  '+ str(payslip.employee_id.address_id.street2) + ' '+ str(payslip.employee_id.address_id.city) + ' ' + str(payslip.employee_id.address_id.country_id.name) + '                              ' + str(payslip.employee_id.bank_account_id.bank_id.name)  + '     ' + str(payslip.employee_id.bank_account_id.bank_id.street) + ' ' + str(payslip.name) + str(payslip.employee_id.work_email) +"\n"
         data_val = str(line)
         file_.write(data_val)
         file_.write("\n")
@@ -57,7 +57,6 @@ class PayslipBatch(models.TransientModel):
             }
             attach_file = self.env['ir.attachment'].create(attachment_vals)
             download_url = '/web/content/' + str(attach_file.id) + '?download=True'
-            #base_url = self.env['ir.config_parameter'].get_param('web.base.url')
 #             Return so it will download in your system
             return {
                     "type": "ir.actions.act_url",
