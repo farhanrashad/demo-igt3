@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Task Approvals",
+    'name': "Task Workflow",
 
     'summary': """
-        Task Approvals through stages
+        Task Workflow through stages
         """,
 
     'description': """
-        Project Task Approvals
+        Project Task Workflow
     """,
 
     'author': "Dynexcel",
@@ -17,14 +17,14 @@
     # Check https://github.com/odoo/odoo/blob/14.0/odoo/addons/base/data/ir_module_category_data.xml
     # for the full list
     'category': 'Project',
-    'version': '14.0.0.4',
+    'version': '14.0.0.1',
 
     # any module necessary for this one to work correctly
     'depends': ['project'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/project_views.xml',
         'views/templates.xml',
     ],
