@@ -175,16 +175,17 @@ class ProjectTask(models.Model):
                         name_seq = self.custom_entry_type_id.sequence_id.next_by_id()  
 
                     desc = ' '
-                    raw_entry_data = custom.description.split('<p>') 
-                    raw_entry_desc = str(raw_entry_data).split('</p>')
-                    for raw_desc in raw_entry_desc:
-                        new_desc = raw_desc.split("['', '") 
-                        ccount = 0
-                        for in_desc in new_desc:
-                            ccount += 1
-                            if ccount > 1:
-                                desc += str(in_desc)                                
-                                break 
+                    if custom.description:
+                        raw_entry_data = custom.description.split('<p>') 
+                        raw_entry_desc = str(raw_entry_data).split('</p>')
+                        for raw_desc in raw_entry_desc:
+                            new_desc = raw_desc.split("['', '") 
+                            ccount = 0
+                            for in_desc in new_desc:
+                                ccount += 1
+                                if ccount > 1:
+                                    desc += str(in_desc)                                
+                                    break 
        
                     custom_vals = {
                         'name':  name_seq, 
