@@ -26,11 +26,11 @@ class PayslipBatch(models.TransientModel):
             if line.doe:
                 line.update({
                   'date_today': line.doe.strftime("%Y%m%d")
-                )}
+                })
             else:
                 line.update({
                   'date_today': datetime.today().strftime("%Y%m%d")
-                )}
+                })
     
     def print_report(self):
         print('ID: ', self.id)
