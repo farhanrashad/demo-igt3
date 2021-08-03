@@ -35,16 +35,16 @@
                             <field name='requester'/>
                             <field name='manager'/>
                             <field name='department'/>
-                            <field name='representative_batch'/>
-                            <field name='date'/>
-                            <field name='type'/>
-                            <field name='is_level' string="Is C-Level?" attrs="{'readonly': [('type','=','category use')]}"/>
-                            <field name='additional_req'/>
+                            <field name='representative_batch' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name='date' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name='type' attrs="{'readonly': [('state','!=','draft')]}"/>
+                            <field name='is_level' string="Is C-Level?" attrs="{'readonly': ['|',('type','=','category use'),('state','!=','draft')]}"/>
+                            <field name='additional_req'  attrs="{'readonly': [('state','!=','draft')]}"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Employee Benefit" name="employee_benefit"  attrs="{'invisible': [('type','=','category use')]}">
-                            <field name='topup_request_lines' attrs="{'readonly': [('state','=','approved')]}">
+                            <field name='topup_request_lines' attrs="{'readonly': [('state','!=','draft')]}">
                                 <tree editable='bottom'>
                                     <field name='employee'/>
                                     <field name='department'/>
@@ -58,7 +58,7 @@
                             </field>
                         </page>
                         <page string="Category" name="category" attrs="{'invisible': [('type','!=','category use')]}">
-                            <field name='topup_request_lines_category' attrs="{'readonly':[('state','=','approved')]}">
+                            <field name='topup_request_lines_category' attrs="{'readonly':[('state','!=','draft')]}">
                                 <tree editable='bottom'>
                                     <field name='category'/>
                                     <field name='description'/>
