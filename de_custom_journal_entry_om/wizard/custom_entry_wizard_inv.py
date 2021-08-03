@@ -13,8 +13,11 @@ class CustomEntryWizard(models.TransientModel):
         
     product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],)
     amount = fields.Float('Down Payment Amount', digits='Account', default=1.0, help="The percentage of amount to be Billed in advance, taxes excluded.")
+    amount_advance_bal_per = fields.Float('Advance %age balance')
+    
     amount_bal = fields.Float('Balance Amount', digits='Account', default=1.0, readonly=True)
     amount_advance = fields.Float('Advance Amount', digits='Account', compute='_compute_advance_amount')
+    
     currency_id = fields.Many2one('res.currency', string='Currency')
     supplier_taxes_id = fields.Many2many("account.tax", string="Vendor Taxes", help="Taxes used for deposits")
     
@@ -27,6 +30,7 @@ class CustomEntryWizard(models.TransientModel):
             'amount_bal': entry_id.amount_total,
             'currency_id': entry_id.currency_id.id,
             'product_id': entry_id.custom_entry_type_id.dp_product_id.id,
+            'amount_advance_bal_per': entry_id.om_amount_advance_bal
             #'supplier_taxes_id': entry_id.custom_entry_type_id.dp_product_id.supplier_taxes_id.ids,
             #'supplier_taxes_id': [(6, 0, entry_id.custom_entry_type_id.dp_product_id.supplier_taxes_id.ids)],
         })
@@ -35,8 +39,13 @@ class CustomEntryWizard(models.TransientModel):
     def create_invoices(self):
         if self.amount > 100 or self.amount <= 0.00:
             raise UserError(_('The value of the down payment amount must be between 1 to 100.'))
-            
+        
         entry_id = self.env['account.custom.entry'].browse(self._context.get('active_ids', []))
+        
+        if (self.amount + self.amount_advance_bal_per):
+            raise UserError(_('Advance amount limit exceeded. the remaining limit is %s'),(entry_id.custom_entry_type_id.amount_advance_limit - self.amount_advance_bal_per))
+            
+        
         invoice = self.env['account.move']
         lines_data = []
         amount = (self.amount / 100) * entry_id.amount_total

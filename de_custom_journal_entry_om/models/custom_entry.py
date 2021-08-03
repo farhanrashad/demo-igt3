@@ -15,6 +15,8 @@ class CustomEntry(models.Model):
     #App fields
     has_om = fields.Selection(related="custom_entry_type_id.has_om")
     allow_advance_inv = fields.Boolean(related='custom_entry_type_id.allow_advance_inv')
+    om_amount_advance_bal = fields.Float(string='OM Advance Amount')
+    om_amount_advance_per = fields.Float(string='OM Advance %age')
     
 class CustomEntryLine(models.Model):
     _inherit = 'account.custom.entry.line'
