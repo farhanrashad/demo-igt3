@@ -15,3 +15,5 @@ class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
     has_om = fields.Selection(CATEGORY_SELECTION, string="Has OM Invoices", default="no", required=True,)
+    allow_advance_inv = fields.Boolean(string='Allow Advance')
+    dp_product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],)

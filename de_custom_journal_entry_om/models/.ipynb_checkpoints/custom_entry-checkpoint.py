@@ -8,12 +8,6 @@ from dateutil.relativedelta import relativedelta
 
 import json
 from lxml import etree
-
-class CustomEntryType(models.Model):
-    _inherit = 'account.custom.entry.type'
-    
-    allow_advance_inv = fields.Boolean(string='Allow Advance')
-    dp_product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],)
     
 class CustomEntry(models.Model):
     _inherit = 'account.custom.entry'

@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="de_custom_journal_entry.account_custom_entry_form_view" />
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='create_payment']" position="after">
-                    <button name="%(de_operations.action_custom_entry_advance_payment_inv)d" string="Create Bill"
+                    <button name="%(de_custom_journal_entry_om.action_custom_entry_advance_payment_inv)d" string="Create Bill"
                         type="action" class="btn-primary" context="{'create_bill':True}"  attrs="{'invisible':[('allow_advance_inv','=',False)]}"/>
                  </xpath>
                 <xpath expr="//button[@name='action_view_invoice']" position="replace">
