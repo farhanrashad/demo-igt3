@@ -20,7 +20,7 @@ class PayslipBatch(models.TransientModel):
     batch_id = fields.Many2one('hr.payslip.run')
     date_today = fields.Char(string='Date Today')
 
-    @api.depends('doe'):
+    @api.depends('doe')
     def _compute_date(self):
         for line in self:
             if line.doe:
