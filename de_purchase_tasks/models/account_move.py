@@ -7,11 +7,12 @@ from odoo.exceptions import UserError
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    milestone_purchase_id = fields.Many2one('purchase.order', readonly=True, compute="_compute_allow_picking")
+    milestone_purchase_id = fields.Many2one('purchase.order', readonly=True, compute="_compute_allow_picking", stroe=True)
     allow_picking = fields.Boolean(string='Allow on Picking', compute="_compute_allow_picking")
 
-    task_id = fields.Many2one('project.task', string='Milestone', compute="_compute_milestone")
+    task_id = fields.Many2one('project.task', string='Milestone',store=True, compute="_compute_milestone")
     
+    @api.depends('milestone_purchase_id')
     def _compute_milestone(self):
         picking = self.env['stock.picking']
         for move in self:
