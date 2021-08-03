@@ -18,6 +18,8 @@ class CustomEntry(models.Model):
     om_amount_advance_bal = fields.Float(string='OM Advance Amount')
     om_amount_advance_per = fields.Float(string='OM Advance %age')
     
+    custom_entry_om_deduction_line = fields.One2many('account.custom.entry.om.deduction', 'custom_entry_id', string='OM Deduction', copy=True, auto_join=True,)
+
 class CustomEntryLine(models.Model):
     _inherit = 'account.custom.entry.line'
     
@@ -38,6 +40,18 @@ class CustomEntryLine(models.Model):
     o_amount = fields.Float(string='OM Amount' )
     o_final_amount = fields.Float(string='OM Final Amount' )
     o_charges = fields.Float(string='OM Service Charges' )
+
+class AccountCustomEntryOMDeduction(models.Model):
+    _name = 'account.custom.entry.om.deduction'
+    _description = 'Custom Entry OM Deduction'
+    
+    custom_entry_id = fields.Many2one('account.custom.entry', string='Custom Entry', required=True, ondelete='cascade', index=True, copy=False)
+    
+    project_id = fields.Many2one('project.project', string="Project", check_company=True, ondelete='cascade')
+    company_id = fields.Many2one('res.company', related='custom_entry_id.company_id')
+    currency_id = fields.Many2one('res.currency',related='custom_entry_id.currency_id')
+    om_deduction_type_id = fields.Many2one('account.custom.entry.om.deduction.type', string='Deduction Type', index=True, required=True, readonly=True,)
+    amount = fields.Monetary(string='Amount')
 
     
     

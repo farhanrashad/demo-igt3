@@ -20,6 +20,8 @@
                 </xpath>
                 <xpath expr="//group[1]/group[2]" position="inside">
                     <field name="allow_advance_inv" invisible="1"/>
+                    <field name="om_amount_advance_bal" invisible="1"/>
+                    <field name="om_amount_advance_per" invisible="1"/>
                 </xpath>
                 
                 <xpath expr="//sheet[1]" position="inside">
@@ -40,6 +42,19 @@
                     <field name="o_final_amount" sum="OM Final Amount" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
                     <field name="o_charges" sum="OM Charges" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
                     
+                </xpath>
+                <xpath expr="//page[@name='custom_entry_line']" position="after">
+                    <page name="om_deduction" string="Deductions">
+                        <field name="custom_entry_om_deduction_line" widget="one2many_list" attrs="{'readonly': [('stage_category', '!=', 'draft')]}" >
+                            <tree string="OM Deduction" editable="bottom">
+                                <field name="project_id" string="Site" required="1" options="{'no_create':True}" />
+                                <field name="company_id" invisible="1" />
+                                <field name="currency_id" invisible="1" />
+                                <field name="om_deduction_type_id" required="1" options="{'no_create':True}" />
+                                <field name="amount" required="1" />
+                            </tree>
+                        </field>
+                    </page>
                 </xpath>
             </field>
     </record>

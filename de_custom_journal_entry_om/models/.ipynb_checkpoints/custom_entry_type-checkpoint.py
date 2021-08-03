@@ -23,3 +23,11 @@ class CustomEntryType(models.Model):
     def _check_amount_advance_limit(self):
         if self.amount_advance_limit > 100 or self.amount_advance_limit <= 0.00:
             raise UserError(_('The limit of the down payment amount must be between 1 to 100.'))
+            
+class CustomEntryOMDeductionType(models.Model):
+    _name = 'account.custom.entry.om.deduction.type'
+    _description = 'Custom Entry OM Deduction Type'
+    
+    name = fields.Char(string='Name', required=True, translate=True)
+    product_id = fields.Many2one('product.product', string="Product", ondelete='cascade')
+    
