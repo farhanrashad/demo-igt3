@@ -21,7 +21,7 @@ class PayslipBatch(models.TransientModel):
     date_today = fields.Char(string='Date Today')
 
     @api.depends('doe')
-    def _compute_date(self):
+    def print_txt_report(self):
         for line in self:
             if line.doe:
                 line.update({
@@ -31,6 +31,7 @@ class PayslipBatch(models.TransientModel):
                 line.update({
                   'date_today': datetime.today().strftime("%Y%m%d")
                 })
+            line.generate_txt_report()
     
     def print_report(self):
         print('ID: ', self.id)
@@ -45,8 +46,7 @@ class PayslipBatch(models.TransientModel):
     
     
     
-    def print_txt_report(self):
-        self._compute_date()
+    def generate_txt_report(self):
         data_val = ''
         vals = ''
         filename = "batch.txt"
