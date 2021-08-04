@@ -588,7 +588,7 @@ class CustomEntry(models.Model):
                 'quantity': line.product_qty,
                 'product_uom_id': line.product_uom_id.id,
                 'product_id': line.product_id.id,
-                #'tax_ids': [(6, 0, tax_ids.ids)],
+                'tax_ids': [(6, 0, line.product_id.supplier_taxes_id.ids)],
                 'analytic_account_id': line.analytic_account_id.id,
                 'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                 'project_id': line.project_id.id,
