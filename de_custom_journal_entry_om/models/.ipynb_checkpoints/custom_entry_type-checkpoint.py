@@ -15,3 +15,19 @@ class CustomEntryType(models.Model):
     _inherit = 'account.custom.entry.type'
     
     has_om = fields.Selection(CATEGORY_SELECTION, string="Has OM Invoices", default="no", required=True,)
+    allow_advance_inv = fields.Boolean(string='Allow Advance')
+    dp_product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],)
+    amount_advance_limit = fields.Float(string='Advance Amount Limit %')
+    
+    @api.constrains('amount_advance_limit')
+    def _check_amount_advance_limit(self):
+        if self.amount_advance_limit > 100 or self.amount_advance_limit <= 0.00:
+            raise UserError(_('The limit of the down payment amount must be between 1 to 100.'))
+            
+class CustomEntryOMDeductionType(models.Model):
+    _name = 'account.custom.entry.om.deduction.type'
+    _description = 'Custom Entry OM Deduction Type'
+    
+    name = fields.Char(string='Name', required=True, translate=True)
+    product_id = fields.Many2one('product.product', string="Product", ondelete='cascade')
+    
