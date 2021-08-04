@@ -74,7 +74,8 @@ class StockPicking(models.Model):
             'invoice_line_ids':lines_data,
         })
         self.update({
-            'move_id': move.id, 
+            'move_id': move.id,
+            'invoice_control': 'invoiced',
         })
         return invoice
     
