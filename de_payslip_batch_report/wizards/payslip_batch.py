@@ -21,7 +21,7 @@ class PayslipBatch(models.TransientModel):
     date_today = fields.Char(string='Date Today')
 
     @api.depends('doe')
-    def print_txt_report(self):
+    def _compute_date(self):
         for line in self:
             if line.doe:
                 line.update({
@@ -31,7 +31,7 @@ class PayslipBatch(models.TransientModel):
                 line.update({
                   'date_today': datetime.today().strftime("%Y%m%d")
                 })
-            line.generate_txt_report()
+            
     
     def print_report(self):
         print('ID: ', self.id)
@@ -46,7 +46,7 @@ class PayslipBatch(models.TransientModel):
     
     
     
-    def generate_txt_report(self):
+    def print_txt_report(self):
         data_val = ''
         vals = ''
         filename = "batch.txt"
@@ -54,7 +54,7 @@ class PayslipBatch(models.TransientModel):
         payslips = self.env['hr.payslip'].search([('payslip_run_id', '=', self.batch_id.id)])
         file_data = '' 
         for payslip in payslips:
-            self.env.cr.execute("""select rpad(concat('',p.number),16,' '), rpad(concat('',ps.debit_ac_no),14,' '), rpad(concat('',c.name,ps.date_today),14,' '),rpad(concat('',p.normal_wage,'.0'),15,' '), rpad(concat('NNOUR',bank.acc_number),40,' '),rpad(concat('',c.name,bank.acc_holder_name),38,' '),rpad(concat('',partner.street,partner.street2,partner.city),70,' '),rpad(concat('',country.name),35,' '),rpad(concat(bbank.name,bbank.street),105,' '),rpad(concat('',bcountry.name),186,' '),rpad(concat('',p.name),350,' '),rpad(concat('E',emp.work_email),536,' '),rpad(concat('',bbank.bic),505,' ')
+            self.env.cr.execute("""select rpad(concat('',p.number),16,' '), rpad(concat('',ps.debit_ac_no),14,' '), rpad(concat('',c.name,to_char(ps.doe,'YYYYMMDD'),14,' '),rpad(concat('',p.normal_wage,'.0'),15,' '), rpad(concat('NNOUR',bank.acc_number),40,' '),rpad(concat('',c.name,bank.acc_holder_name),38,' '),rpad(concat('',partner.street,partner.street2,partner.city),70,' '),rpad(concat('',country.name),35,' '),rpad(concat(bbank.name,bbank.street),105,' '),rpad(concat('',bcountry.name),186,' '),rpad(concat('',p.name),350,' '),rpad(concat('E',emp.work_email),536,' '),rpad(concat('',bbank.bic),505,' ')
             from pay_slip_batch as ps 
             left join hr_payslip as p on ps.batch_id=p.payslip_run_id
             left join hr_employee as emp on p.employee_id=emp.id
