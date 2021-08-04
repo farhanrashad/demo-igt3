@@ -42,8 +42,8 @@ class CustomEntryWizard(models.TransientModel):
         
         entry_id = self.env['account.custom.entry'].browse(self._context.get('active_ids', []))
         
-        if (self.amount + self.amount_advance_bal_per):
-            raise UserError(_('Advance amount limit exceeded. the remaining limit is %s'),(entry_id.custom_entry_type_id.amount_advance_limit - self.amount_advance_bal_per))
+        if (self.amount + entry_id.om_amount_advance_per) > entry_id.custom_entry_type_id.amount_advance_limit:
+            raise UserError(_('Advance amount limit exceeded. the remaining limit is %s') % (entry_id.custom_entry_type_id.amount_advance_limit - entry_id.om_amount_advance_per))
             
         
         invoice = self.env['account.move']

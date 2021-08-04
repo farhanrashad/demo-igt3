@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='create_payment']" position="after">
                     <button name="%(de_custom_journal_entry_om.action_custom_entry_advance_payment_inv)d" string="Create Bill"
-                        type="action" class="btn-primary" context="{'create_bill':True}"  attrs="{'invisible':[('allow_advance_inv','=',False)]}"/>
+                        type="action" class="btn-primary" context="{'create_bill':True}"  attrs="{'invisible':['|', ('allow_advance_inv','=',False),('stage_category','in','closed')]}"/>
                  </xpath>
                 <xpath expr="//button[@name='action_view_invoice']" position="replace">
                     <button type="object"  name="action_view_invoice" attrs="{'invisible': ['|',('allow_advance_inv','=',True),('invoice_count', '=', 0)]}" class="oe_stat_button" icon="fa-pencil-square-o">
