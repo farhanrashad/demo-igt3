@@ -18,7 +18,7 @@ class PayslipBatch(models.TransientModel):
     debit_ac_no = fields.Char(string='Debit A/C No.')
     currency = fields.Many2one('res.currency', string='Currency')
     batch_id = fields.Many2one('hr.payslip.run')
-    date_today = fields.Char(string='Date Today', compute='_compute_date')
+    date_today = fields.Char(string='Date Today')
 
     @api.depends('doe')
     def _compute_date(self):
@@ -46,6 +46,7 @@ class PayslipBatch(models.TransientModel):
     
     
     def print_txt_report(self):
+        self._compute_date()
         data_val = ''
         vals = ''
         filename = "batch.txt"
