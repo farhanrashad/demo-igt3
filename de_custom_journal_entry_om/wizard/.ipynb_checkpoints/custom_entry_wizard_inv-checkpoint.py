@@ -66,7 +66,7 @@ class CustomEntryWizard(models.TransientModel):
             'quantity': 1.0,
             'product_uom_id': self.product_id.uom_id.id,
             'product_id': self.product_id.id,
-            #'tax_ids': [(6, 0, tax_ids.ids)],
+            'tax_ids': [(6, 0, self.product_id.supplier_taxes_id.ids)],
             #'analytic_account_id': line.analytic_account_id.id,
             #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
             #'project_id': line.project_id.id,
