@@ -117,8 +117,6 @@ class CustomEntry(models.Model):
                 entry.account_entry_type = entry.stage_id.next_stage_id.account_entry_type
             else:
                 entry.account_entry_type = 'none'
-            
-   
                 
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
@@ -177,8 +175,8 @@ class CustomEntry(models.Model):
         Move = self.env['account.move']
         can_read = Move.check_access_rights('read', raise_exception=False)
         for move in self:
-            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '!=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
-            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('journal_id', '=', move.custom_entry_type_id.journal_id.id),('journal_id.type', '=', 'general') ]) or 0
 
     def unlink(self):
         for entry in self:
@@ -290,8 +288,27 @@ class CustomEntry(models.Model):
         }
         return invoice_vals
     
+    def action_view_invoice(self):
+        invoices = self.mapped('invoice_ids')
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        #elif len(invoices) == 1:
+            #form_view = [(self.env.ref('account.view_move_form').id, 'form')]
+            if 'views' in action:
+                action['views'] = form_view + [(state,view) for state,view in action['views'] if view != 'form']
+            else:
+                action['views'] = form_view
+            action['res_id'] = invoices.id
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+
+        context = {
+            'default_move_type': 'in_invoice',
+        }
+        return action
     
-    def action_view_invoice(self, invoices=False):
+    def action_view_invoice1(self, invoices=False):
         """This function returns an action that display existing vendor bills of
         given purchase order ids. When only one found, show the vendor bill
         immediately.
