@@ -45,8 +45,9 @@
 			<field name="inherit_id" ref="stock.vpicktree"/>
 			<field name="arch" type="xml">
                 <xpath expr="//field[@name='origin']" position="after">
-			     <field name="origin_picking_id" optional="hide" />
+                    <field name="origin_picking_id" optional="hide" />
                     <field name="is_return" optional="hide" />
+                    <field name="invoice_control" optional="hide" />
                 </xpath>    
             </field>
 		</record>
