@@ -99,9 +99,17 @@ class CustomEntry(models.Model):
     has_advanced = fields.Selection(related="custom_entry_type_id.has_advanced")
     
     
-    invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
-    invoice_count = fields.Integer(compute="_compute_all_moves", string='Bill Count', copy=False, default=0,)
-    move_count = fields.Integer(compute="_compute_all_moves", string='Move Count', copy=False, default=0)
+    #invoice_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Bills', copy=False, store=True)
+    #move_ids = fields.Many2many('account.move', compute="_compute_invoice", string='Journal Entries', copy=False, store=True)
+    #invoice_count = fields.Integer(compute="_compute_all_moves", string='Bill Count', copy=False, default=0,)
+    #move_count = fields.Integer(compute="_compute_all_moves", string='Move Count', copy=False, default=0)
+    
+    invoice_count = fields.Integer(string='Invoice Count', compute='_get_invoiced', readonly=True)
+    invoice_ids = fields.Many2many("account.move", string='Invoices', compute="_get_invoiced", readonly=True, copy=False)
+    
+    move_count = fields.Integer(string='Move Count', compute='_get_moves', readonly=True)
+    move_ids = fields.Many2many("account.move", string='Moves', compute="_get_moves", readonly=True, copy=False)
+
 
     
     @api.depends('date_entry')
@@ -117,8 +125,6 @@ class CustomEntry(models.Model):
                 entry.account_entry_type = entry.stage_id.next_stage_id.account_entry_type
             else:
                 entry.account_entry_type = 'none'
-            
-   
                 
     @api.depends('custom_entry_type_id')
     def _compute_stage_id(self):
@@ -168,8 +174,15 @@ class CustomEntry(models.Model):
     @api.depends('custom_entry_line.invoice_lines.move_id')
     def _compute_invoice(self):
         for entry in self:
-            invoices = entry.mapped('custom_entry_line.invoice_lines.move_id')
+            if self._context.get('open_invoices', True):
+                if entry.journal_id.type == 'purchase':
+                    invoices = entry.mapped('custom_entry_line.invoice_lines.move_id')
+            else:
+                if entry.journal_id.type == 'general':
+                    invoices = entry.mapped('custom_entry_line.invoice_lines.move_id')
             entry.invoice_ids = invoices
+            #elif entry.journal_id.type == 'general':
+            #entry.move_ids = mvoes
             #entry.invoice_count = len(invoices)
     
     @api.depends('custom_entry_line.invoice_lines.move_id')
@@ -177,9 +190,44 @@ class CustomEntry(models.Model):
         Move = self.env['account.move']
         can_read = Move.check_access_rights('read', raise_exception=False)
         for move in self:
-            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '!=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
-            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('move_type', '=', 'entry'),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.invoice_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('journal_id', '=', move.custom_entry_type_id.journal_id.id)]) or 0
+            move.move_count = can_read and Move.search_count([('custom_entry_id', '=', move.id),('journal_id', '=', move.custom_entry_type_id.journal_id.id),('journal_id.type', '=', 'general') ]) or 0
 
+    @api.depends('custom_entry_line.invoice_lines')
+    def _get_invoiced(self):
+        # The invoice_ids are obtained thanks to the invoice lines of the SO
+        # lines, and we also search for possible refunds created directly from
+        # existing invoices. This is necessary since such a refund is not
+        # directly linked to the SO.
+        for entry in self:
+            invoices = entry.custom_entry_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('in_invoice', 'in_refund'))
+            entry.invoice_ids = invoices
+            entry.invoice_count = len(invoices)
+            
+    @api.depends('custom_entry_line.invoice_lines')
+    def _get_moves(self):
+        # The invoice_ids are obtained thanks to the invoice lines of the SO
+        # lines, and we also search for possible refunds created directly from
+        # existing invoices. This is necessary since such a refund is not
+        # directly linked to the SO.
+        for entry in self:
+            moves = entry.custom_entry_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('entry'))
+            entry.move_ids = moves
+            entry.move_count = len(moves)
+    
+    @api.depends('custom_entry_line.invoice_lines')
+    def _get_entries(self):
+        # The invoice_ids are obtained thanks to the invoice lines of the SO
+        # lines, and we also search for possible refunds created directly from
+        # existing invoices. This is necessary since such a refund is not
+        # directly linked to the SO.
+        for entry in self:
+            invoices = entry.custom_entry_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('entry'))
+            entry.invoice_ids = invoices
+            entry.invoice_count = len(invoices)
+            
+            
+            
     def unlink(self):
         for entry in self:
             if not entry.stage_category == 'draft' or entry.invoice_ids:
@@ -290,8 +338,50 @@ class CustomEntry(models.Model):
         }
         return invoice_vals
     
+    def action_view_invoice(self):
+        invoices = self.mapped('invoice_ids')
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_out_invoice_type")
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            form_view = [(self.env.ref('account.view_move_form').id, 'form')]
+            if 'views' in action:
+                action['views'] = form_view + [(state,view) for state,view in action['views'] if view != 'form']
+            else:
+                action['views'] = form_view
+            action['res_id'] = invoices.id
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+
+        context = {
+            'default_move_type': 'in_invoice',
+        }
+        return action
     
-    def action_view_invoice(self, invoices=False):
+    def action_view_move(self):
+        #invoices = self.mapped('invoice_ids')
+        #invoices = self.env['account.move'].search([('custom_entry_id','=',self.id),('move_type','=','entry')])
+        invoices = self.custom_entry_line.invoice_lines.move_id.filtered(lambda r: r.move_type in ('entry'))
+        action = self.env["ir.actions.actions"]._for_xml_id("account.action_move_journal_line")
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            form_view = [(self.env.ref('account.view_move_form').id, 'form')]
+            if 'views' in action:
+                action['views'] = form_view + [(state,view) for state,view in action['views'] if view != 'form']
+            else:
+                action['views'] = form_view
+            action['res_id'] = invoices.id
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+
+        context = {
+            'default_move_type': 'entry',
+        }
+        return action
+    
+    
+    def action_view_invoice1(self, invoices=False):
         """This function returns an action that display existing vendor bills of
         given purchase order ids. When only one found, show the vendor bill
         immediately.
@@ -498,7 +588,7 @@ class CustomEntry(models.Model):
                 'quantity': line.product_qty,
                 'product_uom_id': line.product_uom_id.id,
                 'product_id': line.product_id.id,
-                #'tax_ids': [(6, 0, tax_ids.ids)],
+                'tax_ids': [(6, 0, line.product_id.supplier_taxes_id.ids)],
                 'analytic_account_id': line.analytic_account_id.id,
                 'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                 'project_id': line.project_id.id,

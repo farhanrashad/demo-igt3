@@ -15,8 +15,8 @@ class CustomEntryWizard(models.TransientModel):
     amount = fields.Float('Down Payment Amount', digits='Account', default=1.0, help="The percentage of amount to be Billed in advance, taxes excluded.")
     amount_advance_bal_per = fields.Float('Advance %age balance')
     
-    amount_bal = fields.Float('Balance Amount', digits='Account', default=1.0, readonly=True)
-    amount_advance = fields.Float('Advance Amount', digits='Account', compute='_compute_advance_amount')
+    amount_bal = fields.Float('Remaining Balance Amount', digits='Account', default=1.0, readonly=True)
+    stage_category = fields.Char(string='Stage Category', readonly=True)
     
     currency_id = fields.Many2one('res.currency', string='Currency')
     supplier_taxes_id = fields.Many2many("account.tax", string="Vendor Taxes", help="Taxes used for deposits")
@@ -27,47 +27,58 @@ class CustomEntryWizard(models.TransientModel):
         entry_id = self.env['account.custom.entry'].browse(self._context.get('active_ids',[]))
         
         res.update({
-            'amount_bal': entry_id.amount_total,
+            'amount_bal': entry_id.amount_total - entry_id.om_amount_advance_bal,
+             'stage_category': entry_id.stage_category,
             'currency_id': entry_id.currency_id.id,
             'product_id': entry_id.custom_entry_type_id.dp_product_id.id,
-            'amount_advance_bal_per': entry_id.om_amount_advance_bal
+            'amount_advance_bal_per': entry_id.om_amount_advance_per
             #'supplier_taxes_id': entry_id.custom_entry_type_id.dp_product_id.supplier_taxes_id.ids,
             #'supplier_taxes_id': [(6, 0, entry_id.custom_entry_type_id.dp_product_id.supplier_taxes_id.ids)],
         })
         return res
     
     def create_invoices(self):
-        if self.amount > 100 or self.amount <= 0.00:
-            raise UserError(_('The value of the down payment amount must be between 1 to 100.'))
-        
+        amount = 0
         entry_id = self.env['account.custom.entry'].browse(self._context.get('active_ids', []))
+        if self.stage_category == 'confirm':
+            amount = self.amount_bal
+            entry_id.update({
+                'stage_id' : entry_id.stage_id.next_stage_id.id,
+            })
+        else:
+            if self.amount > 100 or self.amount <= 0.00:
+                raise UserError(_('The value of the down payment amount must be between 1 to 100.'))
         
-        if (self.amount + self.amount_advance_bal_per):
-            raise UserError(_('Advance amount limit exceeded. the remaining limit is %s'),(entry_id.custom_entry_type_id.amount_advance_limit - self.amount_advance_bal_per))
+            if (self.amount + entry_id.om_amount_advance_per) > entry_id.custom_entry_type_id.amount_advance_limit:
+                raise UserError(_('Advance amount limit exceeded. the remaining limit is %s') % (entry_id.custom_entry_type_id.amount_advance_limit - entry_id.om_amount_advance_per))
+            amount = (self.amount / 100) * entry_id.amount_total
             
         
         invoice = self.env['account.move']
         lines_data = []
-        amount = (self.amount / 100) * entry_id.amount_total
+        entry_id.update({
+            'om_amount_advance_per': entry_id.om_amount_advance_per + self.amount,
+            'om_amount_advance_bal': entry_id.om_amount_advance_bal + amount,
+        })
         lines_data.append([0,0,{
             'name': _('Down Payment'),
             'price_unit': amount or 0.0,
             'quantity': 1.0,
             'product_uom_id': self.product_id.uom_id.id,
             'product_id': self.product_id.id,
-            #'tax_ids': [(6, 0, tax_ids.ids)],
+            'tax_ids': [(6, 0, self.product_id.supplier_taxes_id.ids)],
             #'analytic_account_id': line.analytic_account_id.id,
             #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
             #'project_id': line.project_id.id,
         }])
         invoice.create({
-            'move_type': entry_id.custom_entry_type_id.move_type,
+            'move_type': 'in_invoice',
             'custom_entry_id': entry_id.id,
             'invoice_date': fields.Datetime.now(),
             'partner_id': entry_id.partner_id.id,
             #'partner_shipping_id': self.partner_id.id,
             'currency_id': self.currency_id.id,
-            'journal_id': entry_id.custom_entry_type_id.journal_id.id,
+            'journal_id': entry_id.custom_entry_type_id.advance_journal_id.id,
             'invoice_origin': entry_id.name,
             #'fiscal_position_id': fpos.id,
             'invoice_payment_term_id': entry_id.partner_id.property_supplier_payment_term_id.id,

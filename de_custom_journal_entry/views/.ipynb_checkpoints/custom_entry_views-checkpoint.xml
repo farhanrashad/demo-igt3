@@ -77,16 +77,17 @@
                         
                         
                         <div class="oe_button_box" name="button_box">
-                        <button type="object"  name="action_view_invoice" attrs="{'invisible': [('invoice_count', '=', 0)]}" 
+                        <button type="object"  name="action_view_invoice" context="{'open_invoices': True}" attrs="{'invisible': [('invoice_count', '=', 0)]}" 
                             class="oe_stat_button"
                             icon="fa-pencil-square-o">
                             <field name="invoice_count" widget="statinfo" string="Bill"/>
                             <field name='invoice_ids' invisible="1"/>
                         </button>
-                        <button type="object"  name="action_view_invoice" attrs="{'invisible': [('move_count', '=', 0)]}" 
+                        <button type="object"  name="action_view_move" context="{'open_entries': False}" attrs="{'invisible': [('move_count', '=', 0)]}" 
                             class="oe_stat_button"
                             icon="fa-pencil-square-o">
                             <field name="move_count" widget="statinfo" string="Journal Entry"/>
+                            <field name='move_ids' invisible="1"/>
                         </button>
                         <button name="action_view_payment" type="object" class="oe_stat_button"  icon="fa-usd"  string="Payment" attrs="{'invisible': [('payment_count', '=', 0)]}">
                         </button>  

@@ -7,14 +7,14 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='create_payment']" position="after">
                     <button name="%(de_custom_journal_entry_om.action_custom_entry_advance_payment_inv)d" string="Create Bill"
-                        type="action" class="btn-primary" context="{'create_bill':True}"  attrs="{'invisible':[('allow_advance_inv','=',False)]}"/>
+                        type="action" class="btn-primary" context="{'create_bill':True}"  attrs="{'invisible':['|', ('allow_advance_inv','=',False),('stage_category','in',['closed','draft'])]}"/>
                  </xpath>
                 <xpath expr="//button[@name='action_view_invoice']" position="replace">
-                    <button type="object"  name="action_view_invoice" attrs="{'invisible': ['|',('allow_advance_inv','=',True),('invoice_count', '=', 0)]}" class="oe_stat_button" icon="fa-pencil-square-o">
-                            <field name="invoice_count" widget="statinfo" string="Bill"/>
-                            <field name='invoice_ids' invisible="1"/>
+                    <button type="object"  name="action_view_om_invoices" attrs="{'invisible': ['|',('allow_advance_inv','=',False),('om_invoice_count', '=', 0)]}" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="om_invoice_count" widget="statinfo" string="Invoices"/>
+                            <field name='om_invoice_ids' invisible="1"/>
                     </button>
-                    <button type="object"  name="action_view_invoice" attrs="{'invisible': [('allow_advance_inv','=',False)]}" class="oe_stat_button" icon="fa-pencil-square-o">
+                    <button type="object"  name="action_view_invoice" attrs="{'invisible': ['|',('allow_advance_inv','=',True),('om_invoice_count', '=', 0)]}" class="oe_stat_button" icon="fa-pencil-square-o">
                             <field name="invoice_count" widget="statinfo" string="Bill"/>
                     </button>
                 </xpath>
@@ -41,7 +41,6 @@
                     <field name="o_amount" sum="OM Total AMount" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
                     <field name="o_final_amount" sum="OM Final Amount" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
                     <field name="o_charges" sum="OM Charges" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
-                    
                 </xpath>
                 <xpath expr="//page[@name='custom_entry_line']" position="after">
                     <page name="om_deduction" string="Deductions">
