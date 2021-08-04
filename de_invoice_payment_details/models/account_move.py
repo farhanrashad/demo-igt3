@@ -10,7 +10,7 @@ from odoo import models, fields, api
 class AccountMove(models.Model):
     _inherit = 'account.move'
     
-    payment_ids = fields.Char(string='Payments')
+
     invoice_payment_ids = fields.Many2many('account.payment',  string='Payments', compute='_compute_payments')
     
     def _compute_payments(self):
