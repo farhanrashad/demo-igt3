@@ -61,13 +61,13 @@ class CustomEntryWizard(models.TransientModel):
             #'project_id': line.project_id.id,
         }])
         invoice.create({
-            'move_type': entry_id.custom_entry_type_id.move_type,
+            'move_type': 'in_invoice',
             'custom_entry_id': entry_id.id,
             'invoice_date': fields.Datetime.now(),
             'partner_id': entry_id.partner_id.id,
             #'partner_shipping_id': self.partner_id.id,
             'currency_id': self.currency_id.id,
-            'journal_id': entry_id.custom_entry_type_id.journal_id.id,
+            'journal_id': entry_id.custom_entry_type_id.advance_journal_id.id,
             'invoice_origin': entry_id.name,
             #'fiscal_position_id': fpos.id,
             'invoice_payment_term_id': entry_id.partner_id.property_supplier_payment_term_id.id,

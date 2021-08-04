@@ -18,6 +18,8 @@ class CustomEntryType(models.Model):
     allow_advance_inv = fields.Boolean(string='Allow Advance')
     dp_product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],)
     amount_advance_limit = fields.Float(string='Advance Amount Limit %')
+    advance_journal_id = fields.Many2one('account.journal', string="Accounting Journal", company_dependent=True, check_company=True, domain="[('type', 'not in', ['bank', 'cash'])]")
+
     
     @api.constrains('amount_advance_limit')
     def _check_amount_advance_limit(self):

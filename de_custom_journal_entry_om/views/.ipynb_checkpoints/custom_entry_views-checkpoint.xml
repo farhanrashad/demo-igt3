@@ -41,7 +41,6 @@
                     <field name="o_amount" sum="OM Total AMount" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
                     <field name="o_final_amount" sum="OM Final Amount" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
                     <field name="o_charges" sum="OM Charges" attrs="{'column_invisible':[('parent.has_om','==','no')], 'required': [('parent.has_om','==','required')]}"/>
-                    
                 </xpath>
                 <xpath expr="//page[@name='custom_entry_line']" position="after">
                     <page name="om_deduction" string="Deductions">
