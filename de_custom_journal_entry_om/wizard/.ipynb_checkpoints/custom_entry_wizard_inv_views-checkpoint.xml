@@ -17,13 +17,15 @@
                         </group>
                         <group>
                             <field name="supplier_taxes_id" widget="many2many_tags" invisible="1"/>
-                            <field name="amount_bal" invisible="1"/>
-                            <field name="amount_advance" invisible="1"/>
+                            <field name="amount_bal" attrs="{'invisible':[('stage_category','=',['draft','progress'])]}"/>
+                            <field name="stage_category" invisible="1"/>
                         </group>
                     </group>
                     <footer>
+                        <!--
                         <button name="create_invoices" id="create_invoice_open" string="Create and View Bill" type="object"
                             context="{'open_bills': True}" class="btn-primary"/>
+-->
                         <button name="create_invoices" id="create_invoice" string="Create Bill" type="object"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>

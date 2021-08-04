@@ -10,11 +10,11 @@
                         type="action" class="btn-primary" context="{'create_bill':True}"  attrs="{'invisible':['|', ('allow_advance_inv','=',False),('stage_category','in','closed')]}"/>
                  </xpath>
                 <xpath expr="//button[@name='action_view_invoice']" position="replace">
-                    <button type="object"  name="action_view_invoice" attrs="{'invisible': ['|',('allow_advance_inv','=',True),('invoice_count', '=', 0)]}" class="oe_stat_button" icon="fa-pencil-square-o">
-                            <field name="invoice_count" widget="statinfo" string="Bill"/>
-                            <field name='invoice_ids' invisible="1"/>
+                    <button type="object"  name="action_view_om_invoices" attrs="{'invisible': ['|',('allow_advance_inv','=',False),('om_invoice_count', '=', 0)]}" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="om_invoice_count" widget="statinfo" string="Invoices"/>
+                            <field name='om_invoice_ids' invisible="1"/>
                     </button>
-                    <button type="object"  name="action_view_invoice" attrs="{'invisible': [('allow_advance_inv','=',False)]}" class="oe_stat_button" icon="fa-pencil-square-o">
+                    <button type="object"  name="action_view_invoice" attrs="{'invisible': ['|',('allow_advance_inv','=',True),('om_invoice_count', '=', 0)]}" class="oe_stat_button" icon="fa-pencil-square-o">
                             <field name="invoice_count" widget="statinfo" string="Bill"/>
                     </button>
                 </xpath>
