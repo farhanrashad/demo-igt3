@@ -11,6 +11,7 @@
                         <field name="contract_type"/>
                         <field name="doe"/>
                         <field name="debit_ac_no"/>
+                        <field name="date_today" invisible="1" />
                         <field name="currency"/>
                         <field name="batch_id" invisible="1"/>
                     </group>
