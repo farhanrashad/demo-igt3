@@ -16,7 +16,7 @@ class CustomEntryWizard(models.TransientModel):
     amount_advance_bal_per = fields.Float('Advance %age balance')
     
     amount_bal = fields.Float('Remaining Balance Amount', digits='Account', default=1.0, readonly=True)
-    stage_category = fields.Char(string='Stage Category')
+    stage_category = fields.Char(string='Stage Category', readonly=True)
     
     currency_id = fields.Many2one('res.currency', string='Currency')
     supplier_taxes_id = fields.Many2many("account.tax", string="Vendor Taxes", help="Taxes used for deposits")
@@ -27,34 +27,39 @@ class CustomEntryWizard(models.TransientModel):
         entry_id = self.env['account.custom.entry'].browse(self._context.get('active_ids',[]))
         
         res.update({
-            'amount_bal': entry_id.amount_total,
+            'amount_bal': entry_id.amount_total - entry_id.om_amount_advance_bal,
              'stage_category': entry_id.stage_category,
             'currency_id': entry_id.currency_id.id,
             'product_id': entry_id.custom_entry_type_id.dp_product_id.id,
-            'amount_advance_bal_per': entry_id.om_amount_advance_bal
+            'amount_advance_bal_per': entry_id.om_amount_advance_per
             #'supplier_taxes_id': entry_id.custom_entry_type_id.dp_product_id.supplier_taxes_id.ids,
             #'supplier_taxes_id': [(6, 0, entry_id.custom_entry_type_id.dp_product_id.supplier_taxes_id.ids)],
         })
         return res
     
     def create_invoices(self):
+        amount = 0
         entry_id = self.env['account.custom.entry'].browse(self._context.get('active_ids', []))
-        if entry_id.stage_id.stage_category == 'progress':
+        if self.stage_category == 'confirm':
+            amount = self.amount_bal
+            entry_id.update({
+                'stage_id' : entry_id.stage_id.next_stage_id.id,
+            })
+        else:
             if self.amount > 100 or self.amount <= 0.00:
                 raise UserError(_('The value of the down payment amount must be between 1 to 100.'))
         
             if (self.amount + entry_id.om_amount_advance_per) > entry_id.custom_entry_type_id.amount_advance_limit:
                 raise UserError(_('Advance amount limit exceeded. the remaining limit is %s') % (entry_id.custom_entry_type_id.amount_advance_limit - entry_id.om_amount_advance_per))
-                amount = (self.amount / 100) * entry_id.amount_total
-        else:
-            amount = self.amount_bal
-            entry_id.update({
-                'stage_id' : entry_id.stage_id.next_stage_id.id,
-            })
+            amount = (self.amount / 100) * entry_id.amount_total
+            
         
         invoice = self.env['account.move']
         lines_data = []
-        
+        entry_id.update({
+            'om_amount_advance_per': entry_id.om_amount_advance_per + self.amount,
+            'om_amount_advance_bal': entry_id.om_amount_advance_bal + amount,
+        })
         lines_data.append([0,0,{
             'name': _('Down Payment'),
             'price_unit': amount or 0.0,
