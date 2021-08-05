@@ -113,7 +113,8 @@
                         <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
 
                         <button string="Create Bill" name="generate_recurring_invoice" type="object" attrs="{'invisible': ['|',('invoicing_mode', '!=', 'manual'),('stage_category', '!=', 'progress')]}" class="btn-primary"/>
-                        <button string="Start" name="start_subscription" type="object" attrs="{'invisible': [('stage_category','!=', 'draft')]}" class="btn-primary"/>
+                        
+                        <button string="Start" name="start_subscription" type="object" attrs="{'invisible': [('stage_category','!=', 'confirm')]}" class="btn-primary"/>
                         <!--
 -->
 
