@@ -84,7 +84,7 @@
                                     <field name="partner_id"/>
                                 </div>
                                 <div class="o_kanban_record_body">
-                                    <field name="code"/>
+                                    <field name="name"/>
                                 </div>
                                  <div class="o_kanban_record_bottom">
                                     <div class="oe_kanban_bottom_left">
@@ -109,7 +109,9 @@
             <field name="arch" type="xml">
                 <form string="Subscription">
                     <header>
-                        
+                        <button name="button_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
+                        <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+
                         <button string="Create Bill" name="generate_recurring_invoice" type="object" attrs="{'invisible': ['|',('invoicing_mode', '!=', 'manual'),('stage_category', '!=', 'progress')]}" class="btn-primary"/>
                         <button string="Start" name="start_subscription" type="object" attrs="{'invisible': [('stage_category','!=', 'draft')]}" class="btn-primary"/>
                         <!--

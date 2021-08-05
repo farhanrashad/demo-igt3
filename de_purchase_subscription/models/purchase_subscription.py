@@ -112,6 +112,9 @@ class PurchaseSubscription(models.Model):
 
     
     payment_term_id = fields.Many2one('account.payment.term', string='Default Payment Terms', check_company=True, tracking=True, help="These payment terms will be used when generating new invoices and renewal/upsell orders. Note that invoices paid using online payment will use 'Already paid' regardless of this setting.")
+    
+    date_submit = fields.Datetime('Submission Date', readonly=False)
+    date_approved = fields.Datetime('Approved Date', readonly=False)
             
     @api.depends('subscription_type_id')
     def _compute_stage_id(self):
@@ -206,7 +209,34 @@ class PurchaseSubscription(models.Model):
         if self.recurring_next_date:
             recurring_next_date = self.recurring_next_date
             self.recurring_invoice_day = recurring_next_date.day
-            
+    
+    def button_submit(self):
+        #self.ensure_one()
+        for order in self.sudo():
+            group_id = order.subscription_type_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to submit subscription in category '%s'.", order.subscription_type_id.name))
+            if not order.purchase_subscription_line:
+                raise UserError(_("You cannot submit transaction '%s' because there is no line.", self.name))
+           
+        self.update({
+            'date_submit' : fields.Datetime.now(),
+            'stage_id' : self.stage_id.next_stage_id.id,
+        })
+    
+    def button_confirm(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to approve '%s'.", order.stage_id.name))
+                    
+        self.update({
+            'date_approved' : fields.Datetime.now(),
+            'stage_id' : self.stage_id.next_stage_id.id,
+        })
+        
     def start_subscription(self):
         self.ensure_one()
         next_stage_in_progress = self.env['purchase.subscription.stage'].search([('stage_category', '=', 'progress'), ('sequence', '>=', self.stage_id.sequence)], limit=1)
