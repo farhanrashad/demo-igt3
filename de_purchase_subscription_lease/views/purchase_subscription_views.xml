@@ -1,0 +1,27 @@
+<odoo>
+  <data>
+    <!-- Purchase Subscription Plan-->
+        <record id="purchase_subcription_plan_form_view_inherit_limit" model="ir.ui.view">
+            <field name="name">purchase.subscription.plan.form.view.inherit.limit</field>
+            <field name="model">purchase.subscription.plan</field>
+            <field name="inherit_id" ref="de_purchase_subscription.purchase_subscription_plan_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="inside">
+                    <notebook>
+                        <page string="Payment Schedules" id="payment_schedules" attrs="{'invisible':[('invoicing_mode','!=','scheduled')]}">
+                            <field name="subscription_plan_schedule_ids" attrs="{'invisible':[('invoicing_mode','!=','scheduled')]}">
+                                <tree editable="bottom">
+                                    <field name="name" />
+                                    <field name="recurring_interval" sum="Internals"/>
+                                   
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    
+                </xpath>
+                
+            </field>
+        </record>
+  </data>
+</odoo>
