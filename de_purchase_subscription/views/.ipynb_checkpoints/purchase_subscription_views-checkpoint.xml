@@ -184,7 +184,7 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Subscription Lines" id="subscription_lines">
+                            <page string="Subscription Lines" name="subscription_lines">
                                 <field name="purchase_subscription_line">
                                         <tree editable="bottom">
                                             <field name="product_id" domain="[('purchase_subscription', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" context="{'default_purchase_subscription': True}"/>
