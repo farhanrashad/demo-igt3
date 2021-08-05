@@ -10,7 +10,16 @@ from odoo.tools.misc import format_date
 class PurchaseSubscriptionPlan(models.Model):
     _inherit = 'purchase.subscription.plan'
     
+    allow_payment_schedule = fields.Boolean(string='Plan Payment Schedule')
     subscription_plan_schedule_ids = fields.One2many('purchase.subscription.plan.schedule', 'subscription_plan_id', string='Payment Schedules', copy=True)
+    
+    @api.constrains('subscription_plan_schedule_ids','recurring_interval_count')
+    def _check_intervals_payment_schedules(self):
+        tot = 0
+        for schedule in self.subscription_plan_schedule_ids:
+            tot += schedule.recurring_interval
+        if self.recurring_interval_count != tot:
+            raise ValidationError(_("Schedule intervals %s must be equal to total intervals %s",tot,self.recurring_interval_count))
 
 
 class PurchaseSubscriptionPlanSchedule(models.Model):
@@ -20,3 +29,28 @@ class PurchaseSubscriptionPlanSchedule(models.Model):
     subscription_plan_id = fields.Many2one('purchase.subscription.plan', string='Subscription Plan',)
     name = fields.Char(string='Name', compute='_compute_name', store=True,)
     recurring_interval = fields.Integer('Intervals', required=True)
+    
+class PurchaseSubscription(models.Model):
+    _inherit = 'purchase.subscription'    
+    
+    purchase_subscription_schedule_line = fields.One2many('purchase.subscription.schedule', 'purchase_subscription_id', string='Subscription Schedules', copy=True)
+    allow_payment_schedule = fields.Boolean(related='subscription_plan_id.allow_payment_schedule')
+    
+class PurchaseSubscriptionSchedule(models.Model):
+    _name = 'purchase.subscription.schedule'
+    _description = 'Purchase Subscription Schedule'
+    
+    purchase_subscription_id = fields.Many2one('purchase.subscription', string='Subscription', ondelete='cascade')
+    date_from = fields.Date(string='Date From', readonly=True)
+    date_to = fields.Date(string='Date To', readonly=True)
+    recurring_price = fields.Float(string="Recurring Price", required=True, readonly=True)
+    recurring_intervals = fields.Integer(string="Intervals", required=True, readonly=True)
+    recurring_sub_total = fields.Float(string="Subtotal", compute='_compute_recurring_all')
+    
+    discount = fields.Float(string='Discount (%)', digits='Discount')
+    escalation = fields.Float(string='Escalation (%)', digits='Discount')
+    
+    recurring_total = fields.Float(string="Total")
+
+    invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True)
+    company_id = fields.Many2one('res.company', related='purchase_subscription_id.company_id', store=True, index=True)

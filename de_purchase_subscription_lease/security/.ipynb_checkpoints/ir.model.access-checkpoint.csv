@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_purchase_subscription_plan_schedule_manager,access.purchase.subscription.plan.schedule.manager,model_purchase_subscription_plan_schedule,de_purchase_subscription.group_purchase_subscription_manager,1,1,1,1
+access_purchase_subscription_schedule_user,access.purchase.subscription.schedule.user,model_purchase_subscription_schedule,de_purchase_subscription.group_purchase_subscription_user,1,1,1,1
