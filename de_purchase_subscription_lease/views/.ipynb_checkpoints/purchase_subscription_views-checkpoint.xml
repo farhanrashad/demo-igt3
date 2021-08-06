@@ -33,11 +33,14 @@
             <field name="model">purchase.subscription</field>
             <field name="inherit_id" ref="de_purchase_subscription.purchase_subcription_form_view" />
             <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />
+                </xpath>
                 <xpath expr="//field[@name='subscription_plan_id']" position="after">
                     <field name="allow_payment_schedule" invisible="1"/>
                 </xpath>
                 
-                <xpath expr="//notebook" position="inside">
+                <xpath expr="//page[@name='subscription_lines']" position="before">
                     <page string="Payment Schedules" id="payment_schedules" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
                         <field name="purchase_subscription_schedule_line" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
                             <tree editable="bottom">
@@ -48,12 +51,8 @@
                                 <field name="recurring_sub_total" sum="Subtotal"/>
                                 <field name="discount"/>
                                 <field name="escalation"/>
+                                <field name="accum_escalation" invisible="1"/>
                                 <field name="recurring_total" sum="Total"/>
-                                <field name="invoice_id"/>
-                                <field name="company_id" invisible="1" />
-                                <!--
-                                <button type="object" name="create_invoice" string="Create Invoice" icon="fa-arrow-circle-o-right" attrs="{'invisible':[('invoice_id','!=',False)]}"/>
--->
                             </tree>
                         </field>
                     </page>

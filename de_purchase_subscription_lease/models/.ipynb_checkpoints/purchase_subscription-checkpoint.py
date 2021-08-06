@@ -36,21 +36,28 @@ class PurchaseSubscription(models.Model):
     purchase_subscription_schedule_line = fields.One2many('purchase.subscription.schedule', 'purchase_subscription_id', string='Subscription Schedules', copy=True)
     allow_payment_schedule = fields.Boolean(related='subscription_plan_id.allow_payment_schedule')
     
+    
 class PurchaseSubscriptionSchedule(models.Model):
     _name = 'purchase.subscription.schedule'
     _description = 'Purchase Subscription Schedule'
     
     purchase_subscription_id = fields.Many2one('purchase.subscription', string='Subscription', ondelete='cascade')
-    date_from = fields.Date(string='Date From', readonly=True)
-    date_to = fields.Date(string='Date To', readonly=True)
-    recurring_price = fields.Float(string="Recurring Price", required=True, readonly=True)
-    recurring_intervals = fields.Integer(string="Intervals", required=True, readonly=True)
-    recurring_sub_total = fields.Float(string="Subtotal", compute='_compute_recurring_all')
+    date_from = fields.Date(string='Date From')
+    date_to = fields.Date(string='Date To')
+    recurring_price = fields.Float(string="Recurring Price", )
+    recurring_intervals = fields.Integer(string="Intervals", )
+    recurring_sub_total = fields.Float(string="Subtotal", compute='_compute_recurring_total_all')
     
     discount = fields.Float(string='Discount (%)', digits='Discount')
     escalation = fields.Float(string='Escalation (%)', digits='Discount')
+    accum_escalation = fields.Float(string='Accum. Escalation (%)', digits='Discount')
     
-    recurring_total = fields.Float(string="Total")
+    recurring_total = fields.Float(string="Total", compute='_compute_recurring_total_all')
 
-    invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True)
-    company_id = fields.Many2one('res.company', related='purchase_subscription_id.company_id', store=True, index=True)
+    #invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True)
+    #company_id = fields.Many2one('res.company', related='purchase_subscription_id.company_id', store=True, index=True)
+    
+    def _compute_recurring_total_all(self):
+        for line in self:
+            line.recurring_sub_total = line.recurring_price * line.recurring_intervals
+            line.recurring_total = line.recurring_sub_total + (line.recurring_sub_total * (line.accum_escalation / 100))
