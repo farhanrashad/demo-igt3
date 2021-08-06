@@ -35,13 +35,39 @@ class PurchaseSubscription(models.Model):
     
     purchase_subscription_schedule_line = fields.One2many('purchase.subscription.schedule', 'purchase_subscription_id', string='Subscription Schedules', copy=True)
     allow_payment_schedule = fields.Boolean(related='subscription_plan_id.allow_payment_schedule')
+    select_all = fields.Boolean(string='Select All', default=False)
     
+    @api.onchange('select_all')
+    def _select_all(self):
+        for line in self.purchase_subscription_schedule_line:
+            line.record_selection = self.select_all
+    
+    def add_record(self):
+        lines_data = {}
+        for sub in self.purchase_subscription_schedule_line:
+            date_from = sub.date_from
+            date_to = sub.date_to
+        subscription_schedule_id = self.env['purchase.subscription.schedule']
+        lines_date = ({
+            'purchase_subscription_id': self.id,
+            'date_from': date_from,
+            'date_to': date_to,
+            'recurring_price': self.recurring_price,
+            'recurring_intervals': self.recurring_interval,
+            'discount': 0,
+            'escalation':  1,
+            'accum_escalation': 1,
+        })
+        subscription_schedule_id.create(lines_data)
     
 class PurchaseSubscriptionSchedule(models.Model):
     _name = 'purchase.subscription.schedule'
     _description = 'Purchase Subscription Schedule'
     
     purchase_subscription_id = fields.Many2one('purchase.subscription', string='Subscription', ondelete='cascade')
+    
+    record_selection = fields.Boolean(string='Selection', default=False)
+
     date_from = fields.Date(string='Date From')
     date_to = fields.Date(string='Date To')
     recurring_price = fields.Float(string="Recurring Price", )

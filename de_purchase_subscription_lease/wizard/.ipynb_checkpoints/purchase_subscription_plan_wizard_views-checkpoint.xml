@@ -9,7 +9,7 @@
                 
                 <group>
                     <group>
-                        <field name="purchase_subscription_id" invisible="0"/>
+                        <field name="purchase_subscription_id" invisible="1"/>
                         
                         <label for="recurring_interval" string="Review Year"/>
                         <div class="o_row">

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
+from odoo import api, fields, models, tools, SUPERUSER_ID, _
+from odoo.exceptions import UserError, AccessError, ValidationError
+from odoo.tools.safe_eval import safe_eval
+from odoo.tools.misc import format_date
 
 class PurchaseSubscriptionPlanWizard(models.Model):
     _name = 'purchase.subscription.plan.wizard'
@@ -26,28 +27,33 @@ class PurchaseSubscriptionPlanWizard(models.Model):
         lines_data = {}
         esclation = a_esclation = 0
         interval = 0
+        
+        date_from = date_to = fields.Date.today()
+        
         if subscription.purchase_subscription_schedule_line:
             subscription.purchase_subscription_schedule_line.unlink()
             
         if self.recurring_interval_type == 'yearly':
             for plan in subscription.subscription_plan_id.subscription_plan_schedule_ids:
-                interval += plan.recurring_interval
-                if (interval % (self.recurring_interval*12)) == 0:
+                
+                if (interval % (self.recurring_interval*12)) == 0 and not interval == 0:
                     escalation = self.amount
                 else:
                     escalation = 0
                 a_esclation += escalation
+                date_from = subscription.date_start + relativedelta(months=interval)#fields.Date.to_string(subscription.date_start + timedelta(interval))
+                date_to = date_from + relativedelta(months=plan.recurring_interval,days=-1)
                 lines_data = {
                     'purchase_subscription_id': subscription.id,
-                    'date_from': subscription.date_start,
-                    'date_to': subscription.date_start,
+                    'date_from': date_from,
+                    'date_to': date_to,
                     'recurring_price': subscription.recurring_price,
                     'recurring_intervals': plan.recurring_interval,
                     'discount': 0,
                     'escalation':  escalation,
                     'accum_escalation': a_esclation,
                 }
-                
+                interval += plan.recurring_interval
             #subscription.purchase_subscription_schedule_line.sudo().create(lines_data)
                 subscription_schedule_id.create(lines_data)
         #return subscription_schedule_id
