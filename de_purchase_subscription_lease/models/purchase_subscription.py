@@ -172,7 +172,7 @@ class PurchaseSubscription(models.Model):
             prev_name = self.name
             revno = self.revision_number
             self.write({'revision_number': revno + 1,})
-            defaults.update({'revision_number': revno,'revised':True,'active': True,'stage_id': stage_id.id,'current_revision_id': self.id,'unrevisioned_name': self.unrevisioned_name,})
+            defaults.update({'revision_number': revno,'revised':True,'active': True,'current_revision_id': self.id,'unrevisioned_name': self.unrevisioned_name,})
         return super(PurchaseSubscription, self).copy(defaults)
     
 class PurchaseSubscriptionSchedule(models.Model):
