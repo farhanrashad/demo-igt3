@@ -35,6 +35,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
                     <button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('allow_payment_schedule','!=',True),('stage_category','!=','confirm')]}"/>
+                    <button name="action_revision" type="object" string="Revision"/>
  <!--
                     <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />-->
                 </xpath>
