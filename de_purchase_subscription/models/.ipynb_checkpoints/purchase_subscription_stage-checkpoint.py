@@ -31,6 +31,7 @@ class PurchaseSubscriptionStage(models.Model):
         ('progress', 'In Progress'),
         ('confirm', 'Confirmed'),
         ('closed', 'Closed'),
+        ('cancel', 'Cancel'),
     ], string='Category', default='draft')
     
     next_stage_id = fields.Many2one('purchase.subscription.stage', string='Next Stage' )
