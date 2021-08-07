@@ -236,7 +236,18 @@ class PurchaseSubscription(models.Model):
             'date_approved' : fields.Datetime.now(),
             'stage_id' : self.stage_id.next_stage_id.id,
         })
-        
+    
+    def button_refuse(self):
+        for order in self.sudo():
+            group_id = order.stage_id.group_id
+            if group_id:
+                if not (group_id & self.env.user.groups_id):
+                    raise UserError(_("You are not authorize to refuse '%s'.", order.stage_id.name))
+        if self.stage_id.prv_stage_id:
+            self.update({
+                'stage_id' : self.stage_id.prv_stage_id.id,
+            })
+            
     def start_subscription(self):
         self.ensure_one()
         next_stage_in_progress = self.env['purchase.subscription.stage'].search([('stage_category', '=', 'progress'), ('sequence', '>=', self.stage_id.sequence)], limit=1)
