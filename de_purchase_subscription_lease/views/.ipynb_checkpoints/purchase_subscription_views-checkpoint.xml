@@ -34,7 +34,7 @@
             <field name="inherit_id" ref="de_purchase_subscription.purchase_subcription_form_view" />
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
-                    <button string="Create Bill" name="create_bill" type="object" class="btn-primary"/>
+                    <button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('allow_payment_schedule','!=',True),('stage_category','!=','confirm')]}"/>
  <!--
                     <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />-->
                 </xpath>
@@ -66,9 +66,9 @@
                             </tree>
                         </field>
                        
-                            <button name="add_record" string="Add a Line" type="object" class="btn-primary"  />
+                            <button name="add_record" string="Add a Line" type="object" class="btn-primary"  attrs="{'invisible':[('allow_payment_schedule','!=',True)]}" />
                         &#x2063;&#x2063;
-                            <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />
+                            <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  attrs="{'invisible':[('allow_payment_schedule','!=',True)]}"/>
                        
                     </page>
                 </xpath>
