@@ -33,11 +33,12 @@
             <field name="model">purchase.subscription</field>
             <field name="inherit_id" ref="de_purchase_subscription.purchase_subcription_form_view" />
             <field name="arch" type="xml">
-                <!--
                 <xpath expr="//header" position="inside">
-                    <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />
+                    <button string="Create Bill" name="create_bill" type="object" class="btn-primary"/>
+ <!--
+                    <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />-->
                 </xpath>
--->
+
                 <xpath expr="//field[@name='subscription_plan_id']" position="after">
                     <field name="allow_payment_schedule" invisible="1"/>
                 </xpath>
@@ -47,23 +48,26 @@
                         <group>
                             <field name="select_all" nolabel="1"/>
                         </group>
-                        <field name="purchase_subscription_schedule_line" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
-                            <tree editable="bottom">
-                                <field name="record_selection" nolabel="1"/>
-                                 <field name="date_from"/>
-                                <field name="date_to"/>
-                                <field name="recurring_intervals" sum="Intervals"/>
-                                <field name="recurring_price" sum="Recurring"/>
+                        <field name="purchase_subscription_schedule_line" options="{'create':False}" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
+                            <tree editable="bottom" >
+                                <field name="record_selection" nolabel="1" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                 <field name="date_from" readonly="1"/>
+                                <field name="date_to" readonly="1"/>
+                                <field name="recurring_intervals" sum="Intervals" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                <field name="recurring_price" sum="Recurring" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
                                 <field name="recurring_sub_total" sum="Subtotal"/>
-                                <field name="discount"/>
-                                <field name="escalation"/>
+                                <field name="discount" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                <field name="escalation" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
                                 <field name="accum_escalation" invisible="1"/>
                                 <field name="recurring_total" sum="Total"/>
+                                 <field name="invoice_id" readonly="1"/>
+                                <field name="company_id" invisible="1"/>
+                                 <field name="invoice_status"/>
                             </tree>
                         </field>
-                       <!--
+                       
                             <button name="add_record" string="Add a Line" type="object" class="btn-primary"  />
-                        &#x2063;&#x2063; -->
+                        &#x2063;&#x2063;
                             <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />
                        
                     </page>

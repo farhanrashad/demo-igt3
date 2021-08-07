@@ -22,6 +22,7 @@ class PurchaseSubscriptionPlanWizard(models.Model):
     
     
     def create_payment_schedule(self):
+        
         subscription_schedule_id = self.env['purchase.subscription.schedule']
         subscription = self.env['purchase.subscription'].browse(self._context.get('active_ids',[]))
         lines_data = {}
@@ -30,33 +31,34 @@ class PurchaseSubscriptionPlanWizard(models.Model):
         
         date_from = date_to = fields.Date.today()
         
-        if subscription.purchase_subscription_schedule_line:
-            subscription.purchase_subscription_schedule_line.unlink()
+        if subscription.stage_id.stage_category == 'draft':
+            if subscription.purchase_subscription_schedule_line:
+                subscription.purchase_subscription_schedule_line.unlink()
             
-        if self.recurring_interval_type == 'yearly':
-            for plan in subscription.subscription_plan_id.subscription_plan_schedule_ids:
-                
-                if (interval % (self.recurring_interval*12)) == 0 and not interval == 0:
-                    escalation = self.amount
-                else:
-                    escalation = 0
-                a_esclation += escalation
-                date_from = subscription.date_start + relativedelta(months=interval)#fields.Date.to_string(subscription.date_start + timedelta(interval))
-                date_to = date_from + relativedelta(months=plan.recurring_interval,days=-1)
-                lines_data = {
-                    'purchase_subscription_id': subscription.id,
-                    'date_from': date_from,
-                    'date_to': date_to,
-                    'recurring_price': subscription.recurring_price,
-                    'recurring_intervals': plan.recurring_interval,
-                    'discount': 0,
-                    'escalation':  escalation,
-                    'accum_escalation': a_esclation,
-                }
-                interval += plan.recurring_interval
-            #subscription.purchase_subscription_schedule_line.sudo().create(lines_data)
-                subscription_schedule_id.create(lines_data)
-        #return subscription_schedule_id
+            if self.recurring_interval_type == 'yearly':
+                for plan in subscription.subscription_plan_id.subscription_plan_schedule_ids:
+                    
+                    if (interval % (self.recurring_interval*12)) == 0 and not interval == 0:
+                        escalation = self.amount
+                    else:
+                        escalation = 0
+                    a_esclation += escalation
+                    date_from = subscription.date_start + relativedelta(months=interval)#fields.Date.to_string(subscription.date_start + timedelta(interval))
+                    date_to = date_from + relativedelta(months=plan.recurring_interval,days=-1)
+                    lines_data = {
+                        'purchase_subscription_id': subscription.id,
+                        'date_from': date_from,
+                        'date_to': date_to,
+                        'recurring_price': subscription.recurring_price,
+                        'recurring_intervals': plan.recurring_interval,
+                        'discount': 0,
+                        'escalation':  escalation,
+                        'accum_escalation': a_esclation,
+                    }
+                    interval += plan.recurring_interval
+                    #subscription.purchase_subscription_schedule_line.sudo().create(lines_data)
+                    subscription_schedule_id.create(lines_data)
+                    #return subscription_schedule_id
                 
     
     
