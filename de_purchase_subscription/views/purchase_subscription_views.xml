@@ -84,7 +84,7 @@
                                     <field name="partner_id"/>
                                 </div>
                                 <div class="o_kanban_record_body">
-                                    <field name="code"/>
+                                    <field name="name"/>
                                 </div>
                                  <div class="o_kanban_record_bottom">
                                     <div class="oe_kanban_bottom_left">
@@ -109,16 +109,21 @@
             <field name="arch" type="xml">
                 <form string="Subscription">
                     <header>
-                        
+                        <button name="button_submit" string="Submit for Approval" type="object" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['draft'])]}"/>
+                        <button name="button_confirm" type="object" string="Confirm" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+                        <button name="button_refuse" type="object" string="Refuse" class="oe_highlight" attrs="{'invisible': [('stage_category', 'not in', ['progress'])]}"/>
+
+
                         <button string="Create Bill" name="generate_recurring_invoice" type="object" attrs="{'invisible': ['|',('invoicing_mode', '!=', 'manual'),('stage_category', '!=', 'progress')]}" class="btn-primary"/>
-                        <button string="Start" name="start_subscription" type="object" attrs="{'invisible': [('stage_category','!=', 'draft')]}" class="btn-primary"/>
+                        
+                        <button string="Start" name="start_subscription" type="object" attrs="{'invisible': [('stage_category','!=', 'confirm')]}" class="btn-primary"/>
                         <!--
 -->
 
 <!--
                         <field name="stage_id" widget="statusbar" />
 -->                        
-                        <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" />
+                        <field name="stage_id" widget="statusbar" options="{'clickable': '0', 'fold_field': 'fold'}" />
 
                     </header>
                     <sheet string="Subscription">
@@ -181,7 +186,7 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Subscription Lines" id="subscription_lines">
+                            <page string="Subscription Lines" name="subscription_lines">
                                 <field name="purchase_subscription_line">
                                         <tree editable="bottom">
                                             <field name="product_id" domain="[('purchase_subscription', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" context="{'default_purchase_subscription': True}"/>

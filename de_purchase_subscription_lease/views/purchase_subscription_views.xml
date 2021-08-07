@@ -1,0 +1,97 @@
+<odoo>
+  <data>
+    <!-- Purchase Subscription Plan-->
+        <record id="purchase_subcription_plan_form_view_inherit_limit" model="ir.ui.view">
+            <field name="name">purchase.subscription.plan.form.view.inherit.limit</field>
+            <field name="model">purchase.subscription.plan</field>
+            <field name="inherit_id" ref="de_purchase_subscription.purchase_subscription_plan_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoicing_mode']" position="after">
+                    <field name="allow_payment_schedule" />
+                </xpath>
+                <xpath expr="//sheet" position="inside">
+                    <notebook>
+                        <page string="Payment Schedules" id="payment_schedules" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
+                            <field name="subscription_plan_schedule_ids" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
+                                <tree editable="bottom">
+                                    <field name="name" />
+                                    <field name="recurring_interval" sum="Internals"/>
+                                   
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    
+                </xpath>
+                
+            </field>
+        </record>
+      
+      <!-- Purchase Subscription -->
+        <record id="purchase_subcription_form_view_inherit_project" model="ir.ui.view">
+            <field name="name">purchase.subscription.form.view.inherit.project</field>
+            <field name="model">purchase.subscription</field>
+            <field name="inherit_id" ref="de_purchase_subscription.purchase_subcription_form_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button string="Create Bill" name="create_bill" type="object" class="btn-primary" attrs="{'invisible':['|',('allow_payment_schedule','!=',True),('stage_category','!=','confirm')]}"/>
+                    <button name="action_revision" type="object" string="Revision"/>
+ <!--
+                    <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  />-->
+                </xpath>
+
+                <xpath expr="//field[@name='subscription_plan_id']" position="after">
+                    <field name="allow_payment_schedule" invisible="1"/>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+					<page string="Revisions" name="revisions" attrs="{'invisible': [('old_revision_ids' , '=', [])]}">
+						<field name="old_revision_ids">
+							<tree>
+								<field name='name'/>
+								<field name='create_date' string="Superseeded on"/>
+								<field name='create_uid' string="Superseeded by"/>
+							</tree>
+						</field>
+						<group>
+							<field name="current_revision_id" invisible='1'/>
+							<field name="active" invisible='1'/>
+							<field name="revised" invisible='1'/>
+
+						</group>
+
+					</page>
+				</xpath>
+                <xpath expr="//page[@name='subscription_lines']" position="before">
+                    <page string="Payment Schedules" id="payment_schedules" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
+                        <group>
+                            <field name="select_all" nolabel="1"/>
+                        </group>
+                        <field name="purchase_subscription_schedule_line" options="{'create':False}" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
+                            <tree editable="bottom" >
+                                <field name="record_selection" nolabel="1" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                 <field name="date_from" readonly="1"/>
+                                <field name="date_to" readonly="1"/>
+                                <field name="recurring_intervals" sum="Intervals" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                <field name="recurring_price" sum="Recurring" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                <field name="recurring_sub_total" sum="Subtotal"/>
+                                <field name="discount" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                <field name="escalation" attrs="{'readonly':[('invoice_id','!=',False)]}"/>
+                                <field name="accum_escalation" invisible="1"/>
+                                <field name="recurring_total" sum="Total"/>
+                                 <field name="invoice_id" readonly="1"/>
+                                <field name="company_id" invisible="1"/>
+                                 <field name="invoice_status"/>
+                            </tree>
+                        </field>
+                       
+                            <button name="add_record" string="Add a Line" type="object" class="btn-primary"  attrs="{'invisible':[('allow_payment_schedule','!=',True)]}" />
+                        &#x2063;&#x2063;
+                            <button name="%(action_purchase_subscription_plan_wizard)d" string="Populate" type="action" class="btn-primary"  attrs="{'invisible':[('allow_payment_schedule','!=',True)]}"/>
+                       
+                    </page>
+                </xpath>
+            </field>
+        </record>
+      
+  </data>
+</odoo>

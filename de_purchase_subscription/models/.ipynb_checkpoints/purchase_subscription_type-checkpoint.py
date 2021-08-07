@@ -25,11 +25,11 @@ class PurchaseSubscriptionType(models.Model):
     company_id = fields.Many2one(
         'res.company', 'Company', copy=False,
         required=True, index=True, default=lambda s: s.env.company)
+    currency_id = fields.Many2one('res.currency', 'Currency', required=True, default=lambda self: self.env.company.currency_id.id)
     automated_sequence = fields.Boolean('Automated Sequence?',
         help="If checked, the Approval Requests will have an automated generated name based on the given code.")
     sequence_code = fields.Char(string="Code")
-
-    sequence_id = fields.Many2one('ir.sequence', 'Reference Purchase Subscription Sequence',
+    sequence_id = fields.Many2one('ir.sequence', string='Reference Sequence',
         copy=False, check_company=True)
     
     running_subscription_count = fields.Integer("Number of running subscriptions", compute="_compute_running_subscriptions_count")
@@ -37,6 +37,8 @@ class PurchaseSubscriptionType(models.Model):
     posted_bill_count = fields.Integer("Number of bills", compute="_compute_all_bills_count")
 
     request_to_validate_count = fields.Integer("Number of requests to validate", compute="_compute_request_to_validate_count")
+    
+    group_id = fields.Many2one('res.groups', string='Security Group')
     
     def _compute_request_to_validate_count(self):
         for category in self:
@@ -88,11 +90,7 @@ class PurchaseSubscriptionType(models.Model):
             for purchase_subscription_type in self:
                 if purchase_subscription_type.sequence_id:
                     purchase_subscription_type.sequence_id.company_id = vals.get('company_id')
-        return super().write(vals)
-        
-            
-
-            
+        return super().write(vals)    
             
     def create_request(self):
         self.ensure_one()

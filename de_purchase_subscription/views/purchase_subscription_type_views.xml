@@ -70,12 +70,13 @@
                     <group>
                         <group string="Sequence" name="sequence">
                             <field name="automated_sequence"/>
-                        <field name="sequence_code" attrs="{
-                            'invisible': [('automated_sequence', '=', False)],
-                            'required': [('automated_sequence', '=', True)],
-                        }"/>
+                            <field name="sequence_code" attrs="{'invisible': [('automated_sequence', '=', False)],                           'required': [('automated_sequence', '=', True)],}"/>
+                            <field name="sequence_id" attrs="{'invisible': [('automated_sequence', '=', False)],                           'required': [('automated_sequence', '=', True)],}"/>
+
                         </group>
                         <group>
+                            <field name="group_id" options="{'no_create': True,'no_open':True}" />
+                            <field name="currency_id" groups="base.group_multi_currency" force_save="1"/>
                             <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                         </group>
                     </group>
