@@ -43,7 +43,24 @@
                 <xpath expr="//field[@name='subscription_plan_id']" position="after">
                     <field name="allow_payment_schedule" invisible="1"/>
                 </xpath>
-                
+                <xpath expr="//notebook" position="inside">
+					<page string="Revisions" name="revisions" attrs="{'invisible': [('old_revision_ids' , '=', [])]}">
+						<field name="old_revision_ids">
+							<tree>
+								<field name='name'/>
+								<field name='create_date' string="Superseeded on"/>
+								<field name='create_uid' string="Superseeded by"/>
+							</tree>
+						</field>
+						<group>
+							<field name="current_revision_id" invisible='1'/>
+							<field name="active" invisible='1'/>
+							<field name="revised" invisible='1'/>
+
+						</group>
+
+					</page>
+				</xpath>
                 <xpath expr="//page[@name='subscription_lines']" position="before">
                     <page string="Payment Schedules" id="payment_schedules" attrs="{'invisible':[('allow_payment_schedule','!=',True)]}">
                         <group>

@@ -134,7 +134,8 @@ class PurchaseSubscription(models.Model):
         view_ref = self.env['ir.model.data'].get_object_reference('de_purchase_subscription', 'purchase_subcription_form_view')
         view_id = view_ref and view_ref[1] or False,
         self.with_context(purchase_revision_history=True).copy()
-        #self.write({'state': 'draft'})
+        stage_id = self.env['purchase.subscription.stage'].search([('subscription_type_ids','=',self.id),('stage_category','=','draft')],limit=1)
+        self.write({'stage_id': stage_id.id})
         #self.order_line.write({'state': 'draft'})
         revision_seq= 1
         revision_r = self.name.__contains__("-R0")
@@ -162,6 +163,7 @@ class PurchaseSubscription(models.Model):
         
     @api.returns('self', lambda value: value.id)
     def copy(self, defaults=None):
+        stage_id = self.env['purchase.subscription.stage'].search([('subscription_type_ids','=',self.id),('stage_category','=','cancel')],limit=1)
         if not defaults:
             defaults = {}
         if not self.unrevisioned_name:
@@ -170,7 +172,7 @@ class PurchaseSubscription(models.Model):
             prev_name = self.name
             revno = self.revision_number
             self.write({'revision_number': revno + 1,})
-            defaults.update({'revision_number': revno,'revised':True,'active': True,'state': 'cancel','current_revision_id': self.id,'unrevisioned_name': self.unrevisioned_name,})
+            defaults.update({'revision_number': revno,'revised':True,'active': True,'stage_id': stage_id.id,'current_revision_id': self.id,'unrevisioned_name': self.unrevisioned_name,})
         return super(PurchaseSubscription, self).copy(defaults)
     
 class PurchaseSubscriptionSchedule(models.Model):
