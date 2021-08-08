@@ -34,10 +34,11 @@ class CreateHotoTask(http.Controller):
     @http.route('/hoto/task/save', type="http", auth="public", website=True)
     def hoto_task_save(self, **kw):
         vals = {
-            'name': kw.get('description'),
+            'name': 'HOTO',
             'partner_id': int(kw.get('partner_id')),
             'project_id': int(kw.get('project_id')),
             'site_id': int(kw.get('site_id')),
+            'site_hoto': True,
             'hoto_type': kw.get('hoto_type'),
             'date_handover': kw.get('date_handover'),
             'date_rfi': kw.get('date_rfi'),
