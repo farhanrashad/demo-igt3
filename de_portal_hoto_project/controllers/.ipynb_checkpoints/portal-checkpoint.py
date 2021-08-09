@@ -3,6 +3,7 @@
 
 from collections import OrderedDict
 from operator import itemgetter
+from odoo.exceptions import UserError
 
 from odoo import http, _
 from odoo.exceptions import AccessError, MissingError
@@ -33,6 +34,10 @@ class CreateHotoTask(http.Controller):
     
     @http.route('/hoto/task/save', type="http", auth="public", website=True)
     def hoto_task_save(self, **kw):
+        if not kw.get('project_id'):
+            raise UserError('You Are Not Allow to access HOTO Project!')
+        if not kw.get('site_id'):
+            raise UserError('You Are Not Allow to access any Site Project!')    
         vals = {
             'name': 'HOTO',
             'partner_id': int(kw.get('partner_id')),
@@ -51,10 +56,9 @@ class CustomerPortal(CustomerPortal):
 
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
-        if 'project_count' in counters:
-            values['project_count'] = request.env['project.project'].search_count([])
         if 'hoto_count' in counters:
-            values['hoto_count'] = request.env['project.task'].search_count([('project_id.name','=','HOTO')])
+            active_user = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])    
+            values['hoto_count'] = request.env['project.task'].search_count([('partner_id','=', active_user.partner_id.id)])
         return values
 
    
@@ -63,7 +67,7 @@ class CustomerPortal(CustomerPortal):
     # ------------------------------------------------------------
     def _hoto_site_task_get_page_view_values(self, task, access_token, **kwargs):
         values = {
-            'page_name': 'task',
+            'page_name': 'Hoto task',
             'task': task,
             'user': request.env.user
         }
@@ -145,7 +149,9 @@ class CustomerPortal(CustomerPortal):
             if search_in in ('project', 'all'):
                 search_domain = OR([search_domain, [('project_id', 'ilike', search)]])
             domain += search_domain
-
+            
+        active_user = request.env['res.users'].search([('id','=',http.request.env.context.get('uid'))])    
+        domain += [('partner_id', '=', active_user.partner_id.id)]
         # task count
         task_count = request.env['project.task'].search_count(domain)
         # pager
@@ -172,7 +178,7 @@ class CustomerPortal(CustomerPortal):
             'date': date_begin,
             'date_end': date_end,
             'grouped_tasks': grouped_tasks,
-            'page_name': 'task',
+            'page_name': 'Hoto Task',
             'default_url': '/hoto/tasks',
             'pager': pager,
             'searchbar_sortings': searchbar_sortings,
