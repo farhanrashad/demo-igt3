@@ -3,8 +3,8 @@
     <template id="portal_layout_hoto_site" name="Portal layout: project menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
         <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
           
-            <li t-if="page_name == 'task' or task" t-attf-class="breadcrumb-item #{'active ' if not task else ''}">
-                <a t-if="task" t-attf-href="/hoto/tasks?{{ keep_query() }}">Hoto Site</a>
+            <li t-if="page_name == 'hoto_task' or hoto_task" t-attf-class="breadcrumb-item #{'active ' if not hoto_task else ''}">
+                <a t-if="hoto_task" t-attf-href="/hoto/tasks?{{ keep_query() }}">Hoto Site</a>
                 <t t-else="">Hoto Site</t>
             </li>
            
@@ -61,10 +61,10 @@
                                         <span t-esc="task.site_id.name"/>
                                     </td>
                                     <td class="text-left">
-                                        <span t-esc="task.date_handover"/>
+                                        <span t-esc="task.date_handover" t-options='{"widget": "date"}'/>
                                     </td>
                                     <td class="text-left">
-                                        <span t-esc="task.date_onair"/>
+                                        <span t-esc="task.date_onair"  t-options='{"widget": "date"}'/>
                                     </td>
                                     <td class="text-left">
                                         <span t-esc="task.stage_id.name"/>
@@ -136,7 +136,7 @@
                     </div>
                     <div class="row mb-4">
                         <div class="col-12 col-md-6 mb-1">
-                            <strong>On Air Date:</strong> <span t-field="task.date_onair" />
+                            <strong>On Air Date:</strong> <span t-field="task.date_onair"  t-options='{"widget": "date"}'/>
                         </div>
                         <div class="col-12 col-md-6" t-if="task.date_onair">
                            
