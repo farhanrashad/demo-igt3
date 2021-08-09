@@ -22,6 +22,7 @@
                     <field name="allow_advance_inv" invisible="1"/>
                     <field name="om_amount_advance_bal" invisible="1"/>
                     <field name="om_amount_advance_per" invisible="1"/>
+                    <field name="deduction_total" invisible="0"/>
                 </xpath>
                 
                 <xpath expr="//sheet[1]" position="inside">
@@ -50,7 +51,7 @@
                                 <field name="company_id" invisible="1" />
                                 <field name="currency_id" invisible="1" />
                                 <field name="om_deduction_type_id" required="1" options="{'no_create':True}" />
-                                <field name="amount" required="1" />
+                                <field name="amount" sum="amount" required="1" />
                             </tree>
                         </field>
                     </page>

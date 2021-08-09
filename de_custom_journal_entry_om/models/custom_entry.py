@@ -18,10 +18,19 @@ class CustomEntry(models.Model):
     om_amount_advance_bal = fields.Float(string='OM Advance Amount', copy=False)
     om_amount_advance_per = fields.Float(string='OM Advance %age', copy=False)
     
+    deduction_total = fields.Monetary(string='Total Deduction', compute='_compute_total_deductiosn')
+    
     custom_entry_om_deduction_line = fields.One2many('account.custom.entry.om.deduction', 'custom_entry_id', string='OM Deduction', copy=True, auto_join=True,)
     
     om_invoice_count = fields.Integer(string='Invoice Count', compute='_get_om_invoiced', readonly=True)
     om_invoice_ids = fields.Many2many("account.move", string='Invoices', compute="_get_om_invoiced", readonly=True, copy=False)
+    
+    def _compute_total_deductiosn(self):
+        for entry in self:
+            total = 0
+            for line in entry.custom_entry_om_deduction_line:
+                total += line.amount
+            entry.deduction_total = total
     
     def create_journal_entry(self):
         res = super(CustomEntry, self).create_journal_entry()
