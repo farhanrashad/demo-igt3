@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_de_portal_purchase_milestone_de_portal_purchase_milestone,de_portal_purchase_milestone.de_portal_purchase_milestone,model_de_portal_purchase_milestone_de_portal_purchase_milestone,base.group_user,1,1,1,1
