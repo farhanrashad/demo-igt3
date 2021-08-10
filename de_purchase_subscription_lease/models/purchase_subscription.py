@@ -30,6 +30,7 @@ class PurchaseSubscriptionPlanSchedule(models.Model):
     name = fields.Char(string='Name', compute='_compute_name', store=True,)
     recurring_interval = fields.Integer('Intervals', required=True)
     
+    
 class PurchaseSubscription(models.Model):
     _inherit = 'purchase.subscription'    
     
@@ -48,7 +49,7 @@ class PurchaseSubscription(models.Model):
     @api.onchange('select_all')
     def _select_all(self):
         for line in self.purchase_subscription_schedule_line:
-            if not line.invoice_id:
+            if line.state =='draft':
                 line.record_selection = self.select_all
     
     def add_record(self):
@@ -100,6 +101,9 @@ class PurchaseSubscription(models.Model):
                         #'analytic_tag_ids': [(6, 0, line.analytic_tag_ids.ids)],
                         #'project_id': line.project_id.id,
                     }])
+                    line.update({
+                        'state': 'invoice',
+                    })
             invoice.create({
                 'move_type': 'in_invoice',
                 'purchase_subscription_id': self.id,
@@ -185,6 +189,7 @@ class PurchaseSubscriptionSchedule(models.Model):
 
     date_from = fields.Date(string='Date From')
     date_to = fields.Date(string='Date To')
+    
     recurring_price = fields.Float(string="Recurring Price", )
     recurring_intervals = fields.Integer(string="Intervals", )
     recurring_sub_total = fields.Float(string="Subtotal", compute='_compute_recurring_total_all')
@@ -197,6 +202,13 @@ class PurchaseSubscriptionSchedule(models.Model):
     
     invoice_id = fields.Many2one('account.move', string="Invoice", check_company=True, compute='_get_invoice')
     invoice_status = fields.Selection(related='invoice_id.state')
+    state = fields.Selection(selection=[
+            ('draft', 'Draft'),
+            ('invoice', 'Invoice Created'),
+            ('posted', 'Posted'),
+            ('cancel', 'Cancelled'),
+        ], string='Status', required=True, readonly=True, copy=False, tracking=True,
+        default='draft')
     company_id = fields.Many2one('res.company', related='purchase_subscription_id.company_id', store=True, index=True)
     
     @api.onchange('escalation')
