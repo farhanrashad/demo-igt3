@@ -56,7 +56,7 @@ class StockPicking(models.Model):
                     #    'product_id':line.product_id.id,
                     #    'qty_done':line.quantity_done,
                     #})
-            tasks = self.env['project.task'].search([('purchase_id', '=', picking.purchase_id.id),('allow_picking', '=', picking.allow_picking),('stage_id.is_closed','=',True),('delivery_assigned','!=',True)])
+            tasks = self.env['project.task'].search([('purchase_id', '=', picking.purchase_id.id),('allow_picking', '=', picking.allow_picking),('stage_id.stage_category','!=','draft'),('delivery_assigned','!=',True)])
             for task in tasks.sorted(key=lambda r: r.sequence):
                 task_id = task
                 break
